@@ -106,6 +106,11 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .skip-btn { background: transparent; border: 2px solid var(--border); color: var(--text-muted); border-radius: 12px; padding: 12px 20px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 12px; width: 100%; transition: all 0.2s; }
 .skip-btn:hover { border-color: var(--text-muted); }
 
+/* ── FLAG BUTTON ── */
+.flag-btn { background: none; border: none; color: var(--text-muted); font-size: 0.8rem; font-weight: 700; cursor: pointer; padding: 6px 10px; border-radius: 8px; display: flex; align-items: center; gap: 4px; transition: all 0.2s; opacity: 0.6; }
+.flag-btn:hover { opacity: 1; color: var(--danger); }
+.flag-btn.flagged { color: var(--danger); opacity: 1; }
+
 /* ── END SCREEN ── */
 .trophy-section { text-align: center; padding: 28px 0 16px; }
 .trophy-icon { font-size: 5rem; margin-bottom: 8px; }
@@ -196,7 +201,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 </head>
 <body>
 
-<div id="loading-overlay"><div class="spinner"></div><div style="color:var(--text-muted);font-weight:700;font-size:0.9rem">Loading QuizChamp...</div></div>
+<div id="loading-overlay"><div class="spinner"></div><div style="color:var(--text-muted);font-weight:700;font-size:0.9rem">Loading QuizChamp…</div></div>
 <script>
 // Show app immediately — don't wait for Firebase CDN
 window.addEventListener('DOMContentLoaded', function(){
@@ -322,6 +327,10 @@ window.addEventListener('DOMContentLoaded', function(){
   <div id="parent-students-list">
     <div style="text-align:center;color:var(--text-muted);padding:32px">Loading student data…</div>
   </div>
+  <div id="flagged-section" style="margin-top:16px;display:none">
+    <div style="font-size:0.8rem;font-weight:800;color:var(--danger);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">🚩 Flagged Questions</div>
+    <div id="flagged-list"></div>
+  </div>
   <div style="margin-top:16px">
     <button class="btn btn-primary" onclick="showLogin()" style="margin-bottom:10px">👦 Hand to Student →</button>
     <button class="btn btn-ghost" onclick="parentSignOut()" style="font-size:0.85rem">🔒 Sign Out (Lock App)</button>
@@ -388,7 +397,10 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="question-card"><div class="question-text" id="question-text">Loading…</div></div>
   <div class="options-grid" id="options-grid"></div>
-  <button class="skip-btn" onclick="skipQuestion()">Skip this question →</button>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+    <button class="skip-btn" style="margin-top:0;flex:1" onclick="skipQuestion()">Skip this question →</button>
+    <button class="flag-btn" id="flag-btn" onclick="flagQuestion()" title="Flag this question as incorrect or unclear">🚩 Flag</button>
+  </div>
 </div>
 
 <!-- ═══ END / REVIEW SCREEN ═══ -->
@@ -713,6 +725,26 @@ window.parentSignOut=function(){
 async function loadParentDashboard(){
   const container=document.getElementById('parent-students-list');
   container.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:24px">Loading…</div>';
+  // Load flagged questions
+  try {
+    const { getDocs, query, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const flagSnap = await getDocs(query(collection(db,'flags'), orderBy('timestamp','desc'), limit(20)));
+    const flags = [];
+    flagSnap.forEach(d => flags.push(d.data()));
+    const flagSection = document.getElementById('flagged-section');
+    const flagList = document.getElementById('flagged-list');
+    if(flags.length > 0){
+      flagSection.style.display = 'block';
+      flagList.innerHTML = flags.map(f=>`
+        <div style="background:#FFF5F5;border:1px solid #FFD0D0;border-radius:12px;padding:12px 14px;margin-bottom:8px;border-left:4px solid var(--danger)">
+          <div style="font-size:0.7rem;font-weight:800;color:var(--danger);margin-bottom:4px">${f.topic} · L${f.level} · ID: ${f.qId}</div>
+          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">${f.question}</div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">Marked answer: <strong>${f.markedAnswer}</strong> · Flagged by: ${STUDENTS[f.flaggedBy]?.name||f.flaggedBy}</div>
+        </div>`).join('');
+    } else {
+      flagSection.style.display = 'none';
+    }
+  } catch(e){ console.warn('Flags load failed',e); }
   const results=[];
   for(const [id,student] of Object.entries(STUDENTS)){
     if(id==='trial') continue;
@@ -873,6 +905,23 @@ window.skipQuestion=function(){
   if(state.session.current>=state.session.count) finishSession(); else renderQuestion();
 };
 
+window.flagQuestion=function(){
+  const btn=document.getElementById('flag-btn');
+  if(btn.classList.contains('flagged')){ toast('Already flagged 🚩'); return; }
+  const q=getCurrentQuestion();
+  btn.classList.add('flagged');
+  btn.textContent='🚩 Flagged';
+  toast('Flagged for review — thank you! 🚩');
+  // Save to Firestore flags collection
+  if(db && addDoc && collection && serverTimestamp){
+    addDoc(collection(db,'flags'),{
+      qId: q.id, question: q.q, topic: q.t, level: q.l,
+      subject: q.s, markedAnswer: q.a, options: q.o,
+      flaggedBy: PLAYER_ID, timestamp: serverTimestamp()
+    }).catch(e=>console.warn('Flag save failed',e));
+  }
+};
+
 window.confirmQuit=function(){ if(confirm('Quit this session?')) finishSession(); };
 
 // ════════════════════════════════════════════════════════
@@ -957,6 +1006,9 @@ function renderQuestion(){
   document.getElementById('question-text').textContent=q.q;
   document.getElementById('options-grid').innerHTML=q.o.map((opt,i)=>
     `<button class="option-btn" onclick="handleAnswer(${i},this)">${opt}</button>`).join('');
+  // Reset flag button for each new question
+  const fb=document.getElementById('flag-btn');
+  fb.classList.remove('flagged'); fb.textContent='🚩 Flag';
 }
 
 function renderHome(){
@@ -971,60 +1023,4 @@ function renderHome(){
   const days=['M','T','W','T','F','S','S'];
   document.getElementById('weekly-dots').innerHTML=week.map((d,i)=>
     `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`).join('');
-  document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).length;
-}
-
-// ════════════════════════════════════════════════════════
-// DASHBOARD
-// ════════════════════════════════════════════════════════
-function renderDashboard(){ setDashFilter(state.dashFilter); renderBadges(); renderRecs(); }
-
-window.switchDashTab=function(tab){
-  state.dashTab=tab;
-  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',['progress','badges','tips'][i]===tab));
-  document.getElementById('dash-progress').style.display=tab==='progress'?'block':'none';
-  document.getElementById('dash-badges').style.display=tab==='badges'?'block':'none';
-  document.getElementById('dash-tips').style.display=tab==='tips'?'block':'none';
-};
-
-window.setDashFilter=function(filter){
-  state.dashFilter=filter;
-  ['maths','english','all'].forEach(f=>{ const btn=document.getElementById('dash-filter-'+f); if(btn)btn.className=f===filter?'btn btn-primary btn-sm':'btn btn-outline btn-sm'; });
-  const topics=(filter==='all'?['maths','english']:[filter]).flatMap(s=>TOPICS[s]);
-  document.getElementById('dash-topics-list').innerHTML=topics.map(t=>{
-    const p=getTopicProgress(t),acc=p.lastAccuracy!==undefined?p.lastAccuracy:0;
-    const meta=TOPIC_META[t]||{icon:'📌',grad:'linear-gradient(135deg,#667eea,#764ba2)'};
-    return `<div class="topic-card" style="background:${meta.grad}">
-      <div class="tc-level">${getLevelLabel(t)}</div>
-      <div class="tc-icon">${meta.icon}</div>
-      <div class="tc-name">${t}</div>
-      <div class="tc-bar-bg"><div class="tc-bar-fill" style="width:${acc}%"></div></div>
-      <div class="tc-pct">${acc}%</div>
-      <div class="tc-sessions">${p.sessions||0} session${(p.sessions||0)!==1?'s':''}</div>
-    </div>`;
-  }).join('');
-};
-
-function renderBadges(){
-  const badges=state.profile.badges||{},icons={bronze:'🥉',silver:'🥈',gold:'🏅'};
-  document.getElementById('badge-grid').innerHTML=[...TOPICS.maths,...TOPICS.english].slice(0,12).map(t=>{
-    const b=badges[t],meta=TOPIC_META[t]||{icon:'📌'};
-    return `<div class="badge-item${b?' earned':''}"><div class="b-icon">${b?icons[b]:meta.icon}</div><div class="b-name">${t.length>12?t.slice(0,11)+'…':t}</div></div>`;
-  }).join('');
-}
-
-
-function computeRecs(){
-  var recs=[];
-  var subj=state.dashFilter;
-  var topics=subj==='all'?[].concat(TOPICS.maths,TOPICS.english):(TOPICS[subj]||[]);
-  topics.forEach(function(t){
-    var p=getTopicProgress(t);
-    var sessions=p.sessions||0;
-    var acc=p.lastAccuracy!==undefined?p.lastAccuracy:0;
-    if(sessions===0){
-      recs.push({type:"Try This",text:"Start practising "+t+" - no sessions yet!"});
-    } else if(acc<60){
-      recs.push({type:"Needs Work",text:t+" accuracy is "+Math.round(acc)+"% - keep going!"});
-    } else if(acc>=80){
-      recs.push({type:"Great Work",text:"You are nailing "+t+"! Keep the streak going."});
+  document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).
