@@ -923,7 +923,8 @@ window.startAutoSession = function() {
 
 function getCurrentQuestion() { return state.session.questions[state.session.current]; }
 
-window.handleAnswer = function(chosen, btn) {
+window.handleAnswer = function(idx, btn) {
+  const chosen = getCurrentQuestion().o[idx];
   if (state.session.answered) return;
   state.session.answered = true;
   const q = getCurrentQuestion();
@@ -1095,8 +1096,8 @@ function renderQuestion() {
   document.getElementById('quiz-progress').style.width = progress + '%';
   document.getElementById('q-number').textContent = `Q${s.current + 1} of ${s.count}`;
   document.getElementById('question-text').textContent = q.q;
-  document.getElementById('options-grid').innerHTML = q.o.map(opt =>
-    `<button class="option-btn" onclick="handleAnswer('${opt.replace(/'/g,"\\'")}', this)">${opt}</button>`
+  document.getElementById('options-grid').innerHTML = q.o.map((opt, i) =>
+    `<button class="option-btn" onclick="handleAnswer(${i}, this)">${opt}</button>`
   ).join('');
 }
 
@@ -1243,6 +1244,4 @@ async function init() {
 }
 
 init();
-</script>
-</body>
-</html>
+</
