@@ -453,6 +453,7 @@ window.addEventListener('DOMContentLoaded', function(){
 <!-- ══ INSTANT SCRIPT: runs immediately, no Firebase needed ══ -->
 <script>
 var _toastTimer;
+window.db = null; // set to Firestore instance once Firebase loads
 var PARENT_PASSWORD = 'CHAMPION99';
 var STUDENTS = {
   pranav:    {name:'Pranav',    password:'SOAR',   avatar:'🦁'},
@@ -511,6 +512,24 @@ window.showLogin = function() {
 };
 window.showParentLogin = function() { window.showScreen('parent-login'); };
 
+// _doLogin lives here in the instant script so it's ALWAYS available immediately.
+// It waits for Firebase db + the main script's _loadAndGo before proceeding.
+window._doLogin = function(id) {
+  _selectedStudentId = id;
+  document.getElementById('loading-overlay').classList.remove('hidden');
+  var tries = 0;
+  var wait = setInterval(function() {
+    if(window.db !== null && typeof window._loadAndGo === 'function') {
+      clearInterval(wait);
+      window._loadAndGo(id);
+    } else if(++tries > 40) { // 20 second max wait
+      clearInterval(wait);
+      document.getElementById('loading-overlay').classList.add('hidden');
+      window.toast('Connection failed — check your internet and try again');
+    }
+  }, 500);
+};
+
 window.submitParentLogin = function() {
   var pw=document.getElementById('parent-password').value.trim().toUpperCase();
   if(pw!==PARENT_PASSWORD){ _shake('parent-password'); window.toast('Wrong parent password'); return; }
@@ -559,17 +578,7 @@ window.submitLogin = function() {
     return;
   }
   _selectedStudentId = matchId;
-  // Delegate Firebase loading to module; retry up to 5s if not ready
-  if(typeof window._doLogin==='function'){
-    window._doLogin(matchId);
-  } else {
-    window.toast('Loading… please try again in a moment');
-    var tries=0;
-    var wait=setInterval(function(){
-      if(typeof window._doLogin==='function'){ clearInterval(wait); window._doLogin(matchId); }
-      else if(++tries>10){ clearInterval(wait); window.toast('Connection slow — try again'); }
-    },500);
-  }
+  window._doLogin(matchId);
 };
 </script>
 
@@ -658,11 +667,10 @@ async function saveSessionResult(r){
 }
 
 // ════════════════════════════════════════════════════════
-// LOGIN — STUDENT (validation in instant script, Firebase here)
+// LOGIN — STUDENT (called by _doLogin in instant script once Firebase is ready)
 // ════════════════════════════════════════════════════════
-window._doLogin=async function(id){
+window._loadAndGo=async function(id){
   PLAYER_ID=id;
-  document.getElementById('loading-overlay').classList.remove('hidden');
   await loadProfile();
   document.getElementById('loading-overlay').classList.add('hidden');
   showHome();
@@ -1022,8 +1030,4 @@ function renderHome(){
 // ════════════════════════════════════════════════════════
 function renderDashboard(){ setDashFilter(state.dashFilter); renderBadges(); renderRecs(); }
 
-window.switchDashTab=function(tab){
-  state.dashTab=tab;
-  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',['progress','badges','tips'][i]===tab));
-  document.getElementById('dash-progress').style.display=tab==='progress'?'block':'none';
-  document.getElementById
+window
