@@ -246,10 +246,10 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
   </div>
   <div class="disclaimer-box">
     <h3>1. About QuizChamp</h3>
-    QuizChamp is an educational quiz application designed to help children aged 9–12 prepare for the 11+ examination and develop core skills in Maths and English. It is operated by an independent tutor/developer and is not affiliated with any official examination board, school, or local authority.
+    QuizChamp is an educational quiz application designed to help children aged 9–12 develop core skills in Maths and English. It is operated by an independent tutor/developer and is not affiliated with any official examination board, school, or local authority.
 
     <h3>2. Educational Use Only</h3>
-    QuizChamp is provided for educational and practice purposes only. Results within the app do not constitute official assessment scores or guarantees of examination performance. Parents and guardians should not rely solely on this application for 11+ preparation.
+    QuizChamp is provided for educational and practice purposes only. Results within the app do not constitute official assessment scores or guarantees of examination performance. Parents and guardians should not rely solely on this application for academic preparation.
 
     <h3>3. Children's Data & Privacy</h3>
     QuizChamp stores minimal data necessary to track learning progress (quiz scores, session history, topic accuracy). No full names, addresses, or sensitive personal information are collected. Data is stored securely using Google Firebase (EU-West region, London). No data is sold or shared with third parties.
@@ -271,12 +271,13 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
     For any queries, errors, or concerns regarding this application, please contact the operator directly.
   </div>
 
-  <div class="agree-check" onclick="document.getElementById('agree-cb').click()">
+  <div class="agree-check">
     <input type="checkbox" id="agree-cb">
     <label for="agree-cb">I have read and agree to the Terms of Use. I confirm I am the parent or guardian of the child using this account.</label>
   </div>
 
-  <button class="btn btn-primary" onclick="agreeDisclaimer()">Continue to Dashboard →</button>
+  <button class="btn btn-primary" onclick="agreeDisclaimer()">Agree &amp; Start →</button>
+  <button class="btn btn-outline" onclick="agreeAndViewDashboard()" style="margin-top:10px">View Student Progress First</button>
   <button onclick="showScreen('parent-login')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600;display:block;text-align:center;margin-top:12px">‹ Back</button>
 </div>
 
@@ -284,7 +285,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 <div id="screen-parent" class="screen">
   <div class="app-header">
     <div class="app-logo">Quiz<span>Champ</span> 👨‍👩‍👧‍👦</div>
-    <button onclick="showScreen('login')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:700">Sign Out</button>
+    <button onclick="parentSignOut()" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:700">Sign Out</button>
   </div>
   <div style="background:linear-gradient(135deg,var(--warning),#FF8C00);border-radius:var(--radius);padding:20px;margin-bottom:16px;color:var(--navy)">
     <div style="font-size:0.8rem;font-weight:800;opacity:0.7;text-transform:uppercase;letter-spacing:0.06em">Parent Overview</div>
@@ -292,6 +293,10 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
   </div>
   <div id="parent-students-list">
     <div style="text-align:center;color:var(--text-muted);padding:32px">Loading student data…</div>
+  </div>
+  <div style="margin-top:16px">
+    <button class="btn btn-primary" onclick="showLogin()" style="margin-bottom:10px">👦 Hand to Student →</button>
+    <button class="btn btn-ghost" onclick="parentSignOut()" style="font-size:0.85rem">🔒 Sign Out (Lock App)</button>
   </div>
 </div>
 
@@ -869,8 +874,20 @@ window.submitParentLogin=function(){
 
 window.agreeDisclaimer=function(){
   if(!document.getElementById('agree-cb').checked){ toast('Please tick the box to agree'); return; }
+  localStorage.setItem('qc_parent_approved','true');
+  showLogin();
+};
+
+window.agreeAndViewDashboard=function(){
+  if(!document.getElementById('agree-cb').checked){ toast('Please tick the box to agree'); return; }
+  localStorage.setItem('qc_parent_approved','true');
   loadParentDashboard();
   showScreen('parent');
+};
+
+window.parentSignOut=function(){
+  localStorage.removeItem('qc_parent_approved');
+  showScreen('parent-login');
 };
 
 // ════════════════════════════════════════════════════════
@@ -1199,16 +1216,4 @@ function renderRecs(){
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); window.scrollTo(0,0); }
 window.showHome=function(){ renderHome(); showScreen('home'); };
 window.showLogin=function(){ document.getElementById('login-name').value=''; document.getElementById('login-password').value=''; showScreen('login'); };
-window.showDashboard=function(){ renderDashboard(); showScreen('dashboard'); };
-
-let toastTimer;
-window.toast=function(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400); };
-
-// ════════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════════
-document.getElementById('loading-overlay').classList.add('hidden');
-showScreen('login');
-</script>
-</body>
-</html>
+window.showDashboard=function(){ renderDashboard(); showScreen('dashboard
