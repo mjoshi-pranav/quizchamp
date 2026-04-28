@@ -4,20 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>QuizChamp 🏆</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2D3EF5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="QuizChamp">
 <style>
 :root {
-  --primary: #4F46E5;
-  --primary-light: #818CF8;
-  --success: #10B981;
-  --warning: #F59E0B;
-  --danger: #EF4444;
-  --bg: #F1F5F9;
+  --primary: #2D3EF5;
+  --primary-light: #6B7BFF;
+  --primary-dark: #1A2AC0;
+  --success: #2ED573;
+  --warning: #FFB800;
+  --danger: #FF4757;
+  --bg: #F8F7FF;
   --card: #FFFFFF;
-  --text: #1E293B;
-  --text-muted: #64748B;
-  --border: #E2E8F0;
-  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --text: #1A1A2E;
+  --text-muted: #6B7280;
+  --border: #E5E4F0;
+  --shadow: 0 4px 24px rgba(45,62,245,0.10);
   --radius: 16px;
+  --navy: #1A1A2E;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
@@ -26,192 +32,270 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 
 /* ── HEADER ── */
 .app-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 16px; }
-.app-logo { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+.app-logo { font-size: 1.4rem; font-weight: 900; color: var(--primary); letter-spacing: -0.5px; }
 .app-logo span { color: var(--warning); }
 .header-stats { display: flex; gap: 8px; align-items: center; }
-.streak-badge { background: linear-gradient(135deg,#F59E0B,#EF4444); color:#fff; border-radius: 20px; padding: 4px 12px; font-size: 0.85rem; font-weight: 700; }
+.streak-badge { background: linear-gradient(135deg,var(--warning),var(--danger)); color:#fff; border-radius: 20px; padding: 4px 12px; font-size: 0.85rem; font-weight: 700; }
 .xp-badge { background: var(--primary); color:#fff; border-radius: 20px; padding: 4px 12px; font-size: 0.85rem; font-weight: 700; }
 
 /* ── CARDS ── */
 .card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; }
-.card-title { font-size: 1rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+.card-title { font-size: 0.8rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
 
 /* ── XP BAR ── */
 .xp-bar-wrap { background: var(--border); border-radius: 8px; height: 10px; overflow: hidden; margin: 8px 0; }
 .xp-bar-fill { background: linear-gradient(90deg, var(--primary), var(--primary-light)); height: 100%; border-radius: 8px; transition: width 0.6s ease; }
 
 /* ── BUTTONS ── */
-.btn { display: block; width: 100%; padding: 16px; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.15s; text-align: center; }
-.btn-primary { background: var(--primary); color: #fff; }
-.btn-primary:active { background: #3730A3; transform: scale(0.98); }
-.btn-success { background: var(--success); color: #fff; }
+.btn { display: block; width: 100%; padding: 16px; border: none; border-radius: var(--radius); font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.15s; text-align: center; letter-spacing: 0.01em; }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 16px rgba(45,62,245,0.35); }
+.btn-primary:active { background: var(--primary-dark); transform: scale(0.98); }
+.btn-success { background: var(--success); color: var(--navy); box-shadow: 0 4px 16px rgba(46,213,115,0.35); }
 .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
-.btn-sm { padding: 10px 20px; width: auto; display: inline-block; font-size: 0.9rem; }
+.btn-gold { background: var(--warning); color: var(--navy); box-shadow: 0 4px 16px rgba(255,184,0,0.35); }
+.btn-sm { padding: 10px 20px; width: auto; display: inline-block; font-size: 0.85rem; }
 .btn-danger { background: var(--danger); color: #fff; }
+.btn-ghost { background: transparent; border: 2px solid var(--border); color: var(--text-muted); font-weight: 600; }
 
-/* ── LOGIN SCREEN ── */
-.login-hero { text-align: center; padding: 32px 0 24px; }
-.login-trophy { font-size: 4rem; margin-bottom: 8px; }
-.login-title { font-size: 2rem; font-weight: 900; color: var(--primary); }
-.login-title span { color: var(--warning); }
-.login-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
-.student-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-.student-btn { background: var(--card); border: 3px solid var(--border); border-radius: var(--radius); padding: 18px 12px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 1rem; font-weight: 700; color: var(--text); }
-.student-btn:active { transform: scale(0.97); }
-.student-btn.selected { border-color: var(--primary); background: #EEF2FF; color: var(--primary); }
-.student-btn .s-avatar { font-size: 2rem; margin-bottom: 6px; }
-.password-section { display: none; }
-.password-section.visible { display: block; }
-.password-input { width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: var(--radius); font-size: 1.2rem; font-weight: 700; text-align: center; letter-spacing: 0.2em; text-transform: uppercase; outline: none; transition: border-color 0.2s; }
-.password-input:focus { border-color: var(--primary); }
-.password-input.error { border-color: var(--danger); animation: shake 0.3s; }
+/* ── HERO GRADIENT ── */
+.hero-gradient { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: var(--radius); padding: 32px 24px; text-align: center; margin-bottom: 24px; color: #fff; position: relative; overflow: hidden; }
+.hero-gradient::before { content:''; position:absolute; top:-30px; right:-30px; width:140px; height:140px; background:rgba(255,255,255,0.08); border-radius:50%; }
+.hero-gradient::after { content:''; position:absolute; bottom:-40px; left:-20px; width:100px; height:100px; background:rgba(255,255,255,0.06); border-radius:50%; }
+.hero-trophy { font-size: 3.5rem; margin-bottom: 8px; position:relative; z-index:1; }
+.hero-title { font-size: 2.2rem; font-weight: 900; position:relative; z-index:1; letter-spacing:-1px; }
+.hero-title em { color: var(--warning); font-style:normal; }
+.hero-sub { font-size: 0.95rem; opacity: 0.85; margin-top: 6px; position:relative; z-index:1; }
+
+/* ── TEXT INPUTS ── */
+.text-input { width: 100%; padding: 16px 18px; border: 2px solid var(--border); border-radius: var(--radius); font-size: 1rem; font-weight: 600; color: var(--text); background: #fff; outline: none; transition: border-color 0.2s; margin-bottom: 12px; }
+.text-input:focus { border-color: var(--primary); }
+.text-input.error { border-color: var(--danger); animation: shake 0.3s; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+.input-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
 
 /* ── SUBJECT TOGGLE ── */
-.subject-toggle { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.subject-toggle { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .subj-btn { background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s; color: var(--text-muted); }
-.subj-btn.active { border-color: var(--primary); background: #EEF2FF; color: var(--primary); }
+.subj-btn.active { border-color: var(--primary); background: linear-gradient(135deg,#EEF0FF,#E8EAFF); color: var(--primary); }
+
+/* ── TOPIC PICK TOGGLE ── */
+.pick-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.pick-btn { border-radius: 12px; padding: 12px; text-align: center; font-weight: 700; font-size: 0.85rem; cursor: pointer; border: 2px solid var(--border); background: var(--card); color: var(--text-muted); transition: all 0.2s; }
+.pick-btn.active { border-color: var(--primary); background: var(--primary); color: #fff; }
+.topic-list-panel { display: none; max-height: 240px; overflow-y: auto; border: 2px solid var(--border); border-radius: 12px; background: #fff; }
+.topic-list-panel.open { display: block; }
+.topic-list-item { padding: 12px 16px; font-weight: 600; font-size: 0.9rem; cursor: pointer; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; transition: background 0.15s; }
+.topic-list-item:last-child { border-bottom: none; }
+.topic-list-item:hover, .topic-list-item.selected { background: #EEF0FF; color: var(--primary); }
+.topic-list-item .tli-icon { font-size: 1.2rem; }
 
 /* ── QUIZ SCREEN ── */
 .quiz-header { margin-bottom: 16px; }
-.quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted); }
-.quiz-meta .topic-tag { background: var(--primary); color: #fff; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
-.quiz-meta .level-tag { background: var(--warning); color: #fff; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+.quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.topic-tag { background: var(--primary); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
+.level-tag { background: var(--warning); color: var(--navy); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
 .progress-bar-wrap { background: var(--border); border-radius: 8px; height: 8px; overflow: hidden; }
-.progress-bar-fill { background: linear-gradient(90deg, var(--success), #34D399); height: 100%; border-radius: 8px; transition: width 0.4s ease; }
-.q-number { font-size: 0.85rem; color: var(--text-muted); text-align: right; margin-top: 4px; }
-.question-card { background: var(--card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 16px; min-height: 120px; }
-.question-text { font-size: 1.15rem; font-weight: 600; line-height: 1.5; }
+.progress-bar-fill { background: linear-gradient(90deg, var(--success), #1DB954); height: 100%; border-radius: 8px; transition: width 0.4s ease; }
+.q-number { font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 4px; font-weight: 600; }
+.question-card { background: var(--card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 16px; min-height: 120px; border-left: 5px solid var(--primary); }
+.question-text { font-size: 1.15rem; font-weight: 700; line-height: 1.5; color: var(--navy); }
 .options-grid { display: flex; flex-direction: column; gap: 10px; }
-.option-btn { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px 20px; font-size: 1rem; font-weight: 500; cursor: pointer; text-align: left; transition: all 0.15s; width: 100%; }
-.option-btn:active { transform: scale(0.98); background: #EEF2FF; border-color: var(--primary); }
-.option-btn:disabled { cursor: default; opacity: 0.6; }
-.option-btn.picked { border-color: var(--primary); background: #EEF2FF; }
-.skip-btn { background: transparent; border: 2px solid var(--border); color: var(--text-muted); border-radius: 12px; padding: 12px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-top: 12px; width: 100%; }
+.option-btn { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px 20px; font-size: 1rem; font-weight: 600; cursor: pointer; text-align: left; transition: all 0.15s; width: 100%; color: var(--text); }
+.option-btn:active, .option-btn.picked { border-color: var(--primary); background: linear-gradient(135deg,#EEF0FF,#E8EAFF); transform: scale(0.99); }
+.option-btn:disabled { cursor: default; }
+.skip-btn { background: transparent; border: 2px solid var(--border); color: var(--text-muted); border-radius: 12px; padding: 12px 20px; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-top: 12px; width: 100%; transition: all 0.2s; }
+.skip-btn:hover { border-color: var(--text-muted); }
 
 /* ── END SCREEN ── */
-.trophy-section { text-align: center; padding: 24px 0; }
+.trophy-section { text-align: center; padding: 28px 0 16px; }
 .trophy-icon { font-size: 5rem; margin-bottom: 8px; }
-.score-big { font-size: 3rem; font-weight: 900; color: var(--primary); }
-.score-label { color: var(--text-muted); font-size: 1rem; }
+.score-big { font-size: 3.5rem; font-weight: 900; color: var(--primary); letter-spacing: -2px; }
+.score-label { color: var(--text-muted); font-size: 1rem; font-weight: 600; }
 .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
 .stat-box { background: var(--card); border-radius: 12px; padding: 14px; text-align: center; box-shadow: var(--shadow); }
-.stat-val { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
-.stat-lbl { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+.stat-val { font-size: 1.5rem; font-weight: 900; color: var(--primary); }
+.stat-lbl { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
 .review-list { display: flex; flex-direction: column; gap: 12px; }
 .review-item { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); border-left: 4px solid var(--danger); }
-.review-item .q-text { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
-.review-item .your-ans { color: var(--danger); font-size: 0.85rem; margin-bottom: 4px; }
-.review-item .correct-ans { color: var(--success); font-size: 0.85rem; font-weight: 700; }
-.review-item .explanation { color: var(--text-muted); font-size: 0.8rem; margin-top: 6px; border-top: 1px solid var(--border); padding-top: 6px; }
+.review-item .q-text { font-weight: 700; margin-bottom: 8px; font-size: 0.95rem; }
+.review-item .your-ans { color: var(--danger); font-size: 0.85rem; margin-bottom: 4px; font-weight: 600; }
+.review-item .correct-ans { color: #1DB954; font-size: 0.85rem; font-weight: 800; }
+.review-item .explanation { color: var(--text-muted); font-size: 0.82rem; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
 
-/* ── DASHBOARD ── */
+/* ── DASHBOARD TABS ── */
 .nav-tabs { display: flex; gap: 4px; background: var(--card); border-radius: 12px; padding: 4px; margin-bottom: 16px; box-shadow: var(--shadow); }
-.nav-tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
+.nav-tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
 .nav-tab.active { background: var(--primary); color: #fff; }
 
-/* ── TOPIC CARDS (colourful) ── */
+/* ── TOPIC CARDS ── */
 .topic-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.topic-card { border-radius: 14px; padding: 16px; color: #fff; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.topic-card { border-radius: 14px; padding: 16px; color: #fff; box-shadow: var(--shadow); position: relative; overflow: hidden; cursor: default; }
 .topic-card .tc-icon { font-size: 2rem; margin-bottom: 6px; }
-.topic-card .tc-name { font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+.topic-card .tc-name { font-size: 0.78rem; font-weight: 800; margin-bottom: 8px; line-height: 1.3; }
 .topic-card .tc-bar-bg { background: rgba(255,255,255,0.3); border-radius: 4px; height: 6px; margin-bottom: 4px; }
 .topic-card .tc-bar-fill { background: #fff; height: 100%; border-radius: 4px; transition: width 0.6s; }
-.topic-card .tc-pct { font-size: 1.2rem; font-weight: 900; }
-.topic-card .tc-sessions { font-size: 0.7rem; opacity: 0.85; }
-.topic-card .tc-level { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.25); border-radius: 20px; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; }
+.topic-card .tc-pct { font-size: 1.3rem; font-weight: 900; }
+.topic-card .tc-sessions { font-size: 0.7rem; opacity: 0.85; font-weight: 600; }
+.topic-card .tc-level { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.25); border-radius: 20px; font-size: 0.65rem; font-weight: 800; padding: 2px 8px; }
 
 /* ── BADGE GRID ── */
 .badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.badge-item { background: var(--card); border-radius: 12px; padding: 14px; text-align: center; box-shadow: var(--shadow); opacity: 0.4; }
+.badge-item { background: var(--card); border-radius: 12px; padding: 14px; text-align: center; box-shadow: var(--shadow); opacity: 0.4; transition: opacity 0.3s; }
 .badge-item.earned { opacity: 1; }
 .badge-item .b-icon { font-size: 2rem; margin-bottom: 4px; }
-.badge-item .b-name { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); }
+.badge-item .b-name { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
 
-/* ── WEEKLY TARGET ── */
+/* ── WEEKLY DOTS ── */
 .weekly-wrap { display: flex; gap: 8px; justify-content: center; margin: 8px 0; }
-.day-dot { width: 36px; height: 36px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
-.day-dot.done { background: var(--success); color: #fff; }
+.day-dot { width: 36px; height: 36px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 800; color: var(--text-muted); }
+.day-dot.done { background: var(--success); color: var(--navy); }
 .day-dot.today { border: 3px solid var(--primary); }
 
+/* ── DISCLAIMER ── */
+.disclaimer-box { background: #fff; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; max-height: 360px; overflow-y: auto; border: 2px solid var(--border); font-size: 0.82rem; line-height: 1.7; color: var(--text-muted); }
+.disclaimer-box h3 { color: var(--text); font-size: 0.95rem; margin: 12px 0 6px; }
+.agree-check { display: flex; align-items: flex-start; gap: 12px; background: #EEF0FF; border-radius: 12px; padding: 14px; margin-bottom: 16px; cursor: pointer; }
+.agree-check input { width: 20px; height: 20px; accent-color: var(--primary); flex-shrink:0; margin-top:2px; cursor:pointer; }
+.agree-check label { font-size: 0.9rem; font-weight: 600; color: var(--text); cursor: pointer; }
+
+/* ── PARENT DASHBOARD ── */
+.parent-student-card { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; display: flex; align-items: center; gap: 16px; border-left: 5px solid var(--primary); }
+.psc-avatar { font-size: 2rem; }
+.psc-info { flex: 1; }
+.psc-name { font-weight: 800; font-size: 1rem; color: var(--text); }
+.psc-stats { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+.psc-xp { font-weight: 900; font-size: 1.1rem; color: var(--primary); text-align: right; }
+.psc-xp small { display:block; font-size:0.7rem; font-weight:600; color:var(--text-muted); }
+
 /* ── LOADING ── */
-#loading-overlay { position: fixed; inset: 0; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; }
+#loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; }
 #loading-overlay .spinner { width: 48px; height: 48px; border: 5px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 #loading-overlay.hidden { display: none; }
 
 /* ── TOAST ── */
-#toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1E293B; color: #fff; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; transition: transform 0.3s; z-index: 1000; white-space: nowrap; }
+#toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--navy); color: #fff; padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 0.9rem; transition: transform 0.3s; z-index: 1000; white-space: nowrap; }
 #toast.show { transform: translateX(-50%) translateY(0); }
 
-/* ── SESSION EXPIRED OVERLAY ── */
-#expired-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 998; }
+/* ── EXPIRED OVERLAY ── */
+#expired-overlay { position: fixed; inset: 0; background: rgba(26,26,46,0.75); display: none; align-items: center; justify-content: center; z-index: 998; }
 #expired-overlay.show { display: flex; }
 .expired-box { background: #fff; border-radius: 20px; padding: 32px; text-align: center; max-width: 320px; margin: 16px; }
-.expired-box h2 { font-size: 1.4rem; margin-bottom: 8px; }
-.expired-box p { color: var(--text-muted); margin-bottom: 20px; }
 
-@media (min-width: 480px) {
-  .question-text { font-size: 1.25rem; }
-  .screen { padding: 20px; }
-}
+@media (min-width: 480px) { .question-text { font-size: 1.25rem; } .screen { padding: 20px; } }
 </style>
 </head>
 <body>
 
-<div id="loading-overlay">
-  <div class="spinner"></div>
-  <div style="color:var(--text-muted);font-weight:600">Loading QuizChamp…</div>
-</div>
+<div id="loading-overlay"><div class="spinner"></div><div style="color:var(--text-muted);font-weight:700;font-size:0.9rem">Loading QuizChamp…</div></div>
 <div id="toast"></div>
 <div id="expired-overlay">
   <div class="expired-box">
     <div style="font-size:3rem">⏰</div>
-    <h2>Session Expired</h2>
-    <p>You were away for more than 30 minutes. Your progress has been saved.</p>
+    <h2 style="margin:8px 0">Session Expired</h2>
+    <p style="color:var(--text-muted);margin-bottom:20px">You were away for more than 30 minutes.</p>
     <button class="btn btn-primary" onclick="dismissExpired()">Back to Home</button>
   </div>
 </div>
 
-<!-- ═══════════════════ LOGIN SCREEN ═══════════════════ -->
+<!-- ═══ STUDENT LOGIN ═══ -->
 <div id="screen-login" class="screen">
-  <div class="login-hero">
-    <div class="login-trophy">🏆</div>
-    <div class="login-title">Quiz<span>Champ</span></div>
-    <div class="login-subtitle">Who's playing today?</div>
+  <div class="hero-gradient" style="margin-top:16px">
+    <div class="hero-trophy">🏆</div>
+    <div class="hero-title">Quiz<em>Champ</em></div>
+    <div class="hero-sub">Sign in to start your session</div>
   </div>
-
-  <div class="student-grid" id="student-grid">
-    <div class="student-btn" onclick="selectStudent('pranav','Pranav','🦁')">
-      <div class="s-avatar">🦁</div>Pranav
-    </div>
-    <div class="student-btn" onclick="selectStudent('lily','Lily','🌸')">
-      <div class="s-avatar">🌸</div>Lily
-    </div>
-    <div class="student-btn" onclick="selectStudent('mithran','Mithran','⚡')">
-      <div class="s-avatar">⚡</div>Mithran
-    </div>
-    <div class="student-btn" onclick="selectStudent('kabir','Kabir','🚀')">
-      <div class="s-avatar">🚀</div>Kabir
-    </div>
-    <div class="student-btn" onclick="selectStudent('trial','Trial','⭐')" style="grid-column:span 2">
-      <div class="s-avatar">⭐</div>Trial Student
-    </div>
+  <div class="card">
+    <label class="input-label">Your Name</label>
+    <input type="text" id="login-name" class="text-input" placeholder="Enter your first name" autocomplete="off" autocorrect="off" spellcheck="false">
+    <label class="input-label">Secret Word</label>
+    <input type="password" id="login-password" class="text-input" placeholder="••••••" maxlength="12"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter')submitLogin()">
+    <button class="btn btn-primary" onclick="submitLogin()" style="margin-top:4px">Let's Go! 🚀</button>
   </div>
-
-  <div class="password-section" id="password-section">
-    <div class="card">
-      <div class="card-title" id="pw-label">Enter your secret word</div>
-      <input type="password" class="password-input" id="password-input"
-        placeholder="••••••" maxlength="10"
-        oninput="this.value=this.value.toUpperCase()"
-        onkeydown="if(event.key==='Enter')submitLogin()">
-    </div>
-    <button class="btn btn-primary" onclick="submitLogin()">Let's Go! 🚀</button>
+  <div style="text-align:center;margin-top:8px">
+    <button onclick="showParentLogin()" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600;text-decoration:underline">Parent / Tutor Login</button>
   </div>
 </div>
 
-<!-- ═══════════════════ HOME SCREEN ═══════════════════ -->
+<!-- ═══ PARENT LOGIN ═══ -->
+<div id="screen-parent-login" class="screen">
+  <div style="padding:32px 0 16px;text-align:center">
+    <div style="font-size:3rem">👨‍👩‍👧‍👦</div>
+    <div style="font-size:1.5rem;font-weight:900;color:var(--primary);margin-top:8px">Parent Login</div>
+    <div style="color:var(--text-muted);font-size:0.9rem;margin-top:4px">QuizChamp dashboard for parents & tutors</div>
+  </div>
+  <div class="card">
+    <label class="input-label">Parent Password</label>
+    <input type="password" id="parent-password" class="text-input" placeholder="••••••••••" maxlength="20"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter')submitParentLogin()">
+    <button class="btn btn-primary" onclick="submitParentLogin()">Access Dashboard</button>
+  </div>
+  <div style="text-align:center;margin-top:8px">
+    <button onclick="showScreen('login')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600">‹ Back to Student Login</button>
+  </div>
+</div>
+
+<!-- ═══ DISCLAIMER ═══ -->
+<div id="screen-disclaimer" class="screen">
+  <div style="padding:20px 0 16px">
+    <div style="font-size:1.3rem;font-weight:900;color:var(--primary)">📋 Terms of Use</div>
+    <div style="color:var(--text-muted);font-size:0.85rem;margin-top:4px">Please read and agree before continuing</div>
+  </div>
+  <div class="disclaimer-box">
+    <h3>1. About QuizChamp</h3>
+    QuizChamp is an educational quiz application designed to help children aged 9–12 prepare for the 11+ examination and develop core skills in Maths and English. It is operated by an independent tutor/developer and is not affiliated with any official examination board, school, or local authority.
+
+    <h3>2. Educational Use Only</h3>
+    QuizChamp is provided for educational and practice purposes only. Results within the app do not constitute official assessment scores or guarantees of examination performance. Parents and guardians should not rely solely on this application for 11+ preparation.
+
+    <h3>3. Children's Data & Privacy</h3>
+    QuizChamp stores minimal data necessary to track learning progress (quiz scores, session history, topic accuracy). No full names, addresses, or sensitive personal information are collected. Data is stored securely using Google Firebase (EU-West region, London). No data is sold or shared with third parties.
+    By creating a login for your child, you confirm you are the parent or legal guardian and you consent to this data being stored on your child's behalf.
+
+    <h3>4. Parental Responsibility</h3>
+    Parents and guardians are responsible for supervising their child's use of this app. QuizChamp is not responsible for the amount of time a child spends on the application. We recommend a maximum of 30 minutes of uninterrupted use per session.
+
+    <h3>5. Accuracy of Content</h3>
+    Every effort has been made to ensure questions and explanations are accurate and appropriate for the target age group. However, QuizChamp makes no warranty as to the completeness or accuracy of educational content. If you spot an error, please report it.
+
+    <h3>6. Limitation of Liability</h3>
+    QuizChamp and its operator accept no liability for any examination results, educational outcomes, or decisions made based on a child's performance within the application. Use is entirely at the parent's/guardian's discretion.
+
+    <h3>7. Changes to These Terms</h3>
+    These terms may be updated from time to time. Continued use of the application after any changes constitutes acceptance of the new terms.
+
+    <h3>8. Contact</h3>
+    For any queries, errors, or concerns regarding this application, please contact the operator directly.
+  </div>
+
+  <div class="agree-check" onclick="document.getElementById('agree-cb').click()">
+    <input type="checkbox" id="agree-cb">
+    <label for="agree-cb">I have read and agree to the Terms of Use. I confirm I am the parent or guardian of the child using this account.</label>
+  </div>
+
+  <button class="btn btn-primary" onclick="agreeDisclaimer()">Continue to Dashboard →</button>
+  <button onclick="showScreen('parent-login')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600;display:block;text-align:center;margin-top:12px">‹ Back</button>
+</div>
+
+<!-- ═══ PARENT DASHBOARD ═══ -->
+<div id="screen-parent" class="screen">
+  <div class="app-header">
+    <div class="app-logo">Quiz<span>Champ</span> 👨‍👩‍👧‍👦</div>
+    <button onclick="showScreen('login')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:700">Sign Out</button>
+  </div>
+  <div style="background:linear-gradient(135deg,var(--warning),#FF8C00);border-radius:var(--radius);padding:20px;margin-bottom:16px;color:var(--navy)">
+    <div style="font-size:0.8rem;font-weight:800;opacity:0.7;text-transform:uppercase;letter-spacing:0.06em">Parent Overview</div>
+    <div style="font-size:1.3rem;font-weight:900;margin-top:4px">All Students Progress</div>
+  </div>
+  <div id="parent-students-list">
+    <div style="text-align:center;color:var(--text-muted);padding:32px">Loading student data…</div>
+  </div>
+</div>
+
+<!-- ═══ HOME SCREEN ═══ -->
 <div id="screen-home" class="screen">
   <div class="app-header">
     <div class="app-logo">Quiz<span>Champ</span> 🏆</div>
@@ -221,125 +305,98 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
     </div>
   </div>
 
-  <div class="card" style="background:linear-gradient(135deg,#4F46E5,#818CF8);color:#fff;border:none">
-    <div style="font-size:0.85rem;opacity:0.85;margin-bottom:2px">Welcome back,</div>
-    <div style="font-size:1.4rem;font-weight:800" id="home-welcome">Champion!</div>
-    <div style="font-size:0.8rem;opacity:0.8;margin-top:4px" id="home-level-label">⭐ 0 XP · Level 1</div>
+  <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden">
+    <div style="font-size:0.8rem;opacity:0.8;font-weight:700">Welcome back,</div>
+    <div style="font-size:1.5rem;font-weight:900;margin-top:2px" id="home-welcome">Champion!</div>
+    <div style="font-size:0.8rem;opacity:0.75;margin-top:6px" id="home-level-label">⭐ 0 XP · Level 1</div>
     <div class="xp-bar-wrap" style="margin-top:10px;background:rgba(255,255,255,0.25)">
       <div class="xp-bar-fill" id="xp-bar" style="width:0%;background:#fff"></div>
     </div>
+    <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:0.1">🏆</div>
   </div>
 
   <div class="card">
     <div class="card-title">This Week</div>
     <div class="weekly-wrap" id="weekly-dots"></div>
-    <div style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-top:6px">
-      <span id="weekly-count">0</span>/5 sessions this week
-    </div>
+    <div style="text-align:center;font-size:0.82rem;color:var(--text-muted);margin-top:6px;font-weight:600"><span id="weekly-count">0</span>/5 sessions this week</div>
   </div>
 
   <div class="card">
-    <div class="card-title">Choose Focus</div>
+    <div class="card-title">Session Setup</div>
+    <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);margin-bottom:8px">SUBJECT FOCUS</div>
     <div class="subject-toggle">
       <div class="subj-btn active" id="subj-maths" onclick="setSubject('maths')">🔢 Maths</div>
       <div class="subj-btn" id="subj-mix" onclick="setSubject('mix')">🔀 Mix</div>
       <div class="subj-btn" id="subj-english" onclick="setSubject('english')">📖 English</div>
     </div>
-    <div style="font-size:0.8rem;color:var(--text-muted);text-align:center">
-      QuizChamp picks your 5 weakest topics automatically
+    <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);margin-bottom:8px;margin-top:4px">TOPIC SELECTION</div>
+    <div class="pick-toggle">
+      <div class="pick-btn active" id="pick-auto" onclick="setPickMode('auto')">🎯 QuizChamp Picks</div>
+      <div class="pick-btn" id="pick-manual" onclick="setPickMode('manual')">📋 I'll Choose</div>
     </div>
+    <div class="topic-list-panel" id="topic-list-panel"></div>
   </div>
 
-  <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">
-    🚀 Start Session
-  </button>
-  <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">
-    📊 My Dashboard
-  </button>
-  <button class="btn btn-outline" onclick="showLogin()" style="font-size:0.85rem;padding:10px;border-color:var(--border);color:var(--text-muted)">
-    Switch Player
-  </button>
+  <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">🚀 Start Session</button>
+  <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">📊 My Dashboard</button>
+  <button class="btn btn-ghost btn-sm" onclick="showLogin()" style="display:block;width:100%;margin-bottom:8px">Switch Player</button>
 </div>
 
-<!-- ═══════════════════ QUIZ SCREEN ═══════════════════ -->
+<!-- ═══ QUIZ SCREEN ═══ -->
 <div id="screen-quiz" class="screen">
   <div class="quiz-header">
     <div class="quiz-meta">
       <span class="topic-tag" id="q-topic-tag">Topic</span>
       <span class="level-tag" id="q-level-tag">L3</span>
-      <button onclick="confirmQuit()" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer">✕ Quit</button>
+      <button onclick="confirmQuit()" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:700">✕ Quit</button>
     </div>
-    <div class="progress-bar-wrap">
-      <div class="progress-bar-fill" id="quiz-progress" style="width:0%"></div>
-    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="quiz-progress" style="width:0%"></div></div>
     <div class="q-number" id="q-number">Q1 of 20</div>
   </div>
-
-  <div class="question-card">
-    <div class="question-text" id="question-text">Loading...</div>
-  </div>
-
+  <div class="question-card"><div class="question-text" id="question-text">Loading…</div></div>
   <div class="options-grid" id="options-grid"></div>
   <button class="skip-btn" onclick="skipQuestion()">Skip this question →</button>
 </div>
 
-<!-- ═══════════════════ END / REVIEW SCREEN ═══════════════════ -->
+<!-- ═══ END / REVIEW SCREEN ═══ -->
 <div id="screen-end" class="screen">
-  <div class="app-header">
-    <div class="app-logo">Quiz<span>Champ</span> 🏆</div>
-  </div>
-
+  <div class="app-header"><div class="app-logo">Quiz<span>Champ</span> 🏆</div></div>
   <div class="trophy-section">
     <div class="trophy-icon" id="end-trophy">🏆</div>
     <div class="score-big" id="end-score">0/0</div>
     <div class="score-label">correct answers</div>
   </div>
-
   <div class="stats-row">
-    <div class="stat-box">
-      <div class="stat-val" id="end-accuracy">0%</div>
-      <div class="stat-lbl">Accuracy</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-val" id="end-xp">+0</div>
-      <div class="stat-lbl">XP Earned</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-val" id="end-time">0m</div>
-      <div class="stat-lbl">Time</div>
-    </div>
+    <div class="stat-box"><div class="stat-val" id="end-accuracy">0%</div><div class="stat-lbl">Accuracy</div></div>
+    <div class="stat-box"><div class="stat-val" id="end-xp">+0</div><div class="stat-lbl">XP Earned</div></div>
+    <div class="stat-box"><div class="stat-val" id="end-time">0m</div><div class="stat-lbl">Time</div></div>
   </div>
-
   <div id="new-badge-section" style="display:none" class="card">
     <div class="card-title">🎖️ Badge Earned!</div>
     <div id="new-badge-content" style="text-align:center;font-size:2rem;padding:8px"></div>
   </div>
-
-  <div class="card" id="review-section">
+  <div class="card">
     <div class="card-title">Review Wrong Answers (<span id="wrong-count">0</span>)</div>
     <div class="review-list" id="review-list"></div>
   </div>
-
   <div style="display:flex;gap:10px;margin-top:8px">
     <button class="btn btn-outline btn-sm" onclick="showDashboard()" style="flex:1">📊 Dashboard</button>
     <button class="btn btn-primary btn-sm" onclick="startAutoSession()" style="flex:1">Play Again 🚀</button>
   </div>
 </div>
 
-<!-- ═══════════════════ DASHBOARD SCREEN ═══════════════════ -->
+<!-- ═══ STUDENT DASHBOARD ═══ -->
 <div id="screen-dashboard" class="screen">
   <div class="app-header">
-    <button onclick="showHome()" style="background:none;border:none;font-size:1.5rem;cursor:pointer">‹</button>
+    <button onclick="showHome()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--primary)">‹</button>
     <div class="app-logo">Dashboard</div>
     <div></div>
   </div>
-
   <div class="nav-tabs">
     <div class="nav-tab active" onclick="switchDashTab('progress')">Progress</div>
     <div class="nav-tab" onclick="switchDashTab('badges')">Badges</div>
     <div class="nav-tab" onclick="switchDashTab('tips')">Tips</div>
   </div>
-
   <div id="dash-progress">
     <div class="card" style="margin-bottom:8px">
       <div class="card-title">Filter</div>
@@ -351,19 +408,11 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
     </div>
     <div class="topic-cards-grid" id="dash-topics-list"></div>
   </div>
-
   <div id="dash-badges" style="display:none">
-    <div class="card">
-      <div class="card-title">Your Badges</div>
-      <div class="badge-grid" id="badge-grid"></div>
-    </div>
+    <div class="card"><div class="card-title">Your Badges</div><div class="badge-grid" id="badge-grid"></div></div>
   </div>
-
   <div id="dash-tips" style="display:none">
-    <div class="card">
-      <div class="card-title">📌 Recommendations</div>
-      <div id="recs-list"></div>
-    </div>
+    <div class="card"><div class="card-title">📌 Recommendations</div><div id="recs-list"></div></div>
   </div>
 </div>
 
@@ -372,61 +421,80 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCx2QVHmIyZabn2--avx0D7c2frfMz-TjI",
-  authDomain: "pranav-11plus-quiz.firebaseapp.com",
-  projectId: "pranav-11plus-quiz",
-  storageBucket: "pranav-11plus-quiz.firebasestorage.app",
-  messagingSenderId: "103805774245",
-  appId: "1:103805774245:web:f72a952f8774e0f81f204c"
+  apiKey:"AIzaSyCx2QVHmIyZabn2--avx0D7c2frfMz-TjI",
+  authDomain:"pranav-11plus-quiz.firebaseapp.com",
+  projectId:"pranav-11plus-quiz",
+  storageBucket:"pranav-11plus-quiz.firebasestorage.app",
+  messagingSenderId:"103805774245",
+  appId:"1:103805774245:web:f72a952f8774e0f81f204c"
 };
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
 
 // ════════════════════════════════════════════════════════
-// STUDENTS
+// STUDENTS — 25 accounts
 // ════════════════════════════════════════════════════════
 const STUDENTS = {
-  pranav:  { name: 'Pranav',       password: 'SOAR',  avatar: '🦁' },
-  lily:    { name: 'Lily',         password: 'BLOOM', avatar: '🌸' },
-  mithran: { name: 'Mithran',      password: 'BRAVE', avatar: '⚡' },
-  kabir:   { name: 'Kabir',        password: 'APEX',  avatar: '🚀' },
-  trial:   { name: 'Trial Student',password: 'SPARK', avatar: '⭐' }
+  pranav:    { name:'Pranav',      password:'SOAR',   avatar:'🦁' },
+  lily:      { name:'Lily',        password:'BLOOM',  avatar:'🌸' },
+  mithran:   { name:'Mithran',     password:'BRAVE',  avatar:'⚡' },
+  kabir:     { name:'Kabir',       password:'APEX',   avatar:'🚀' },
+  trial:     { name:'Trial',       password:'SPARK',  avatar:'⭐' },
+  student06: { name:'Student06',   password:'RISE',   avatar:'🌟' },
+  student07: { name:'Student07',   password:'BOLD',   avatar:'🔥' },
+  student08: { name:'Student08',   password:'SHINE',  avatar:'💫' },
+  student09: { name:'Student09',   password:'LEAP',   avatar:'🎯' },
+  student10: { name:'Student10',   password:'FORGE',  avatar:'⚡' },
+  student11: { name:'Student11',   password:'QUEST',  avatar:'🧩' },
+  student12: { name:'Student12',   password:'GLOW',   avatar:'✨' },
+  student13: { name:'Student13',   password:'SWIFT',  avatar:'🦅' },
+  student14: { name:'Student14',   password:'DARE',   avatar:'💪' },
+  student15: { name:'Student15',   password:'CREST',  avatar:'🏔️' },
+  student16: { name:'Student16',   password:'BLAZE',  avatar:'🔥' },
+  student17: { name:'Student17',   password:'PEAK',   avatar:'🏆' },
+  student18: { name:'Student18',   password:'STORM',  avatar:'⛈️' },
+  student19: { name:'Student19',   password:'FLARE',  avatar:'🌠' },
+  student20: { name:'Student20',   password:'NOVA',   avatar:'🌌' },
+  student21: { name:'Student21',   password:'TITAN',  avatar:'🦾' },
+  student22: { name:'Student22',   password:'PRISM',  avatar:'🌈' },
+  student23: { name:'Student23',   password:'VALOR',  avatar:'🛡️' },
+  student24: { name:'Student24',   password:'SCOUT',  avatar:'🧭' },
+  student25: { name:'Student25',   password:'ZENITH', avatar:'🌙' },
 };
 
+const PARENT_PASSWORD = 'CHAMPION99';
+
 // ════════════════════════════════════════════════════════
-// TOPIC META — icons + gradients
+// TOPIC META
 // ════════════════════════════════════════════════════════
 const TOPIC_META = {
-  'Fractions':                { icon:'🍕', grad:'linear-gradient(135deg,#FF6B6B,#FF8E53)' },
-  'Multiplication & Division':{ icon:'✖️',  grad:'linear-gradient(135deg,#4ECDC4,#44A08D)' },
-  'Place Value & Number':     { icon:'🔢', grad:'linear-gradient(135deg,#45B7D1,#2980B9)' },
-  'Addition & Subtraction':   { icon:'➕', grad:'linear-gradient(135deg,#96CEB4,#2ECC71)' },
-  'Decimals':                 { icon:'🔟', grad:'linear-gradient(135deg,#F7DC6F,#F39C12)' },
-  'Percentages':              { icon:'💯', grad:'linear-gradient(135deg,#DDA0DD,#9B59B6)' },
-  'Geometry – Shapes':        { icon:'🔷', grad:'linear-gradient(135deg,#98D8C8,#1ABC9C)' },
-  'Angles':                   { icon:'📐', grad:'linear-gradient(135deg,#F8C471,#E67E22)' },
-  'Measurement & Units':      { icon:'📏', grad:'linear-gradient(135deg,#82E0AA,#27AE60)' },
-  'Perimeter & Area':         { icon:'📦', grad:'linear-gradient(135deg,#AED6F1,#3498DB)' },
-  'Data & Statistics':        { icon:'📊', grad:'linear-gradient(135deg,#F1948A,#E74C3C)' },
-  'Problem Solving':          { icon:'🧩', grad:'linear-gradient(135deg,#BB8FCE,#8E44AD)' },
-  'Vocabulary':               { icon:'📚', grad:'linear-gradient(135deg,#F0B27A,#E59866)' },
-  'Punctuation':              { icon:'✏️',  grad:'linear-gradient(135deg,#5DADE2,#2E86C1)' },
-  'Grammar':                  { icon:'📝', grad:'linear-gradient(135deg,#48C9B0,#17A589)' },
-  'Spelling':                 { icon:'🔤', grad:'linear-gradient(135deg,#EC7063,#C0392B)' },
-  'Verbal Reasoning':         { icon:'🧠', grad:'linear-gradient(135deg,#A569BD,#7D3C98)' },
-  'Synonyms & Antonyms':      { icon:'🔄', grad:'linear-gradient(135deg,#45D1B5,#1ABC9C)' },
-  'Sentence Structure':       { icon:'📜', grad:'linear-gradient(135deg,#F0A500,#E67E22)' },
-  'Reading Comprehension':    { icon:'📖', grad:'linear-gradient(135deg,#5B9BD5,#2980B9)' },
+  'Fractions':                {icon:'🍕',grad:'linear-gradient(135deg,#FF6B6B,#FF8E53)'},
+  'Multiplication & Division':{icon:'✖️', grad:'linear-gradient(135deg,#4ECDC4,#44A08D)'},
+  'Place Value & Number':     {icon:'🔢',grad:'linear-gradient(135deg,#45B7D1,#2980B9)'},
+  'Addition & Subtraction':   {icon:'➕',grad:'linear-gradient(135deg,#96CEB4,#2ECC71)'},
+  'Decimals':                 {icon:'🔟',grad:'linear-gradient(135deg,#F7DC6F,#F39C12)'},
+  'Percentages':              {icon:'💯',grad:'linear-gradient(135deg,#DDA0DD,#9B59B6)'},
+  'Geometry – Shapes':        {icon:'🔷',grad:'linear-gradient(135deg,#98D8C8,#1ABC9C)'},
+  'Angles':                   {icon:'📐',grad:'linear-gradient(135deg,#F8C471,#E67E22)'},
+  'Measurement & Units':      {icon:'📏',grad:'linear-gradient(135deg,#82E0AA,#27AE60)'},
+  'Perimeter & Area':         {icon:'📦',grad:'linear-gradient(135deg,#AED6F1,#3498DB)'},
+  'Data & Statistics':        {icon:'📊',grad:'linear-gradient(135deg,#F1948A,#E74C3C)'},
+  'Problem Solving':          {icon:'🧩',grad:'linear-gradient(135deg,#BB8FCE,#8E44AD)'},
+  'Vocabulary':               {icon:'📚',grad:'linear-gradient(135deg,#F0B27A,#E59866)'},
+  'Punctuation':              {icon:'✏️', grad:'linear-gradient(135deg,#5DADE2,#2E86C1)'},
+  'Grammar':                  {icon:'📝',grad:'linear-gradient(135deg,#48C9B0,#17A589)'},
+  'Spelling':                 {icon:'🔤',grad:'linear-gradient(135deg,#EC7063,#C0392B)'},
+  'Verbal Reasoning':         {icon:'🧠',grad:'linear-gradient(135deg,#A569BD,#7D3C98)'},
+  'Synonyms & Antonyms':      {icon:'🔄',grad:'linear-gradient(135deg,#45D1B5,#1ABC9C)'},
+  'Sentence Structure':       {icon:'📜',grad:'linear-gradient(135deg,#F0A500,#E67E22)'},
+  'Reading Comprehension':    {icon:'📖',grad:'linear-gradient(135deg,#5B9BD5,#2980B9)'},
 };
 
 const TOPICS = {
-  maths: ['Fractions','Multiplication & Division','Place Value & Number','Addition & Subtraction','Decimals','Percentages','Geometry – Shapes','Angles','Measurement & Units','Perimeter & Area','Data & Statistics','Problem Solving'],
-  english: ['Vocabulary','Punctuation','Grammar','Spelling','Verbal Reasoning','Synonyms & Antonyms','Sentence Structure','Reading Comprehension']
+  maths:['Fractions','Multiplication & Division','Place Value & Number','Addition & Subtraction','Decimals','Percentages','Geometry – Shapes','Angles','Measurement & Units','Perimeter & Area','Data & Statistics','Problem Solving'],
+  english:['Vocabulary','Punctuation','Grammar','Spelling','Verbal Reasoning','Synonyms & Antonyms','Sentence Structure','Reading Comprehension']
 };
 
-// ════════════════════════════════════════════════════════
-// QUESTION BANK
-// ════════════════════════════════════════════════════════
 const QUESTIONS = [
 // ── L3: Fractions ────────────────────────────────────────
 {id:'mf3_01',s:'maths',t:'Fractions',l:3,q:'What is ½ of 20?',o:['5','8','10','15'],a:'10',e:'Half means divide by 2. 20 ÷ 2 = 10'},
@@ -722,526 +790,425 @@ const QUESTIONS = [
 // ════════════════════════════════════════════════════════
 let PLAYER_ID = null;
 let state = {
-  subject: 'maths',
-  session: null,
-  profile: {
-    xp:0, streak:0, lastSessionDate:null,
-    weekSessions:[], topicProgress:{}, badges:{}, personalBest:{}
-  },
-  dashFilter: 'maths',
-  dashTab: 'progress'
+  subject:'maths', pickMode:'auto', manualTopic:null,
+  session:null,
+  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{}},
+  dashFilter:'maths', dashTab:'progress'
 };
-
-const XP_PER_CORRECT = 15;
-const XP_PER_QUESTION = 5;
-const XP_PER_LEVEL = 200;
+const XP_PER_CORRECT=15, XP_PER_QUESTION=5, XP_PER_LEVEL=200;
 
 // ════════════════════════════════════════════════════════
-// PAGE VISIBILITY — TIMER PAUSE
+// PAGE VISIBILITY
 // ════════════════════════════════════════════════════════
-let hiddenAt = null;
-const MAX_AWAY_MS = 30 * 60 * 1000;
-
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    hiddenAt = Date.now();
-  } else {
-    if (hiddenAt && state.session) {
-      const away = Date.now() - hiddenAt;
-      if (away > MAX_AWAY_MS) {
-        hiddenAt = null;
-        document.getElementById('expired-overlay').classList.add('show');
-      } else {
-        state.session.startTime += away; // compensate timer
-      }
+let hiddenAt=null;
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){ hiddenAt=Date.now(); }
+  else {
+    if(hiddenAt&&state.session){
+      const away=Date.now()-hiddenAt;
+      if(away>30*60*1000){ hiddenAt=null; document.getElementById('expired-overlay').classList.add('show'); }
+      else state.session.startTime+=away;
     }
-    hiddenAt = null;
+    hiddenAt=null;
   }
 });
-
-window.dismissExpired = function() {
-  document.getElementById('expired-overlay').classList.remove('show');
-  state.session = null;
-  showHome();
-};
+window.dismissExpired=function(){ document.getElementById('expired-overlay').classList.remove('show'); state.session=null; showHome(); };
 
 // ════════════════════════════════════════════════════════
 // FIRESTORE
 // ════════════════════════════════════════════════════════
-async function loadProfile() {
-  try {
-    const ref = doc(db, 'players', PLAYER_ID);
-    const snap = await getDoc(ref);
-    if (snap.exists()) {
-      state.profile = { ...state.profile, ...snap.data() };
-    } else {
-      await setDoc(ref, state.profile);
-    }
-  } catch(e) { console.warn('Load failed', e); }
+async function loadProfile(){
+  try{
+    const ref=doc(db,'players',PLAYER_ID); const snap=await getDoc(ref);
+    if(snap.exists()) state.profile={...state.profile,...snap.data()};
+    else await setDoc(ref,state.profile);
+  }catch(e){console.warn('Load failed',e);}
 }
-
-async function saveProfile() {
-  try {
-    await setDoc(doc(db, 'players', PLAYER_ID), state.profile, { merge: true });
-  } catch(e) { console.warn('Save failed', e); }
+async function saveProfile(){
+  try{ await setDoc(doc(db,'players',PLAYER_ID),state.profile,{merge:true}); }catch(e){console.warn(e);}
 }
-
-async function saveSessionResult(result) {
-  try {
-    await addDoc(collection(db, 'sessions'), { playerId: PLAYER_ID, ...result, timestamp: serverTimestamp() });
-  } catch(e) { console.warn('Session save failed', e); }
+async function saveSessionResult(r){
+  try{ await addDoc(collection(db,'sessions'),{playerId:PLAYER_ID,...r,timestamp:serverTimestamp()}); }catch(e){}
 }
 
 // ════════════════════════════════════════════════════════
-// LOGIN
+// LOGIN — STUDENT
 // ════════════════════════════════════════════════════════
-let selectedStudentId = null;
-
-window.selectStudent = function(id, name, avatar) {
-  selectedStudentId = id;
-  document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
-  document.getElementById('pw-label').textContent = `${avatar} ${name} — enter your secret word`;
-  const ps = document.getElementById('password-section');
-  ps.classList.add('visible');
-  document.getElementById('password-input').value = '';
-  document.getElementById('password-input').classList.remove('error');
-  setTimeout(() => document.getElementById('password-input').focus(), 100);
-};
-
-window.submitLogin = async function() {
-  if (!selectedStudentId) return;
-  const entered = document.getElementById('password-input').value.trim().toUpperCase();
-  const expected = STUDENTS[selectedStudentId].password;
-  if (entered !== expected) {
-    const inp = document.getElementById('password-input');
-    inp.classList.add('error');
-    setTimeout(() => inp.classList.remove('error'), 500);
-    toast('Wrong secret word — try again!');
-    return;
-  }
-  PLAYER_ID = selectedStudentId;
+window.submitLogin=async function(){
+  const nameRaw=document.getElementById('login-name').value.trim();
+  const pw=document.getElementById('login-password').value.trim().toUpperCase();
+  if(!nameRaw){toast('Please enter your name'); return;}
+  // Find student by name (case-insensitive)
+  const entry=Object.entries(STUDENTS).find(([id,s])=>s.name.toLowerCase()===nameRaw.toLowerCase());
+  if(!entry){ shakeInput('login-name'); toast('Name not found — check spelling'); return; }
+  const [id,student]=entry;
+  if(pw!==student.password){ shakeInput('login-password'); toast('Wrong secret word — try again!'); return; }
+  PLAYER_ID=id;
   document.getElementById('loading-overlay').classList.remove('hidden');
   await loadProfile();
   document.getElementById('loading-overlay').classList.add('hidden');
   showHome();
 };
 
-// ════════════════════════════════════════════════════════
-// TOPIC PROGRESS HELPERS
-// ════════════════════════════════════════════════════════
-function getTopicProgress(topic) {
-  return state.profile.topicProgress[topic] || { correct3:0, correct4:0, attempts:0, totalTime:0, sessions:0 };
+function shakeInput(id){
+  const el=document.getElementById(id);
+  el.classList.add('error');
+  setTimeout(()=>el.classList.remove('error'),500);
 }
 
-function getTopicPhase(topic) {
-  const p = getTopicProgress(topic);
-  if (p.correct3 >= 30 && p.correct4 >= 30) return 5;
-  if (p.correct3 >= 30 && p.correct4 >= 20) return 4;
-  if (p.correct3 >= 30) return 3;
-  if (p.correct3 >= 21) return 2;
+// ════════════════════════════════════════════════════════
+// LOGIN — PARENT
+// ════════════════════════════════════════════════════════
+window.showParentLogin=function(){ showScreen('parent-login'); };
+
+window.submitParentLogin=function(){
+  const pw=document.getElementById('parent-password').value.trim().toUpperCase();
+  if(pw!==PARENT_PASSWORD){ shakeInput('parent-password'); toast('Wrong parent password'); return; }
+  showScreen('disclaimer');
+};
+
+window.agreeDisclaimer=function(){
+  if(!document.getElementById('agree-cb').checked){ toast('Please tick the box to agree'); return; }
+  loadParentDashboard();
+  showScreen('parent');
+};
+
+// ════════════════════════════════════════════════════════
+// PARENT DASHBOARD
+// ════════════════════════════════════════════════════════
+async function loadParentDashboard(){
+  const container=document.getElementById('parent-students-list');
+  container.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:24px">Loading…</div>';
+  const results=[];
+  for(const [id,student] of Object.entries(STUDENTS)){
+    if(id==='trial') continue;
+    try{
+      const snap=await getDoc(doc(db,'players',id));
+      if(snap.exists()){
+        const data=snap.data();
+        results.push({id,student,data});
+      }
+    }catch(e){}
+  }
+  results.sort((a,b)=>(b.data.xp||0)-(a.data.xp||0));
+  if(results.length===0){ container.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:24px">No student data yet.</div>'; return; }
+  container.innerHTML=results.map(({id,student,data},i)=>{
+    const xp=data.xp||0;
+    const streak=data.streak||0;
+    const sessions=Object.values(data.topicProgress||{}).reduce((s,p)=>s+(p.sessions||0),0);
+    const lastDate=data.lastSessionDate ? new Date(data.lastSessionDate).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : 'Never';
+    const topTopic=Object.entries(data.topicProgress||{}).sort((a,b)=>(b[1].lastAccuracy||0)-(a[1].lastAccuracy||0))[0];
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
+    return `<div class="parent-student-card">
+      <div class="psc-avatar">${student.avatar}</div>
+      <div class="psc-info">
+        <div class="psc-name">${medal} ${student.name}</div>
+        <div class="psc-stats">🔥 ${streak} day streak &nbsp;·&nbsp; ${sessions} sessions &nbsp;·&nbsp; Last: ${lastDate}</div>
+        ${topTopic?`<div style="font-size:0.75rem;color:var(--primary);margin-top:3px;font-weight:700">Best: ${topTopic[0]} (${topTopic[1].lastAccuracy||0}%)</div>`:''}
+      </div>
+      <div class="psc-xp">⭐ ${xp}<small>XP</small></div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// TOPIC HELPERS
+// ════════════════════════════════════════════════════════
+function getTopicProgress(t){ return state.profile.topicProgress[t]||{correct3:0,correct4:0,attempts:0,totalTime:0,sessions:0}; }
+function getTopicPhase(t){
+  const p=getTopicProgress(t);
+  if(p.correct3>=30&&p.correct4>=30) return 5;
+  if(p.correct3>=30&&p.correct4>=20) return 4;
+  if(p.correct3>=30) return 3;
+  if(p.correct3>=21) return 2;
   return 1;
 }
-
-function getLevelLabel(topic) {
-  const ph = getTopicPhase(topic);
-  if (ph >= 5) return 'L4+'; if (ph >= 4) return 'L3–5'; if (ph >= 3) return 'L3–4';
-  if (ph >= 2) return 'L3*'; return 'L3';
-}
+function getLevelLabel(t){ const ph=getTopicPhase(t); return ph>=5?'L4+':ph>=4?'L3–5':ph>=3?'L3–4':ph>=2?'L3*':'L3'; }
 
 // ════════════════════════════════════════════════════════
 // AUTO-TOPIC SELECTION
 // ════════════════════════════════════════════════════════
-function pickWeakestTopics(preferredSubject, count = 5) {
-  const pool = preferredSubject === 'mix'
-    ? [...TOPICS.maths, ...TOPICS.english]
-    : TOPICS[preferredSubject];
-
-  const scored = pool.map(t => {
-    const p = getTopicProgress(t);
-    if (!p.sessions) return { t, score: 200 };
-    const daysSince = p.lastSession
-      ? Math.min(30, (Date.now() - new Date(p.lastSession)) / 86400000)
-      : 30;
-    return { t, score: daysSince * 2 + (100 - (p.lastAccuracy || 0)) };
+function pickWeakestTopics(subj, count=5){
+  const pool=subj==='mix'?[...TOPICS.maths,...TOPICS.english]:TOPICS[subj];
+  const scored=pool.map(t=>{
+    const p=getTopicProgress(t);
+    if(!p.sessions) return {t,score:200};
+    const days=p.lastSession?Math.min(30,(Date.now()-new Date(p.lastSession))/86400000):30;
+    return {t,score:days*2+(100-(p.lastAccuracy||0))};
   });
-  scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, count).map(x => x.t);
+  scored.sort((a,b)=>b.score-a.score);
+  return scored.slice(0,count).map(x=>x.t);
 }
 
-// ════════════════════════════════════════════════════════
-// ADAPTIVE QUESTION POOL
-// ════════════════════════════════════════════════════════
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
   return arr;
 }
 
-function buildTopicPool(topic, count) {
-  const phase = getTopicPhase(topic);
-  const subj = TOPICS.maths.includes(topic) ? 'maths' : 'english';
-  const mixes = {1:[[3,1.0]],2:[[3,0.8],[4,0.2]],3:[[3,0.6],[4,0.4]],4:[[3,0.2],[4,0.6]],5:[[4,0.7],[5,0.3]]};
-  const mix = mixes[phase] || mixes[1];
-  const byLevel = {};
-  QUESTIONS.filter(q => q.t === topic && q.s === subj && !q.x).forEach(q => {
-    if (!byLevel[q.l]) byLevel[q.l] = [];
-    byLevel[q.l].push(q);
-  });
-  let pool = [];
-  for (const [lvl, ratio] of mix) {
-    const avail = byLevel[lvl] || [];
-    const needed = Math.round(count * ratio);
-    pool.push(...shuffle([...avail]).slice(0, needed));
+function buildTopicPool(topic,count){
+  const phase=getTopicPhase(topic);
+  const subj=TOPICS.maths.includes(topic)?'maths':'english';
+  const mixes={1:[[3,1.0]],2:[[3,0.8],[4,0.2]],3:[[3,0.6],[4,0.4]],4:[[3,0.2],[4,0.6]],5:[[4,0.7],[5,0.3]]};
+  const mix=mixes[phase]||mixes[1];
+  const byLevel={};
+  QUESTIONS.filter(q=>q.t===topic&&q.s===subj&&!q.x).forEach(q=>{ if(!byLevel[q.l])byLevel[q.l]=[]; byLevel[q.l].push(q); });
+  let pool=[];
+  for(const [lvl,ratio] of mix){
+    const avail=byLevel[lvl]||[]; const needed=Math.round(count*ratio);
+    pool.push(...shuffle([...avail]).slice(0,needed));
   }
-  if (pool.length < count) {
-    const extras = shuffle([...(byLevel[3]||[])]).filter(q => !pool.find(p => p.id === q.id));
-    pool.push(...extras.slice(0, count - pool.length));
+  if(pool.length<count){
+    const extras=shuffle([...(byLevel[3]||[])]).filter(q=>!pool.find(p=>p.id===q.id));
+    pool.push(...extras.slice(0,count-pool.length));
   }
-  return shuffle(pool).slice(0, count);
+  return shuffle(pool).slice(0,count);
 }
 
 // ════════════════════════════════════════════════════════
-// QUIZ SESSION
+// SUBJECT & PICK MODE
 // ════════════════════════════════════════════════════════
-window.startAutoSession = function() {
-  const topics = pickWeakestTopics(state.subject, 5);
-  const questions = [];
-  topics.forEach(t => questions.push(...buildTopicPool(t, 4)));
-  if (questions.length === 0) { toast('No questions available!'); return; }
-  state.session = {
-    topics, questions: shuffle(questions),
-    count: questions.length, current: 0,
-    correct: 0, wrong: [], skipped: [],
-    startTime: Date.now(), answered: false
-  };
-  renderQuestion();
-  showScreen('quiz');
+window.setSubject=function(s){
+  state.subject=s; state.manualTopic=null;
+  ['maths','mix','english'].forEach(id=>document.getElementById('subj-'+id).classList.toggle('active',id===s));
+  if(state.pickMode==='manual') renderTopicList();
 };
 
-function getCurrentQuestion() { return state.session.questions[state.session.current]; }
-
-window.handleAnswer = function(idx, btn) {
-  const chosen = getCurrentQuestion().o[idx];
-  if (state.session.answered) return;
-  state.session.answered = true;
-  const q = getCurrentQuestion();
-  btn.classList.add('picked');
-  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
-  if (chosen !== q.a) state.session.wrong.push({ q, chosen });
-  else state.session.correct++;
-  setTimeout(() => {
-    state.session.current++;
-    state.session.answered = false;
-    if (state.session.current >= state.session.count) finishSession();
-    else renderQuestion();
-  }, 350);
+window.setPickMode=function(mode){
+  state.pickMode=mode; state.manualTopic=null;
+  document.getElementById('pick-auto').classList.toggle('active',mode==='auto');
+  document.getElementById('pick-manual').classList.toggle('active',mode==='manual');
+  const panel=document.getElementById('topic-list-panel');
+  if(mode==='manual'){ panel.classList.add('open'); renderTopicList(); }
+  else panel.classList.remove('open');
 };
 
-window.skipQuestion = function() {
-  if (state.session.answered) return;
-  state.session.wrong.push({ q: getCurrentQuestion(), chosen: '(skipped)' });
-  state.session.current++;
-  if (state.session.current >= state.session.count) finishSession();
-  else renderQuestion();
-};
+function renderTopicList(){
+  const subj=state.subject;
+  const pool=subj==='mix'?[...TOPICS.maths,...TOPICS.english]:(TOPICS[subj]||TOPICS.maths);
+  document.getElementById('topic-list-panel').innerHTML=pool.map(t=>{
+    const meta=TOPIC_META[t]||{icon:'📌'};
+    const sel=t===state.manualTopic?' selected':'';
+    return `<div class="topic-list-item${sel}" onclick="selectManualTopic('${t.replace(/'/g,"\\'")}')">
+      <span class="tli-icon">${meta.icon}</span>${t}
+    </div>`;
+  }).join('');
+}
 
-window.confirmQuit = function() {
-  if (confirm('Quit this session? Progress will be saved.')) { finishSession(); }
+window.selectManualTopic=function(t){
+  state.manualTopic=t;
+  document.querySelectorAll('.topic-list-item').forEach(el=>{
+    el.classList.toggle('selected', el.textContent.trim()===t);
+  });
 };
 
 // ════════════════════════════════════════════════════════
-// GAMIFICATION HELPERS
+// START SESSION
 // ════════════════════════════════════════════════════════
-function getWeekDates() {
-  const dates = [], now = new Date();
-  const day = now.getDay();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(monday); d.setDate(monday.getDate() + i);
-    dates.push(d.toDateString());
+window.startAutoSession=function(){
+  let questions=[];
+  if(state.pickMode==='manual'&&state.manualTopic){
+    questions=buildTopicPool(state.manualTopic,20);
+    if(questions.length===0){ toast('Not enough questions for this topic yet!'); return; }
+  } else {
+    const topics=pickWeakestTopics(state.subject,5);
+    topics.forEach(t=>questions.push(...buildTopicPool(t,4)));
+    if(questions.length===0){ toast('No questions available!'); return; }
+    questions=shuffle(questions);
   }
+  state.session={questions,count:questions.length,current:0,correct:0,wrong:[],skipped:[],startTime:Date.now(),answered:false};
+  renderQuestion(); showScreen('quiz');
+};
+
+function getCurrentQuestion(){ return state.session.questions[state.session.current]; }
+
+window.handleAnswer=function(idx,btn){
+  if(state.session.answered) return;
+  state.session.answered=true;
+  const q=getCurrentQuestion(); const chosen=q.o[idx];
+  btn.classList.add('picked');
+  document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
+  if(chosen!==q.a) state.session.wrong.push({q,chosen});
+  else state.session.correct++;
+  setTimeout(()=>{ state.session.current++; state.session.answered=false; if(state.session.current>=state.session.count) finishSession(); else renderQuestion(); },350);
+};
+
+window.skipQuestion=function(){
+  if(state.session.answered) return;
+  state.session.wrong.push({q:getCurrentQuestion(),chosen:'(skipped)'});
+  state.session.current++;
+  if(state.session.current>=state.session.count) finishSession(); else renderQuestion();
+};
+
+window.confirmQuit=function(){ if(confirm('Quit this session?')) finishSession(); };
+
+// ════════════════════════════════════════════════════════
+// GAMIFICATION
+// ════════════════════════════════════════════════════════
+function getWeekDates(){
+  const dates=[],now=new Date(),day=now.getDay();
+  const mon=new Date(now); mon.setDate(now.getDate()-(day===0?6:day-1));
+  for(let i=0;i<7;i++){ const d=new Date(mon); d.setDate(mon.getDate()+i); dates.push(d.toDateString()); }
   return dates;
 }
-
-function getXPLevel() {
-  const xp = state.profile.xp || 0;
-  return { level: Math.floor(xp / XP_PER_LEVEL) + 1, xpInLevel: xp % XP_PER_LEVEL, xpForLevel: XP_PER_LEVEL };
-}
-
-function checkBadges(topic, accuracy) {
-  const b = state.profile.badges || {};
-  const sessions = state.profile.topicProgress[topic]?.sessions || 0;
-  const cur = b[topic];
-  if (accuracy >= 90 && sessions >= 3 && cur !== 'gold') b[topic] = 'gold';
-  else if (accuracy >= 75 && sessions >= 2 && !cur) b[topic] = 'silver';
-  else if (accuracy >= 60 && !cur) b[topic] = 'bronze';
-  state.profile.badges = b;
+function getXPLevel(){ const xp=state.profile.xp||0; return {level:Math.floor(xp/XP_PER_LEVEL)+1,xpInLevel:xp%XP_PER_LEVEL,xpForLevel:XP_PER_LEVEL}; }
+function checkBadges(topic,accuracy){
+  const b=state.profile.badges||{}; const sessions=state.profile.topicProgress[topic]?.sessions||0; const cur=b[topic];
+  if(accuracy>=90&&sessions>=3&&cur!=='gold') b[topic]='gold';
+  else if(accuracy>=75&&sessions>=2&&!cur) b[topic]='silver';
+  else if(accuracy>=60&&!cur) b[topic]='bronze';
+  state.profile.badges=b;
 }
 
 // ════════════════════════════════════════════════════════
-// END SESSION
+// FINISH SESSION
 // ════════════════════════════════════════════════════════
-async function finishSession() {
+async function finishSession(){
   showScreen('end');
-  const s = state.session;
-  const duration = Math.round((Date.now() - s.startTime) / 1000);
-  const accuracy = Math.round((s.correct / s.count) * 100);
-  const xpEarned = s.correct * XP_PER_CORRECT + s.count * XP_PER_QUESTION;
-
-  // Update topic progress for each topic in session
-  const topicSet = [...new Set(s.questions.map(q => q.t))];
-  topicSet.forEach(topic => {
-    const tp = getTopicProgress(topic);
-    const topicQs = s.questions.filter(q => q.t === topic);
-    const topicWrong = s.wrong.filter(w => w.q.t === topic).map(w => w.q.id);
-    topicQs.forEach(q => {
-      if (!topicWrong.includes(q.id)) {
-        if (q.l === 3) tp.correct3 = (tp.correct3||0) + 1;
-        if (q.l === 4) tp.correct4 = (tp.correct4||0) + 1;
-      }
-    });
-    tp.attempts = (tp.attempts||0) + topicQs.length;
-    const topicCorrect = topicQs.length - topicQs.filter(q => topicWrong.includes(q.id)).length;
-    tp.lastAccuracy = Math.round((topicCorrect / topicQs.length) * 100);
-    tp.sessions = (tp.sessions||0) + 1;
-    tp.totalTime = (tp.totalTime||0) + Math.round(duration / topicSet.length);
-    tp.lastSession = new Date().toISOString();
-    state.profile.topicProgress[topic] = tp;
-    checkBadges(topic, tp.lastAccuracy);
+  const s=state.session;
+  const duration=Math.round((Date.now()-s.startTime)/1000);
+  const accuracy=s.count>0?Math.round((s.correct/s.count)*100):0;
+  const xpEarned=s.correct*XP_PER_CORRECT+s.count*XP_PER_QUESTION;
+  const topicSet=[...new Set(s.questions.map(q=>q.t))];
+  topicSet.forEach(topic=>{
+    const tp=getTopicProgress(topic);
+    const topicQs=s.questions.filter(q=>q.t===topic);
+    const wrongIds=s.wrong.filter(w=>w.q.t===topic).map(w=>w.q.id);
+    topicQs.forEach(q=>{ if(!wrongIds.includes(q.id)){ if(q.l===3)tp.correct3=(tp.correct3||0)+1; if(q.l===4)tp.correct4=(tp.correct4||0)+1; } });
+    const corr=topicQs.length-topicQs.filter(q=>wrongIds.includes(q.id)).length;
+    tp.attempts=(tp.attempts||0)+topicQs.length;
+    tp.lastAccuracy=Math.round((corr/topicQs.length)*100);
+    tp.sessions=(tp.sessions||0)+1;
+    tp.totalTime=(tp.totalTime||0)+Math.round(duration/topicSet.length);
+    tp.lastSession=new Date().toISOString();
+    state.profile.topicProgress[topic]=tp;
+    checkBadges(topic,tp.lastAccuracy);
   });
-
-  state.profile.xp = (state.profile.xp || 0) + xpEarned;
-
-  // Streak
-  const today = new Date().toDateString();
-  const last = state.profile.lastSessionDate;
-  if (last !== today) {
-    const yest = new Date(Date.now() - 86400000).toDateString();
-    state.profile.streak = (last === yest) ? (state.profile.streak||0)+1 : 1;
-    state.profile.lastSessionDate = today;
-  }
-
-  // Weekly
-  const week = getWeekDates();
-  if (!state.profile.weekSessions) state.profile.weekSessions = [];
-  if (!state.profile.weekSessions.includes(today)) state.profile.weekSessions.push(today);
-  state.profile.weekSessions = state.profile.weekSessions.filter(d => week.includes(d));
-
-  // Personal best per topic
-  const pb = state.profile.personalBest || {};
-  topicSet.forEach(t => {
-    const tp = getTopicProgress(t);
-    if (!pb[t] || tp.lastAccuracy > pb[t]) pb[t] = tp.lastAccuracy;
-  });
-  state.profile.personalBest = pb;
-
+  state.profile.xp=(state.profile.xp||0)+xpEarned;
+  const today=new Date().toDateString(),last=state.profile.lastSessionDate;
+  if(last!==today){ const yest=new Date(Date.now()-86400000).toDateString(); state.profile.streak=(last===yest)?(state.profile.streak||0)+1:1; state.profile.lastSessionDate=today; }
+  const week=getWeekDates(); if(!state.profile.weekSessions)state.profile.weekSessions=[];
+  if(!state.profile.weekSessions.includes(today))state.profile.weekSessions.push(today);
+  state.profile.weekSessions=state.profile.weekSessions.filter(d=>week.includes(d));
+  const pb=state.profile.personalBest||{};
+  topicSet.forEach(t=>{ const tp=getTopicProgress(t); if(!pb[t]||tp.lastAccuracy>pb[t])pb[t]=tp.lastAccuracy; });
+  state.profile.personalBest=pb;
   await saveProfile();
-  await saveSessionResult({ topics: topicSet, correct: s.correct, total: s.count, accuracy, duration, xpEarned });
-
+  await saveSessionResult({topics:topicSet,correct:s.correct,total:s.count,accuracy,duration,xpEarned});
   // Render end screen
-  document.getElementById('end-score').textContent = `${s.correct}/${s.count}`;
-  document.getElementById('end-accuracy').textContent = accuracy + '%';
-  document.getElementById('end-xp').textContent = '+' + xpEarned;
-  document.getElementById('end-time').textContent = Math.ceil(duration/60) + 'm';
-
-  let trophy = '📋';
-  if (accuracy >= 90) trophy = '🏆';
-  else if (accuracy >= 75) trophy = '🥇';
-  else if (accuracy >= 60) trophy = '🥈';
-  else if (accuracy >= 40) trophy = '🥉';
-  document.getElementById('end-trophy').textContent = trophy;
-
-  // Badge
-  const newBadges = topicSet.filter(t => state.profile.badges[t]);
-  if (newBadges.length > 0) {
-    const icons = {bronze:'🥉',silver:'🥈',gold:'🏅'};
-    const b = state.profile.badges[newBadges[0]];
-    document.getElementById('new-badge-section').style.display = 'block';
-    document.getElementById('new-badge-content').textContent = `${icons[b]} ${b.toUpperCase()} badge for ${newBadges[0]}!`;
-  } else {
-    document.getElementById('new-badge-section').style.display = 'none';
-  }
-
-  // Wrong answer review
-  document.getElementById('wrong-count').textContent = s.wrong.length;
-  const reviewList = document.getElementById('review-list');
-  if (s.wrong.length === 0) {
-    reviewList.innerHTML = '<div style="text-align:center;color:var(--success);font-weight:700;padding:16px">🎉 Perfect score! No wrong answers!</div>';
-  } else {
-    reviewList.innerHTML = s.wrong.map(w =>
-      `<div class="review-item">
-        <div class="q-text">${w.q.q}</div>
-        <div class="your-ans">✗ Your answer: ${w.chosen}</div>
-        <div class="correct-ans">✓ Correct: ${w.q.a}</div>
-        ${w.q.e ? `<div class="explanation">💡 ${w.q.e}</div>` : ''}
-      </div>`
-    ).join('');
-  }
+  document.getElementById('end-score').textContent=`${s.correct}/${s.count}`;
+  document.getElementById('end-accuracy').textContent=accuracy+'%';
+  document.getElementById('end-xp').textContent='+'+xpEarned;
+  document.getElementById('end-time').textContent=Math.ceil(duration/60)+'m';
+  const trophies=['📋','🥉','🥈','🥇','🏆'];
+  document.getElementById('end-trophy').textContent=accuracy>=90?'🏆':accuracy>=75?'🥇':accuracy>=60?'🥈':accuracy>=40?'🥉':'📋';
+  const newBadge=topicSet.find(t=>state.profile.badges[t]);
+  if(newBadge){ const icons={bronze:'🥉',silver:'🥈',gold:'🏅'}; const b=state.profile.badges[newBadge]; document.getElementById('new-badge-section').style.display='block'; document.getElementById('new-badge-content').textContent=`${icons[b]} ${b.toUpperCase()} badge for ${newBadge}!`; }
+  else document.getElementById('new-badge-section').style.display='none';
+  document.getElementById('wrong-count').textContent=s.wrong.length;
+  document.getElementById('review-list').innerHTML=s.wrong.length===0
+    ?'<div style="text-align:center;color:#1DB954;font-weight:800;padding:16px">🎉 Perfect score! No wrong answers!</div>'
+    :s.wrong.map(w=>`<div class="review-item"><div class="q-text">${w.q.q}</div><div class="your-ans">✗ Your answer: ${w.chosen}</div><div class="correct-ans">✓ Correct: ${w.q.a}</div>${w.q.e?`<div class="explanation">💡 ${w.q.e}</div>`:''}</div>`).join('');
   renderHome();
 }
 
 // ════════════════════════════════════════════════════════
-// RENDER FUNCTIONS
+// RENDER
 // ════════════════════════════════════════════════════════
-function renderQuestion() {
-  const s = state.session;
-  const q = getCurrentQuestion();
-  const progress = (s.current / s.count) * 100;
-  document.getElementById('q-topic-tag').textContent = q.t;
-  document.getElementById('q-level-tag').textContent = 'L' + q.l;
-  document.getElementById('quiz-progress').style.width = progress + '%';
-  document.getElementById('q-number').textContent = `Q${s.current + 1} of ${s.count}`;
-  document.getElementById('question-text').textContent = q.q;
-  document.getElementById('options-grid').innerHTML = q.o.map((opt, i) =>
-    `<button class="option-btn" onclick="handleAnswer(${i}, this)">${opt}</button>`
-  ).join('');
+function renderQuestion(){
+  const s=state.session,q=getCurrentQuestion();
+  document.getElementById('q-topic-tag').textContent=q.t;
+  document.getElementById('q-level-tag').textContent='L'+q.l;
+  document.getElementById('quiz-progress').style.width=(s.current/s.count*100)+'%';
+  document.getElementById('q-number').textContent=`Q${s.current+1} of ${s.count}`;
+  document.getElementById('question-text').textContent=q.q;
+  document.getElementById('options-grid').innerHTML=q.o.map((opt,i)=>
+    `<button class="option-btn" onclick="handleAnswer(${i},this)">${opt}</button>`).join('');
 }
 
-function renderHome() {
-  const st = STUDENTS[PLAYER_ID] || {};
-  const { level, xpInLevel, xpForLevel } = getXPLevel();
-  document.getElementById('home-welcome').textContent = `${st.avatar || ''} ${st.name || 'Champion'}!`;
-  document.getElementById('home-streak').textContent = state.profile.streak || 0;
-  document.getElementById('home-xp').textContent = state.profile.xp || 0;
-  document.getElementById('home-level-label').textContent = `⭐ ${state.profile.xp||0} XP · Level ${level}`;
-  document.getElementById('xp-bar').style.width = Math.round((xpInLevel / xpForLevel) * 100) + '%';
-
-  const week = getWeekDates();
-  const done = state.profile.weekSessions || [];
-  const days = ['M','T','W','T','F','S','S'];
-  const today = new Date().toDateString();
-  document.getElementById('weekly-dots').innerHTML = week.map((d, i) =>
-    `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`
-  ).join('');
-  document.getElementById('weekly-count').textContent = week.filter(d => done.includes(d)).length;
+function renderHome(){
+  const st=STUDENTS[PLAYER_ID]||{};
+  const {level,xpInLevel,xpForLevel}=getXPLevel();
+  document.getElementById('home-welcome').textContent=`${st.avatar||''} ${st.name||'Champion'}!`;
+  document.getElementById('home-streak').textContent=state.profile.streak||0;
+  document.getElementById('home-xp').textContent=state.profile.xp||0;
+  document.getElementById('home-level-label').textContent=`⭐ ${state.profile.xp||0} XP · Level ${level}`;
+  document.getElementById('xp-bar').style.width=Math.round((xpInLevel/xpForLevel)*100)+'%';
+  const week=getWeekDates(),done=state.profile.weekSessions||[],today=new Date().toDateString();
+  const days=['M','T','W','T','F','S','S'];
+  document.getElementById('weekly-dots').innerHTML=week.map((d,i)=>
+    `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`).join('');
+  document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).length;
 }
 
 // ════════════════════════════════════════════════════════
 // DASHBOARD
 // ════════════════════════════════════════════════════════
-function renderDashboard() {
-  setDashFilter(state.dashFilter);
-  renderBadges();
-  renderRecs();
-}
+function renderDashboard(){ setDashFilter(state.dashFilter); renderBadges(); renderRecs(); }
 
-window.switchDashTab = function(tab) {
-  state.dashTab = tab;
-  document.querySelectorAll('.nav-tab').forEach((el,i) =>
-    el.classList.toggle('active', ['progress','badges','tips'][i] === tab));
-  document.getElementById('dash-progress').style.display = tab==='progress'?'block':'none';
-  document.getElementById('dash-badges').style.display = tab==='badges'?'block':'none';
-  document.getElementById('dash-tips').style.display = tab==='tips'?'block':'none';
+window.switchDashTab=function(tab){
+  state.dashTab=tab;
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',['progress','badges','tips'][i]===tab));
+  document.getElementById('dash-progress').style.display=tab==='progress'?'block':'none';
+  document.getElementById('dash-badges').style.display=tab==='badges'?'block':'none';
+  document.getElementById('dash-tips').style.display=tab==='tips'?'block':'none';
 };
 
-window.setDashFilter = function(filter) {
-  state.dashFilter = filter;
-  ['maths','english','all'].forEach(f => {
-    const btn = document.getElementById('dash-filter-'+f);
-    if (btn) btn.className = f===filter ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
-  });
-  const subjects = filter==='all' ? ['maths','english'] : [filter];
-  const topics = subjects.flatMap(s => TOPICS[s]);
-  document.getElementById('dash-topics-list').innerHTML = topics.map(t => {
-    const p = getTopicProgress(t);
-    const acc = p.lastAccuracy !== undefined ? p.lastAccuracy : 0;
-    const meta = TOPIC_META[t] || { icon:'📌', grad:'linear-gradient(135deg,#667eea,#764ba2)' };
-    const lvl = getLevelLabel(t);
-    const sessions = p.sessions || 0;
+window.setDashFilter=function(filter){
+  state.dashFilter=filter;
+  ['maths','english','all'].forEach(f=>{ const btn=document.getElementById('dash-filter-'+f); if(btn)btn.className=f===filter?'btn btn-primary btn-sm':'btn btn-outline btn-sm'; });
+  const topics=(filter==='all'?['maths','english']:[filter]).flatMap(s=>TOPICS[s]);
+  document.getElementById('dash-topics-list').innerHTML=topics.map(t=>{
+    const p=getTopicProgress(t),acc=p.lastAccuracy!==undefined?p.lastAccuracy:0;
+    const meta=TOPIC_META[t]||{icon:'📌',grad:'linear-gradient(135deg,#667eea,#764ba2)'};
     return `<div class="topic-card" style="background:${meta.grad}">
-      <div class="tc-level">${lvl}</div>
+      <div class="tc-level">${getLevelLabel(t)}</div>
       <div class="tc-icon">${meta.icon}</div>
       <div class="tc-name">${t}</div>
       <div class="tc-bar-bg"><div class="tc-bar-fill" style="width:${acc}%"></div></div>
       <div class="tc-pct">${acc}%</div>
-      <div class="tc-sessions">${sessions} session${sessions!==1?'s':''}</div>
+      <div class="tc-sessions">${p.sessions||0} session${(p.sessions||0)!==1?'s':''}</div>
     </div>`;
   }).join('');
 };
 
-function renderBadges() {
-  const badges = state.profile.badges || {};
-  const all = [...TOPICS.maths, ...TOPICS.english];
-  const icons = {bronze:'🥉',silver:'🥈',gold:'🏅'};
-  document.getElementById('badge-grid').innerHTML = all.slice(0,12).map(t => {
-    const b = badges[t];
-    const meta = TOPIC_META[t] || {icon:'📌'};
-    return `<div class="badge-item${b?' earned':''}">
-      <div class="b-icon">${b ? icons[b] : meta.icon}</div>
-      <div class="b-name">${t.length>12?t.slice(0,11)+'…':t}</div>
-    </div>`;
+function renderBadges(){
+  const badges=state.profile.badges||{},icons={bronze:'🥉',silver:'🥈',gold:'🏅'};
+  document.getElementById('badge-grid').innerHTML=[...TOPICS.maths,...TOPICS.english].slice(0,12).map(t=>{
+    const b=badges[t],meta=TOPIC_META[t]||{icon:'📌'};
+    return `<div class="badge-item${b?' earned':''}"><div class="b-icon">${b?icons[b]:meta.icon}</div><div class="b-name">${t.length>12?t.slice(0,11)+'…':t}</div></div>`;
   }).join('');
 }
 
-function renderRecs() {
-  const all = [...TOPICS.maths, ...TOPICS.english];
-  const recs = [];
-  const now = Date.now();
-  all.forEach(t => {
-    const p = getTopicProgress(t);
-    if (!p.sessions) { recs.push({type:'🆕 Try it!', text:`You haven't tried ${t} yet — give it a go!`}); return; }
-    if (p.lastSession) {
-      const days = Math.round((now - new Date(p.lastSession)) / 86400000);
-      if (days >= 7) recs.push({type:'⏰ Neglected', text:`You haven't practised ${t} in ${days} days. Time to revisit!`});
-    }
-    if (p.lastAccuracy < 60 && p.sessions >= 2) recs.push({type:'📈 Needs work', text:`${t}: ${p.lastAccuracy}% accuracy. Keep practising!`});
-    if (p.sessions >= 3 && p.lastAccuracy >= 85) recs.push({type:'⭐ Level up', text:`Great work on ${t}! You may be ready for harder questions.`});
+function renderRecs(){
+  const all=[...TOPICS.maths,...TOPICS.english],recs=[],now=Date.now();
+  all.forEach(t=>{
+    const p=getTopicProgress(t);
+    if(!p.sessions){recs.push({type:'🆕 Try it!',text:`You haven't tried ${t} yet!`});return;}
+    if(p.lastSession&&Math.round((now-new Date(p.lastSession))/86400000)>=7) recs.push({type:'⏰ Neglected',text:`${t} not practised in ${Math.round((now-new Date(p.lastSession))/86400000)} days.`});
+    if(p.lastAccuracy<60&&p.sessions>=2) recs.push({type:'📈 Needs work',text:`${t}: ${p.lastAccuracy}% accuracy. Keep going!`});
+    if(p.sessions>=3&&p.lastAccuracy>=85) recs.push({type:'⭐ Level up',text:`Great work on ${t}! Ready for harder questions.`});
   });
-  const recsList = document.getElementById('recs-list');
-  recsList.innerHTML = recs.slice(0,5).length
-    ? recs.slice(0,5).map(r => `<div style="background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border-radius:14px;padding:14px 16px;margin-bottom:8px;border-left:4px solid var(--primary)">
-        <div style="font-size:0.7rem;font-weight:700;color:var(--primary);margin-bottom:4px">${r.type}</div>
-        <div style="font-size:0.9rem">${r.text}</div>
-      </div>`).join('')
-    : '<div style="color:var(--text-muted);text-align:center;padding:16px">Complete some sessions to get tips!</div>';
+  document.getElementById('recs-list').innerHTML=recs.slice(0,5).length
+    ?recs.slice(0,5).map(r=>`<div style="background:linear-gradient(135deg,#EEF0FF,#E8EAFF);border-radius:14px;padding:14px 16px;margin-bottom:8px;border-left:4px solid var(--primary)"><div style="font-size:0.7rem;font-weight:800;color:var(--primary);margin-bottom:4px">${r.type}</div><div style="font-size:0.9rem;font-weight:600">${r.text}</div></div>`).join('')
+    :'<div style="color:var(--text-muted);text-align:center;padding:16px;font-weight:600">Complete some sessions to get personalised tips!</div>';
 }
 
 // ════════════════════════════════════════════════════════
-// SUBJECT TOGGLE
+// NAVIGATION & TOAST
 // ════════════════════════════════════════════════════════
-window.setSubject = function(s) {
-  state.subject = s;
-  ['maths','mix','english'].forEach(id => {
-    document.getElementById('subj-'+id).classList.toggle('active', id===s);
-  });
-};
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); window.scrollTo(0,0); }
+window.showHome=function(){ renderHome(); showScreen('home'); };
+window.showLogin=function(){ document.getElementById('login-name').value=''; document.getElementById('login-password').value=''; showScreen('login'); };
+window.showDashboard=function(){ renderDashboard(); showScreen('dashboard'); };
 
-// ════════════════════════════════════════════════════════
-// NAVIGATION
-// ════════════════════════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-'+id).classList.add('active');
-  window.scrollTo(0,0);
-}
-
-window.showHome = function() { renderHome(); showScreen('home'); };
-window.showLogin = function() { selectedStudentId=null; document.getElementById('password-section').classList.remove('visible'); document.querySelectorAll('.student-btn').forEach(b=>b.classList.remove('selected')); showScreen('login'); };
-window.showDashboard = function() { renderDashboard(); showScreen('dashboard'); };
-
-// ════════════════════════════════════════════════════════
-// TOAST
-// ════════════════════════════════════════════════════════
 let toastTimer;
-window.toast = function(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
-};
+window.toast=function(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400); };
 
 // ════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════
-async function init() {
-  document.getElementById('loading-overlay').classList.add('hidden');
-  showScreen('login');
-}
-
-init();
-</
+document.getElementById('loading-overlay').classList.add('hidden');
+showScreen('login');
+</script>
+</body>
+</html>
