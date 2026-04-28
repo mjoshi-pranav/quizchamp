@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Pranav's 11+ Quiz 🎯</title>
+<title>QuizChamp 🏆</title>
 <style>
 :root {
   --primary: #4F46E5;
@@ -49,24 +49,28 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .btn-sm { padding: 10px 20px; width: auto; display: inline-block; font-size: 0.9rem; }
 .btn-danger { background: var(--danger); color: #fff; }
 
-/* ── SUBJECT SELECTOR ── */
-.subject-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-.subject-card { background: var(--card); border: 3px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
-.subject-card.selected { border-color: var(--primary); background: #EEF2FF; }
-.subject-card .icon { font-size: 2.5rem; margin-bottom: 8px; }
-.subject-card .label { font-weight: 700; font-size: 1rem; }
+/* ── LOGIN SCREEN ── */
+.login-hero { text-align: center; padding: 32px 0 24px; }
+.login-trophy { font-size: 4rem; margin-bottom: 8px; }
+.login-title { font-size: 2rem; font-weight: 900; color: var(--primary); }
+.login-title span { color: var(--warning); }
+.login-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-top: 4px; }
+.student-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.student-btn { background: var(--card); border: 3px solid var(--border); border-radius: var(--radius); padding: 18px 12px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 1rem; font-weight: 700; color: var(--text); }
+.student-btn:active { transform: scale(0.97); }
+.student-btn.selected { border-color: var(--primary); background: #EEF2FF; color: var(--primary); }
+.student-btn .s-avatar { font-size: 2rem; margin-bottom: 6px; }
+.password-section { display: none; }
+.password-section.visible { display: block; }
+.password-input { width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: var(--radius); font-size: 1.2rem; font-weight: 700; text-align: center; letter-spacing: 0.2em; text-transform: uppercase; outline: none; transition: border-color 0.2s; }
+.password-input:focus { border-color: var(--primary); }
+.password-input.error { border-color: var(--danger); animation: shake 0.3s; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
 
-/* ── TOPIC SELECTOR ── */
-.topic-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
-.topic-item { display: flex; align-items: center; justify-content: space-between; background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 12px 16px; cursor: pointer; transition: all 0.2s; }
-.topic-item.selected { border-color: var(--primary); background: #EEF2FF; }
-.topic-item .topic-name { font-weight: 600; }
-.topic-item .topic-level { font-size: 0.75rem; color: var(--text-muted); background: var(--bg); padding: 2px 8px; border-radius: 20px; }
-
-/* ── Q COUNT SELECTOR ── */
-.qcount-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.qcount-btn { background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 12px; text-align: center; cursor: pointer; font-weight: 700; font-size: 1rem; transition: all 0.2s; }
-.qcount-btn.selected { border-color: var(--primary); background: #EEF2FF; color: var(--primary); }
+/* ── SUBJECT TOGGLE ── */
+.subject-toggle { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.subj-btn { background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s; color: var(--text-muted); }
+.subj-btn.active { border-color: var(--primary); background: #EEF2FF; color: var(--primary); }
 
 /* ── QUIZ SCREEN ── */
 .quiz-header { margin-bottom: 16px; }
@@ -76,20 +80,14 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .progress-bar-wrap { background: var(--border); border-radius: 8px; height: 8px; overflow: hidden; }
 .progress-bar-fill { background: linear-gradient(90deg, var(--success), #34D399); height: 100%; border-radius: 8px; transition: width 0.4s ease; }
 .q-number { font-size: 0.85rem; color: var(--text-muted); text-align: right; margin-top: 4px; }
-
 .question-card { background: var(--card); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 16px; min-height: 120px; }
 .question-text { font-size: 1.15rem; font-weight: 600; line-height: 1.5; }
-
 .options-grid { display: flex; flex-direction: column; gap: 10px; }
-.option-btn { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px 20px; font-size: 1rem; font-weight: 500; cursor: pointer; text-align: left; transition: all 0.2s; width: 100%; }
-.option-btn:active { transform: scale(0.98); }
-.option-btn.selected { border-color: var(--primary); background: #EEF2FF; color: var(--primary); }
-.option-btn.correct { border-color: var(--success); background: #D1FAE5; color: #065F46; }
-.option-btn.wrong { border-color: var(--danger); background: #FEE2E2; color: #991B1B; }
-.option-btn:disabled { cursor: default; }
-
-.quiz-footer { display: flex; gap: 10px; align-items: center; }
-.skip-btn { background: transparent; border: 2px solid var(--border); color: var(--text-muted); border-radius: 12px; padding: 12px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+.option-btn { background: var(--card); border: 2px solid var(--border); border-radius: 14px; padding: 16px 20px; font-size: 1rem; font-weight: 500; cursor: pointer; text-align: left; transition: all 0.15s; width: 100%; }
+.option-btn:active { transform: scale(0.98); background: #EEF2FF; border-color: var(--primary); }
+.option-btn:disabled { cursor: default; opacity: 0.6; }
+.option-btn.picked { border-color: var(--primary); background: #EEF2FF; }
+.skip-btn { background: transparent; border: 2px solid var(--border); color: var(--text-muted); border-radius: 12px; padding: 12px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-top: 12px; width: 100%; }
 
 /* ── END SCREEN ── */
 .trophy-section { text-align: center; padding: 24px 0; }
@@ -100,7 +98,6 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .stat-box { background: var(--card); border-radius: 12px; padding: 14px; text-align: center; box-shadow: var(--shadow); }
 .stat-val { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
 .stat-lbl { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
-
 .review-list { display: flex; flex-direction: column; gap: 12px; }
 .review-item { background: var(--card); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); border-left: 4px solid var(--danger); }
 .review-item .q-text { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
@@ -113,22 +110,23 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .nav-tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
 .nav-tab.active { background: var(--primary); color: #fff; }
 
-.topic-row { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: 12px; padding: 14px; box-shadow: var(--shadow); margin-bottom: 8px; }
-.topic-row .t-name { font-weight: 600; font-size: 0.9rem; flex: 1; }
-.topic-row .t-bar-wrap { flex: 2; background: var(--border); border-radius: 6px; height: 8px; overflow: hidden; }
-.topic-row .t-bar-fill { height: 100%; border-radius: 6px; transition: width 0.6s; }
-.topic-row .t-pct { font-weight: 700; font-size: 0.85rem; width: 40px; text-align: right; }
-.topic-row .t-lvl { background: var(--primary); color: #fff; border-radius: 20px; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; }
+/* ── TOPIC CARDS (colourful) ── */
+.topic-cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.topic-card { border-radius: 14px; padding: 16px; color: #fff; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+.topic-card .tc-icon { font-size: 2rem; margin-bottom: 6px; }
+.topic-card .tc-name { font-size: 0.8rem; font-weight: 700; margin-bottom: 8px; line-height: 1.3; }
+.topic-card .tc-bar-bg { background: rgba(255,255,255,0.3); border-radius: 4px; height: 6px; margin-bottom: 4px; }
+.topic-card .tc-bar-fill { background: #fff; height: 100%; border-radius: 4px; transition: width 0.6s; }
+.topic-card .tc-pct { font-size: 1.2rem; font-weight: 900; }
+.topic-card .tc-sessions { font-size: 0.7rem; opacity: 0.85; }
+.topic-card .tc-level { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.25); border-radius: 20px; font-size: 0.65rem; font-weight: 800; padding: 2px 7px; }
 
+/* ── BADGE GRID ── */
 .badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 .badge-item { background: var(--card); border-radius: 12px; padding: 14px; text-align: center; box-shadow: var(--shadow); opacity: 0.4; }
 .badge-item.earned { opacity: 1; }
 .badge-item .b-icon { font-size: 2rem; margin-bottom: 4px; }
 .badge-item .b-name { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); }
-
-.rec-card { background: linear-gradient(135deg, #EEF2FF, #E0E7FF); border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; border-left: 4px solid var(--primary); }
-.rec-card .rec-text { font-size: 0.9rem; font-weight: 500; }
-.rec-card .rec-type { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
 
 /* ── WEEKLY TARGET ── */
 .weekly-wrap { display: flex; gap: 8px; justify-content: center; margin: 8px 0; }
@@ -146,7 +144,13 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1E293B; color: #fff; padding: 12px 24px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; transition: transform 0.3s; z-index: 1000; white-space: nowrap; }
 #toast.show { transform: translateX(-50%) translateY(0); }
 
-/* ── RESPONSIVE ── */
+/* ── SESSION EXPIRED OVERLAY ── */
+#expired-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 998; }
+#expired-overlay.show { display: flex; }
+.expired-box { background: #fff; border-radius: 20px; padding: 32px; text-align: center; max-width: 320px; margin: 16px; }
+.expired-box h2 { font-size: 1.4rem; margin-bottom: 8px; }
+.expired-box p { color: var(--text-muted); margin-bottom: 20px; }
+
 @media (min-width: 480px) {
   .question-text { font-size: 1.25rem; }
   .screen { padding: 20px; }
@@ -157,17 +161,72 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 
 <div id="loading-overlay">
   <div class="spinner"></div>
-  <div style="color:var(--text-muted);font-weight:600">Loading Pranav's Quiz…</div>
+  <div style="color:var(--text-muted);font-weight:600">Loading QuizChamp…</div>
 </div>
 <div id="toast"></div>
+<div id="expired-overlay">
+  <div class="expired-box">
+    <div style="font-size:3rem">⏰</div>
+    <h2>Session Expired</h2>
+    <p>You were away for more than 30 minutes. Your progress has been saved.</p>
+    <button class="btn btn-primary" onclick="dismissExpired()">Back to Home</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ LOGIN SCREEN ═══════════════════ -->
+<div id="screen-login" class="screen">
+  <div class="login-hero">
+    <div class="login-trophy">🏆</div>
+    <div class="login-title">Quiz<span>Champ</span></div>
+    <div class="login-subtitle">Who's playing today?</div>
+  </div>
+
+  <div class="student-grid" id="student-grid">
+    <div class="student-btn" onclick="selectStudent('pranav','Pranav','🦁')">
+      <div class="s-avatar">🦁</div>Pranav
+    </div>
+    <div class="student-btn" onclick="selectStudent('lily','Lily','🌸')">
+      <div class="s-avatar">🌸</div>Lily
+    </div>
+    <div class="student-btn" onclick="selectStudent('mithran','Mithran','⚡')">
+      <div class="s-avatar">⚡</div>Mithran
+    </div>
+    <div class="student-btn" onclick="selectStudent('kabir','Kabir','🚀')">
+      <div class="s-avatar">🚀</div>Kabir
+    </div>
+    <div class="student-btn" onclick="selectStudent('trial','Trial','⭐')" style="grid-column:span 2">
+      <div class="s-avatar">⭐</div>Trial Student
+    </div>
+  </div>
+
+  <div class="password-section" id="password-section">
+    <div class="card">
+      <div class="card-title" id="pw-label">Enter your secret word</div>
+      <input type="password" class="password-input" id="password-input"
+        placeholder="••••••" maxlength="10"
+        oninput="this.value=this.value.toUpperCase()"
+        onkeydown="if(event.key==='Enter')submitLogin()">
+    </div>
+    <button class="btn btn-primary" onclick="submitLogin()">Let's Go! 🚀</button>
+  </div>
+</div>
 
 <!-- ═══════════════════ HOME SCREEN ═══════════════════ -->
 <div id="screen-home" class="screen">
   <div class="app-header">
-    <div class="app-logo">Pranav's <span>11+</span> Quiz</div>
+    <div class="app-logo">Quiz<span>Champ</span> 🏆</div>
     <div class="header-stats">
       <div class="streak-badge">🔥 <span id="home-streak">0</span></div>
       <div class="xp-badge">⭐ <span id="home-xp">0</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,#4F46E5,#818CF8);color:#fff;border:none">
+    <div style="font-size:0.85rem;opacity:0.85;margin-bottom:2px">Welcome back,</div>
+    <div style="font-size:1.4rem;font-weight:800" id="home-welcome">Champion!</div>
+    <div style="font-size:0.8rem;opacity:0.8;margin-top:4px" id="home-level-label">⭐ 0 XP · Level 1</div>
+    <div class="xp-bar-wrap" style="margin-top:10px;background:rgba(255,255,255,0.25)">
+      <div class="xp-bar-fill" id="xp-bar" style="width:0%;background:#fff"></div>
     </div>
   </div>
 
@@ -175,66 +234,30 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
     <div class="card-title">This Week</div>
     <div class="weekly-wrap" id="weekly-dots"></div>
     <div style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-top:6px">
-      <span id="weekly-count">0</span>/5 sessions done
+      <span id="weekly-count">0</span>/5 sessions this week
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Level Progress</div>
-    <div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:4px">
-      <span>XP to next level</span>
-      <span id="xp-label">0 / 100</span>
+    <div class="card-title">Choose Focus</div>
+    <div class="subject-toggle">
+      <div class="subj-btn active" id="subj-maths" onclick="setSubject('maths')">🔢 Maths</div>
+      <div class="subj-btn" id="subj-mix" onclick="setSubject('mix')">🔀 Mix</div>
+      <div class="subj-btn" id="subj-english" onclick="setSubject('english')">📖 English</div>
     </div>
-    <div class="xp-bar-wrap"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
+    <div style="font-size:0.8rem;color:var(--text-muted);text-align:center">
+      QuizChamp picks your 5 weakest topics automatically
+    </div>
   </div>
 
-  <button class="btn btn-primary" onclick="showSetup()" style="margin-bottom:12px">
-    🚀 Start Quiz
+  <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">
+    🚀 Start Session
   </button>
-  <button class="btn btn-outline" onclick="showDashboard()">
-    📊 View Dashboard
+  <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">
+    📊 My Dashboard
   </button>
-</div>
-
-<!-- ═══════════════════ SETUP SCREEN ═══════════════════ -->
-<div id="screen-setup" class="screen">
-  <div class="app-header">
-    <button onclick="showHome()" style="background:none;border:none;font-size:1.5rem;cursor:pointer">‹</button>
-    <div class="app-logo">Setup Quiz</div>
-    <div></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Choose Subject</div>
-    <div class="subject-grid">
-      <div class="subject-card" id="subj-maths" onclick="selectSubject('maths')">
-        <div class="icon">🔢</div>
-        <div class="label">Maths</div>
-      </div>
-      <div class="subject-card" id="subj-english" onclick="selectSubject('english')">
-        <div class="icon">📖</div>
-        <div class="label">English</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Choose Topic</div>
-    <div class="topic-list" id="topic-list"></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">Number of Questions</div>
-    <div class="qcount-grid">
-      <div class="qcount-btn" onclick="selectQCount(15)">15</div>
-      <div class="qcount-btn selected" onclick="selectQCount(20)">20</div>
-      <div class="qcount-btn" onclick="selectQCount(25)">25</div>
-      <div class="qcount-btn" onclick="selectQCount(30)">30</div>
-    </div>
-  </div>
-
-  <button class="btn btn-primary" onclick="startQuiz()" id="start-btn">
-    Let's Go! 🎯
+  <button class="btn btn-outline" onclick="showLogin()" style="font-size:0.85rem;padding:10px;border-color:var(--border);color:var(--text-muted)">
+    Switch Player
   </button>
 </div>
 
@@ -257,19 +280,13 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
   </div>
 
   <div class="options-grid" id="options-grid"></div>
-
-  <div class="quiz-footer" style="margin-top:12px">
-    <button class="skip-btn" onclick="skipQuestion()">Skip →</button>
-    <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none;flex:1">
-      Next Question →
-    </button>
-  </div>
+  <button class="skip-btn" onclick="skipQuestion()">Skip this question →</button>
 </div>
 
 <!-- ═══════════════════ END / REVIEW SCREEN ═══════════════════ -->
 <div id="screen-end" class="screen">
   <div class="app-header">
-    <div class="app-logo">Session Complete!</div>
+    <div class="app-logo">Quiz<span>Champ</span> 🏆</div>
   </div>
 
   <div class="trophy-section">
@@ -305,7 +322,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 
   <div style="display:flex;gap:10px;margin-top:8px">
     <button class="btn btn-outline btn-sm" onclick="showDashboard()" style="flex:1">📊 Dashboard</button>
-    <button class="btn btn-primary btn-sm" onclick="showSetup()" style="flex:1">Play Again 🚀</button>
+    <button class="btn btn-primary btn-sm" onclick="startAutoSession()" style="flex:1">Play Again 🚀</button>
   </div>
 </div>
 
@@ -325,14 +342,14 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 
   <div id="dash-progress">
     <div class="card" style="margin-bottom:8px">
-      <div class="card-title">Subject Filter</div>
+      <div class="card-title">Filter</div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-primary btn-sm" id="dash-filter-maths" onclick="setDashFilter('maths')">🔢 Maths</button>
         <button class="btn btn-outline btn-sm" id="dash-filter-english" onclick="setDashFilter('english')">📖 English</button>
         <button class="btn btn-outline btn-sm" id="dash-filter-all" onclick="setDashFilter('all')">All</button>
       </div>
     </div>
-    <div id="dash-topics-list"></div>
+    <div class="topic-cards-grid" id="dash-topics-list"></div>
   </div>
 
   <div id="dash-badges" style="display:none">
@@ -351,11 +368,8 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 </div>
 
 <script type="module">
-// ════════════════════════════════════════════════════════
-// FIREBASE
-// ════════════════════════════════════════════════════════
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, limit, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCx2QVHmIyZabn2--avx0D7c2frfMz-TjI",
@@ -367,14 +381,54 @@ const firebaseConfig = {
 };
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
-const PLAYER_ID = 'pranav';
 
 // ════════════════════════════════════════════════════════
-// QUESTION BANK — Level 3
+// STUDENTS
+// ════════════════════════════════════════════════════════
+const STUDENTS = {
+  pranav:  { name: 'Pranav',       password: 'SOAR',  avatar: '🦁' },
+  lily:    { name: 'Lily',         password: 'BLOOM', avatar: '🌸' },
+  mithran: { name: 'Mithran',      password: 'BRAVE', avatar: '⚡' },
+  kabir:   { name: 'Kabir',        password: 'APEX',  avatar: '🚀' },
+  trial:   { name: 'Trial Student',password: 'SPARK', avatar: '⭐' }
+};
+
+// ════════════════════════════════════════════════════════
+// TOPIC META — icons + gradients
+// ════════════════════════════════════════════════════════
+const TOPIC_META = {
+  'Fractions':                { icon:'🍕', grad:'linear-gradient(135deg,#FF6B6B,#FF8E53)' },
+  'Multiplication & Division':{ icon:'✖️',  grad:'linear-gradient(135deg,#4ECDC4,#44A08D)' },
+  'Place Value & Number':     { icon:'🔢', grad:'linear-gradient(135deg,#45B7D1,#2980B9)' },
+  'Addition & Subtraction':   { icon:'➕', grad:'linear-gradient(135deg,#96CEB4,#2ECC71)' },
+  'Decimals':                 { icon:'🔟', grad:'linear-gradient(135deg,#F7DC6F,#F39C12)' },
+  'Percentages':              { icon:'💯', grad:'linear-gradient(135deg,#DDA0DD,#9B59B6)' },
+  'Geometry – Shapes':        { icon:'🔷', grad:'linear-gradient(135deg,#98D8C8,#1ABC9C)' },
+  'Angles':                   { icon:'📐', grad:'linear-gradient(135deg,#F8C471,#E67E22)' },
+  'Measurement & Units':      { icon:'📏', grad:'linear-gradient(135deg,#82E0AA,#27AE60)' },
+  'Perimeter & Area':         { icon:'📦', grad:'linear-gradient(135deg,#AED6F1,#3498DB)' },
+  'Data & Statistics':        { icon:'📊', grad:'linear-gradient(135deg,#F1948A,#E74C3C)' },
+  'Problem Solving':          { icon:'🧩', grad:'linear-gradient(135deg,#BB8FCE,#8E44AD)' },
+  'Vocabulary':               { icon:'📚', grad:'linear-gradient(135deg,#F0B27A,#E59866)' },
+  'Punctuation':              { icon:'✏️',  grad:'linear-gradient(135deg,#5DADE2,#2E86C1)' },
+  'Grammar':                  { icon:'📝', grad:'linear-gradient(135deg,#48C9B0,#17A589)' },
+  'Spelling':                 { icon:'🔤', grad:'linear-gradient(135deg,#EC7063,#C0392B)' },
+  'Verbal Reasoning':         { icon:'🧠', grad:'linear-gradient(135deg,#A569BD,#7D3C98)' },
+  'Synonyms & Antonyms':      { icon:'🔄', grad:'linear-gradient(135deg,#45D1B5,#1ABC9C)' },
+  'Sentence Structure':       { icon:'📜', grad:'linear-gradient(135deg,#F0A500,#E67E22)' },
+  'Reading Comprehension':    { icon:'📖', grad:'linear-gradient(135deg,#5B9BD5,#2980B9)' },
+};
+
+const TOPICS = {
+  maths: ['Fractions','Multiplication & Division','Place Value & Number','Addition & Subtraction','Decimals','Percentages','Geometry – Shapes','Angles','Measurement & Units','Perimeter & Area','Data & Statistics','Problem Solving'],
+  english: ['Vocabulary','Punctuation','Grammar','Spelling','Verbal Reasoning','Synonyms & Antonyms','Sentence Structure','Reading Comprehension']
+};
+
+// ════════════════════════════════════════════════════════
+// QUESTION BANK
 // ════════════════════════════════════════════════════════
 const QUESTIONS = [
-
-// ── MATHS: Fractions ──────────────────────────────────
+// ── L3: Fractions ────────────────────────────────────────
 {id:'mf3_01',s:'maths',t:'Fractions',l:3,q:'What is ½ of 20?',o:['5','8','10','15'],a:'10',e:'Half means divide by 2. 20 ÷ 2 = 10'},
 {id:'mf3_02',s:'maths',t:'Fractions',l:3,q:'What is ¼ of 16?',o:['2','4','6','8'],a:'4',e:'Quarter means divide by 4. 16 ÷ 4 = 4'},
 {id:'mf3_03',s:'maths',t:'Fractions',l:3,q:'What is ¾ of 12?',o:['3','6','8','9'],a:'9',e:'¾ of 12: first find ¼ = 3, then × 3 = 9'},
@@ -390,257 +444,289 @@ const QUESTIONS = [
 {id:'mf3_13',s:'maths',t:'Fractions',l:3,q:'Which fraction equals 2/4?',o:['1/3','1/2','2/3','3/4'],a:'1/2',e:'2/4 simplifies to 1/2 (divide both by 2)'},
 {id:'mf3_14',s:'maths',t:'Fractions',l:3,q:'What is ⅖ of 20?',o:['4','6','8','10'],a:'8',e:'⅕ of 20 = 4, × 2 = 8'},
 {id:'mf3_15',s:'maths',t:'Fractions',l:3,q:'What is 1/10 of 50?',o:['5','10','15','20'],a:'5',e:'50 ÷ 10 = 5'},
-{id:'mf3_16',s:'maths',t:'Fractions',l:3,q:'Which is the smallest fraction: ¼, ½ or ⅓?',o:['¼','½','⅓','They are equal'],a:'¼',e:'¼ = 0.25, ⅓ ≈ 0.33, ½ = 0.5. So ¼ is smallest.'},
+{id:'mf3_16',s:'maths',t:'Fractions',l:3,q:'Which is the smallest: ¼, ½ or ⅓?',o:['¼','½','⅓','They are equal'],a:'¼',e:'¼ = 0.25, ⅓ ≈ 0.33, ½ = 0.5. So ¼ is smallest.'},
 {id:'mf3_17',s:'maths',t:'Fractions',l:3,q:'What is ⅗ of 10?',o:['3','5','6','8'],a:'6',e:'⅕ of 10 = 2, × 3 = 6'},
 {id:'mf3_18',s:'maths',t:'Fractions',l:3,q:'What fraction of 20 is 10?',o:['¼','⅓','½','¾'],a:'½',e:'10/20 = 1/2'},
 {id:'mf3_19',s:'maths',t:'Fractions',l:3,q:'½ + ¼ = ?',o:['2/6','½','¾','1'],a:'¾',e:'½ = 2/4, so 2/4 + 1/4 = 3/4'},
 {id:'mf3_20',s:'maths',t:'Fractions',l:3,q:'What is ¼ of 100?',o:['10','20','25','40'],a:'25',e:'100 ÷ 4 = 25'},
-
-// ── MATHS: Multiplication & Division ─────────────────
-{id:'mmd3_01',s:'maths',t:'Multiplication & Division',l:3,q:'6 × 7 = ?',o:['36','42','48','54'],a:'42',e:'6 × 7 = 42 (6 times table)'},
-{id:'mmd3_02',s:'maths',t:'Multiplication & Division',l:3,q:'8 × 9 = ?',o:['63','64','72','81'],a:'72',e:'8 × 9 = 72 (9 times table)'},
-{id:'mmd3_03',s:'maths',t:'Multiplication & Division',l:3,q:'48 ÷ 6 = ?',o:['6','7','8','9'],a:'8',e:'48 ÷ 6 = 8 (inverse of 6 × 8)'},
-{id:'mmd3_04',s:'maths',t:'Multiplication & Division',l:3,q:'7 × 8 = ?',o:['48','54','56','63'],a:'56',e:'7 × 8 = 56 (7 times table)'},
-{id:'mmd3_05',s:'maths',t:'Multiplication & Division',l:3,q:'63 ÷ 7 = ?',o:['7','8','9','10'],a:'9',e:'63 ÷ 7 = 9 (7 × 9 = 63)'},
+// ── L4: Fractions ────────────────────────────────────────
+{id:'mf4_01',s:'maths',t:'Fractions',l:4,q:'What is 3/8 + 1/4?',o:['4/12','1/2','5/8','7/8'],a:'5/8',e:'1/4 = 2/8, so 3/8 + 2/8 = 5/8'},
+{id:'mf4_02',s:'maths',t:'Fractions',l:4,q:'What is 5/6 − 1/3?',o:['4/3','4/6','1/2','2/3'],a:'1/2',e:'1/3 = 2/6, so 5/6 − 2/6 = 3/6 = 1/2'},
+{id:'mf4_03',s:'maths',t:'Fractions',l:4,q:'Simplify 18/24.',o:['3/4','6/8','9/12','2/3'],a:'3/4',e:'18/24: divide both by 6 → 3/4'},
+{id:'mf4_04',s:'maths',t:'Fractions',l:4,q:'Convert 11/4 to a mixed number.',o:['2¼','2¾','3¼','1¾'],a:'2¾',e:'11 ÷ 4 = 2 remainder 3, so 2¾'},
+{id:'mf4_05',s:'maths',t:'Fractions',l:4,q:'What is 2/3 × 9?',o:['3','6','9','18'],a:'6',e:'2/3 × 9 = (2 × 9) ÷ 3 = 18 ÷ 3 = 6'},
+{id:'mf4_06',s:'maths',t:'Fractions',l:4,q:'Which is greatest: 3/4, 7/10, or 5/8?',o:['3/4','7/10','5/8','They are equal'],a:'3/4',e:'3/4=0.75, 7/10=0.70, 5/8=0.625. So 3/4 is greatest.'},
+{id:'mf4_07',s:'maths',t:'Fractions',l:4,q:'What is 4/5 of 35?',o:['20','24','28','32'],a:'28',e:'1/5 of 35 = 7, × 4 = 28'},
+{id:'mf4_08',s:'maths',t:'Fractions',l:4,q:'What is 1¾ + 2½?',o:['3¼','4','4¼','4½'],a:'4¼',e:'1¾ + 2½ = 1 3/4 + 2 2/4 = 3 5/4 = 4 1/4'},
+{id:'mf4_09',s:'maths',t:'Fractions',l:4,q:'Convert 3⅖ to an improper fraction.',o:['15/5','17/5','16/5','18/5'],a:'17/5',e:'3 × 5 = 15, + 2 = 17 → 17/5'},
+{id:'mf4_10',s:'maths',t:'Fractions',l:4,q:'3/4 − 1/6 = ?',o:['2/3','7/12','1/2','5/12'],a:'7/12',e:'Common denominator 12: 9/12 − 2/12 = 7/12'},
+{id:'mf4_11',s:'maths',t:'Fractions',l:4,q:'What is 5/6 of 24?',o:['15','18','20','22'],a:'20',e:'1/6 of 24 = 4, × 5 = 20'},
+{id:'mf4_12',s:'maths',t:'Fractions',l:4,q:'Simplify 36/48.',o:['3/4','2/3','6/8','9/12'],a:'3/4',e:'36/48: divide both by 12 → 3/4'},
+{id:'mf4_13',s:'maths',t:'Fractions',l:4,q:'What is 7/10 + 1/4?',o:['8/14','9/20','19/20','4/5'],a:'19/20',e:'Common denominator 20: 14/20 + 5/20 = 19/20'},
+{id:'mf4_14',s:'maths',t:'Fractions',l:4,q:'2/3 + 3/4 = ?',o:['5/7','5/12','17/12','1½'],a:'17/12',e:'Common denominator 12: 8/12 + 9/12 = 17/12'},
+{id:'mf4_15',s:'maths',t:'Fractions',l:4,q:'What is 3/5 ÷ 3?',o:['9/5','1/5','3/15','1/3'],a:'1/5',e:'Dividing a fraction by 3: 3/5 ÷ 3 = 3/15 = 1/5'},
+{id:'mf4_16',s:'maths',t:'Fractions',l:4,q:'A recipe needs 2/3 cup sugar for 8 biscuits. How much for 24 biscuits?',o:['1 cup','1½ cups','2 cups','2½ cups'],a:'2 cups',e:'24 is 3× more than 8, so 2/3 × 3 = 2 cups'},
+{id:'mf4_17',s:'maths',t:'Fractions',l:4,q:'What is 1⅔ × 6?',o:['7','8','10','12'],a:'10',e:'1⅔ = 5/3. 5/3 × 6 = 30/3 = 10'},
+{id:'mf4_18',s:'maths',t:'Fractions',l:4,q:'Which fraction is between 1/2 and 3/4?',o:['1/3','2/5','5/8','7/8'],a:'5/8',e:'5/8 = 0.625, which is between 0.5 and 0.75'},
+{id:'mf4_19',s:'maths',t:'Fractions',l:4,q:'What is 5/8 as a decimal?',o:['0.58','0.625','0.65','0.8'],a:'0.625',e:'5 ÷ 8 = 0.625'},
+{id:'mf4_20',s:'maths',t:'Fractions',l:4,q:'Jake ate 3/8 of a pizza. Mia ate 1/4. What fraction is left?',o:['3/8','4/8','3/4','5/8'],a:'3/8',e:'3/8 + 2/8 = 5/8 eaten. 8/8 − 5/8 = 3/8 left'},
+// ── L3: Multiplication & Division ────────────────────────
+{id:'mmd3_01',s:'maths',t:'Multiplication & Division',l:3,q:'6 × 7 = ?',o:['36','42','48','54'],a:'42',e:'6 × 7 = 42'},
+{id:'mmd3_02',s:'maths',t:'Multiplication & Division',l:3,q:'8 × 9 = ?',o:['63','64','72','81'],a:'72',e:'8 × 9 = 72'},
+{id:'mmd3_03',s:'maths',t:'Multiplication & Division',l:3,q:'48 ÷ 6 = ?',o:['6','7','8','9'],a:'8',e:'48 ÷ 6 = 8'},
+{id:'mmd3_04',s:'maths',t:'Multiplication & Division',l:3,q:'7 × 8 = ?',o:['48','54','56','63'],a:'56',e:'7 × 8 = 56'},
+{id:'mmd3_05',s:'maths',t:'Multiplication & Division',l:3,q:'63 ÷ 7 = ?',o:['7','8','9','10'],a:'9',e:'63 ÷ 7 = 9'},
 {id:'mmd3_06',s:'maths',t:'Multiplication & Division',l:3,q:'9 × 6 = ?',o:['45','48','54','56'],a:'54',e:'9 × 6 = 54'},
-{id:'mmd3_07',s:'maths',t:'Multiplication & Division',l:3,q:'56 ÷ 8 = ?',o:['5','6','7','8'],a:'7',e:'56 ÷ 8 = 7 (8 × 7 = 56)'},
+{id:'mmd3_07',s:'maths',t:'Multiplication & Division',l:3,q:'56 ÷ 8 = ?',o:['5','6','7','8'],a:'7',e:'56 ÷ 8 = 7'},
 {id:'mmd3_08',s:'maths',t:'Multiplication & Division',l:3,q:'12 × 7 = ?',o:['74','80','84','96'],a:'84',e:'12 × 7 = 84'},
-{id:'mmd3_09',s:'maths',t:'Multiplication & Division',l:3,q:'72 ÷ 9 = ?',o:['6','7','8','9'],a:'8',e:'72 ÷ 9 = 8 (9 × 8 = 72)'},
+{id:'mmd3_09',s:'maths',t:'Multiplication & Division',l:3,q:'72 ÷ 9 = ?',o:['6','7','8','9'],a:'8',e:'72 ÷ 9 = 8'},
 {id:'mmd3_10',s:'maths',t:'Multiplication & Division',l:3,q:'11 × 8 = ?',o:['80','84','88','96'],a:'88',e:'11 × 8 = 88'},
-{id:'mmd3_11',s:'maths',t:'Multiplication & Division',l:3,q:'144 ÷ 12 = ?',o:['10','11','12','13'],a:'12',e:'144 ÷ 12 = 12 (12 × 12 = 144)'},
+{id:'mmd3_11',s:'maths',t:'Multiplication & Division',l:3,q:'144 ÷ 12 = ?',o:['10','11','12','13'],a:'12',e:'144 ÷ 12 = 12'},
 {id:'mmd3_12',s:'maths',t:'Multiplication & Division',l:3,q:'9 × 9 = ?',o:['72','81','90','99'],a:'81',e:'9 × 9 = 81'},
-{id:'mmd3_13',s:'maths',t:'Multiplication & Division',l:3,q:'A baker makes 9 cakes per day. How many in 6 days?',o:['45','54','56','63'],a:'54',e:'9 × 6 = 54 cakes'},
+{id:'mmd3_13',s:'maths',t:'Multiplication & Division',l:3,q:'A baker makes 9 cakes per day. How many in 6 days?',o:['45','54','56','63'],a:'54',e:'9 × 6 = 54'},
 {id:'mmd3_14',s:'maths',t:'Multiplication & Division',l:3,q:'6 × 12 = ?',o:['62','70','72','84'],a:'72',e:'6 × 12 = 72'},
-{id:'mmd3_15',s:'maths',t:'Multiplication & Division',l:3,q:'96 ÷ 8 = ?',o:['10','11','12','13'],a:'12',e:'96 ÷ 8 = 12 (8 × 12 = 96)'},
-{id:'mmd3_16',s:'maths',t:'Multiplication & Division',l:3,q:'There are 7 rows of 9 chairs. How many chairs total?',o:['54','56','62','63'],a:'63',e:'7 × 9 = 63'},
+{id:'mmd3_15',s:'maths',t:'Multiplication & Division',l:3,q:'96 ÷ 8 = ?',o:['10','11','12','13'],a:'12',e:'96 ÷ 8 = 12 because 8 × 12 = 96'},
+{id:'mmd3_16',s:'maths',t:'Multiplication & Division',l:3,q:'7 rows of 9 chairs — how many total?',o:['54','56','62','63'],a:'63',e:'7 × 9 = 63'},
 {id:'mmd3_17',s:'maths',t:'Multiplication & Division',l:3,q:'7 × 11 = ?',o:['70','74','77','84'],a:'77',e:'7 × 11 = 77'},
-{id:'mmd3_18',s:'maths',t:'Multiplication & Division',l:3,q:'84 ÷ 7 = ?',o:['10','11','12','14'],a:'12',e:'84 ÷ 7 = 12 (7 × 12 = 84)'},
-{id:'mmd3_19',s:'maths',t:'Multiplication & Division',l:3,q:'108 ÷ 9 = ?',o:['10','11','12','13'],a:'12',e:'108 ÷ 9 = 12 (9 × 12 = 108)'},
+{id:'mmd3_18',s:'maths',t:'Multiplication & Division',l:3,q:'84 ÷ 7 = ?',o:['10','11','12','14'],a:'12',e:'84 ÷ 7 = 12'},
+{id:'mmd3_19',s:'maths',t:'Multiplication & Division',l:3,q:'108 ÷ 9 = ?',o:['10','11','12','13'],a:'12',e:'108 ÷ 9 = 12'},
 {id:'mmd3_20',s:'maths',t:'Multiplication & Division',l:3,q:'8 × 12 = ?',o:['88','92','96','104'],a:'96',e:'8 × 12 = 96'},
-
-// ── MATHS: Place Value & Number ───────────────────────
-{id:'mpv3_01',s:'maths',t:'Place Value & Number',l:3,q:'What is the value of the digit 7 in 473?',o:['7','70','700','7000'],a:'70',e:'In 473, the 7 is in the tens column, so it represents 70'},
+// ── L4: Multiplication & Division ────────────────────────
+{id:'mmd4_01',s:'maths',t:'Multiplication & Division',l:4,q:'24 × 15 = ?',o:['300','340','360','380'],a:'360',e:'24 × 15 = 24 × 10 + 24 × 5 = 240 + 120 = 360'},
+{id:'mmd4_02',s:'maths',t:'Multiplication & Division',l:4,q:'342 ÷ 6 = ?',o:['54','57','58','62'],a:'57',e:'342 ÷ 6: 6 × 57 = 342'},
+{id:'mmd4_03',s:'maths',t:'Multiplication & Division',l:4,q:'What is the remainder when 125 ÷ 8?',o:['3','4','5','6'],a:'5',e:'8 × 15 = 120, 125 − 120 = 5 remainder'},
+{id:'mmd4_04',s:'maths',t:'Multiplication & Division',l:4,q:'37 × 12 = ?',o:['404','434','444','454'],a:'444',e:'37 × 12 = 37 × 10 + 37 × 2 = 370 + 74 = 444'},
+{id:'mmd4_05',s:'maths',t:'Multiplication & Division',l:4,q:'256 ÷ 16 = ?',o:['14','15','16','17'],a:'16',e:'16 × 16 = 256'},
+{id:'mmd4_06',s:'maths',t:'Multiplication & Division',l:4,q:'How many factors does 36 have?',o:['7','8','9','10'],a:'9',e:'Factors of 36: 1,2,3,4,6,9,12,18,36 — that\'s 9 factors'},
+{id:'mmd4_07',s:'maths',t:'Multiplication & Division',l:4,q:'What is the LCM of 4 and 6?',o:['8','10','12','24'],a:'12',e:'Multiples of 4: 4,8,12… Multiples of 6: 6,12… LCM = 12'},
+{id:'mmd4_08',s:'maths',t:'Multiplication & Division',l:4,q:'504 ÷ 7 = ?',o:['62','70','72','74'],a:'72',e:'7 × 72 = 504'},
+{id:'mmd4_09',s:'maths',t:'Multiplication & Division',l:4,q:'3.5 × 6 = ?',o:['18','20','21','24'],a:'21',e:'3.5 × 6 = 3 × 6 + 0.5 × 6 = 18 + 3 = 21'},
+{id:'mmd4_10',s:'maths',t:'Multiplication & Division',l:4,q:'625 ÷ 25 = ?',o:['20','23','25','30'],a:'25',e:'25 × 25 = 625'},
+{id:'mmd4_11',s:'maths',t:'Multiplication & Division',l:4,q:'48 × 25 = ?',o:['1,000','1,100','1,200','1,400'],a:'1,200',e:'48 × 25 = 48 × 100 ÷ 4 = 4800 ÷ 4 = 1,200'},
+{id:'mmd4_12',s:'maths',t:'Multiplication & Division',l:4,q:'What is 5² × 4?',o:['40','80','100','120'],a:'100',e:'5² = 25, 25 × 4 = 100'},
+{id:'mmd4_13',s:'maths',t:'Multiplication & Division',l:4,q:'432 ÷ 9 = ?',o:['44','46','48','52'],a:'48',e:'9 × 48 = 432'},
+{id:'mmd4_14',s:'maths',t:'Multiplication & Division',l:4,q:'How many 15s in 225?',o:['13','14','15','16'],a:'15',e:'225 ÷ 15 = 15 (15 × 15 = 225)'},
+{id:'mmd4_15',s:'maths',t:'Multiplication & Division',l:4,q:'28 × 35 = ?',o:['840','900','960','980'],a:'980',e:'28 × 35 = 28 × 30 + 28 × 5 = 840 + 140 = 980'},
+{id:'mmd4_16',s:'maths',t:'Multiplication & Division',l:4,q:'84 ÷ 3 + 6 × 4 = ?',o:['40','48','52','56'],a:'52',e:'BODMAS: 84 ÷ 3 = 28, 6 × 4 = 24, 28 + 24 = 52'},
+{id:'mmd4_17',s:'maths',t:'Multiplication & Division',l:4,q:'4 × 13 × 5 = ?',o:['200','240','260','280'],a:'260',e:'4 × 5 = 20, 20 × 13 = 260'},
+{id:'mmd4_18',s:'maths',t:'Multiplication & Division',l:4,q:'What is the HCF of 24 and 36?',o:['4','6','8','12'],a:'12',e:'Factors of 24: 1,2,3,4,6,8,12,24. Factors of 36: 1,2,3,4,6,9,12,18,36. HCF = 12'},
+{id:'mmd4_19',s:'maths',t:'Multiplication & Division',l:4,q:'576 ÷ 24 = ?',o:['22','24','26','28'],a:'24',e:'24 × 24 = 576'},
+{id:'mmd4_20',s:'maths',t:'Multiplication & Division',l:4,q:'A box holds 18 oranges. How many boxes for 270 oranges?',o:['13','14','15','16'],a:'15',e:'270 ÷ 18 = 15'},
+// ── L3: Place Value & Number ──────────────────────────────
+{id:'mpv3_01',s:'maths',t:'Place Value & Number',l:3,q:'What is the value of the digit 7 in 473?',o:['7','70','700','7000'],a:'70',e:'In 473, the 7 is in the tens column = 70'},
 {id:'mpv3_02',s:'maths',t:'Place Value & Number',l:3,q:'What is 346 rounded to the nearest 10?',o:['300','340','350','400'],a:'350',e:'346: the units digit is 6 (≥5), so round up to 350'},
-{id:'mpv3_03',s:'maths',t:'Place Value & Number',l:3,q:'Which is the largest number: 526, 562, 256, 625?',o:['526','562','256','625'],a:'625',e:'Comparing hundreds first: 6 > 5 > 2, so 625 is largest'},
-{id:'mpv3_04',s:'maths',t:'Place Value & Number',l:3,q:'What is 580 rounded to the nearest 100?',o:['500','550','600','700'],a:'600',e:'580: tens digit is 8 (≥5), so round up to 600'},
+{id:'mpv3_03',s:'maths',t:'Place Value & Number',l:3,q:'Which is the largest: 526, 562, 256, 625?',o:['526','562','256','625'],a:'625',e:'Comparing hundreds: 6 > 5 > 2, so 625 is largest'},
+{id:'mpv3_04',s:'maths',t:'Place Value & Number',l:3,q:'What is 580 rounded to the nearest 100?',o:['500','550','600','700'],a:'600',e:'580: tens digit is 8 (≥5), round up to 600'},
 {id:'mpv3_05',s:'maths',t:'Place Value & Number',l:3,q:'What number is 100 more than 750?',o:['760','800','850','950'],a:'850',e:'750 + 100 = 850'},
 {id:'mpv3_06',s:'maths',t:'Place Value & Number',l:3,q:'Write seven hundred and sixty-three in digits.',o:['367','637','673','763'],a:'763',e:'Seven hundred = 700, sixty = 60, three = 3 → 763'},
 {id:'mpv3_07',s:'maths',t:'Place Value & Number',l:3,q:'What is the value of the 5 in 2,504?',o:['5','50','500','5000'],a:'500',e:'In 2,504 the digit 5 is in the hundreds column = 500'},
-{id:'mpv3_08',s:'maths',t:'Place Value & Number',l:3,q:'Put in order (smallest first): 842, 248, 428, 824',o:['248,428,824,842','248,428,842,824','248,824,428,842','428,248,824,842'],a:'248,428,824,842',e:'Compare hundreds: 2<4<8, then within 8s: 824<842'},
-{id:'mpv3_09',s:'maths',t:'Place Value & Number',l:3,q:'What is -3 + 5?',o:['-8','-2','2','8'],a:'2',e:'Start at -3 on the number line, move 5 right = 2'},
+{id:'mpv3_08',s:'maths',t:'Place Value & Number',l:3,q:'Order smallest first: 842, 248, 428, 824',o:['248,428,824,842','248,428,842,824','428,248,824,842','248,824,428,842'],a:'248,428,824,842',e:'Compare hundreds: 2<4<8, then 824<842'},
+{id:'mpv3_09',s:'maths',t:'Place Value & Number',l:3,q:'What is -3 + 5?',o:['-8','-2','2','8'],a:'2',e:'Start at -3, move 5 right = 2'},
 {id:'mpv3_10',s:'maths',t:'Place Value & Number',l:3,q:'Which temperature is colder: -4°C or -7°C?',o:['-4°C','-7°C','They are equal','Cannot tell'],a:'-7°C',e:'On a number line, -7 is further left (colder) than -4'},
-{id:'mpv3_11',s:'maths',t:'Place Value & Number',l:3,q:'What is 1,000 less than 4,567?',o:['3,456','3,567','4,467','4,557'],a:'3,567',e:'4,567 − 1,000 = 3,567 (reduce thousands digit by 1)'},
-{id:'mpv3_12',s:'maths',t:'Place Value & Number',l:3,q:'Round 3,748 to the nearest 100.',o:['3,700','3,740','3,800','4,000'],a:'3,800',e:'3,748: tens digit is 4… wait, 48 → round to 3,800 (748→800: tens=4, but units=8 → 3,748 nearest 100: look at tens digit 4, so 3,700). Actually 748 → hundreds digit is 7, tens is 4 → round down → 3,700',x:'3,700'},
+{id:'mpv3_11',s:'maths',t:'Place Value & Number',l:3,q:'What is 1,000 less than 4,567?',o:['3,456','3,567','4,467','4,557'],a:'3,567',e:'4,567 − 1,000 = 3,567'},
+{id:'mpv3_12',s:'maths',t:'Place Value & Number',l:3,q:'Round 3,748 to the nearest 100.',o:['3,600','3,700','3,800','4,000'],a:'3,700',e:'3,748: tens digit is 4 (< 5), round down to 3,700'},
 {id:'mpv3_13',s:'maths',t:'Place Value & Number',l:3,q:'How many tens are there in 350?',o:['3','5','35','350'],a:'35',e:'350 ÷ 10 = 35 tens'},
 {id:'mpv3_14',s:'maths',t:'Place Value & Number',l:3,q:'What is 10 × 10?',o:['20','100','1,000','10,000'],a:'100',e:'10 × 10 = 100'},
-{id:'mpv3_15',s:'maths',t:'Place Value & Number',l:3,q:'Which of these is an even number?',o:['137','249','362','475'],a:'362',e:'Even numbers end in 0,2,4,6 or 8. Only 362 ends in 2.'},
-
-// ── MATHS: Addition & Subtraction ─────────────────────
-{id:'mas3_01',s:'maths',t:'Addition & Subtraction',l:3,q:'345 + 267 = ?',o:['502','602','612','622'],a:'612',e:'345 + 267: 5+7=12 carry 1, 4+6+1=11 carry 1, 3+2+1=6 → 612'},
-{id:'mas3_02',s:'maths',t:'Addition & Subtraction',l:3,q:'500 − 237 = ?',o:['263','273','283','363'],a:'263',e:'500 − 237 = 263 (borrow from hundreds)'},
-{id:'mas3_03',s:'maths',t:'Addition & Subtraction',l:3,q:'628 + 145 = ?',o:['763','773','783','793'],a:'773',e:'628 + 145: 8+5=13 carry 1, 2+4+1=7, 6+1=7 → 773'},
+{id:'mpv3_15',s:'maths',t:'Place Value & Number',l:3,q:'Which of these is an even number?',o:['137','249','362','475'],a:'362',e:'Even numbers end in 0,2,4,6,8. Only 362 ends in 2.'},
+// ── L4: Place Value & Number ──────────────────────────────
+{id:'mpv4_01',s:'maths',t:'Place Value & Number',l:4,q:'What is 3.45 rounded to 1 decimal place?',o:['3.4','3.5','3.6','4.0'],a:'3.5',e:'3.45 — the hundredths digit is 5, so round up: 3.5'},
+{id:'mpv4_02',s:'maths',t:'Place Value & Number',l:4,q:'What is the value of the digit 7 in 3.718?',o:['7','7 tenths','7 hundredths','7 thousandths'],a:'7 tenths',e:'In 3.718, the 7 is in the tenths column = 7 tenths'},
+{id:'mpv4_03',s:'maths',t:'Place Value & Number',l:4,q:'What is 5.2 × 100?',o:['52','520','5,200','0.052'],a:'520',e:'Multiply by 100: move decimal 2 places right → 520'},
+{id:'mpv4_04',s:'maths',t:'Place Value & Number',l:4,q:'Which is smallest: 4.09, 4.9, 4.19, 4.019?',o:['4.09','4.9','4.19','4.019'],a:'4.019',e:'4.019 < 4.09 < 4.19 < 4.9'},
+{id:'mpv4_05',s:'maths',t:'Place Value & Number',l:4,q:'What is 10³?',o:['30','300','1,000','10,000'],a:'1,000',e:'10³ = 10 × 10 × 10 = 1,000'},
+{id:'mpv4_06',s:'maths',t:'Place Value & Number',l:4,q:'What is 7.5 ÷ 100?',o:['0.075','0.75','75','750'],a:'0.075',e:'Divide by 100: move decimal 2 places left → 0.075'},
+{id:'mpv4_07',s:'maths',t:'Place Value & Number',l:4,q:'What is 1,000 more than 47,832?',o:['47,932','48,732','48,832','57,832'],a:'48,832',e:'47,832 + 1,000 = 48,832'},
+{id:'mpv4_08',s:'maths',t:'Place Value & Number',l:4,q:'What digit is in the thousandths place in 5.2637?',o:['2','6','3','7'],a:'3',e:'5.2637 — tenths:2, hundredths:6, thousandths:3'},
+{id:'mpv4_09',s:'maths',t:'Place Value & Number',l:4,q:'Which is smaller: 0.302 or 0.32?',o:['0.302','0.32','They are equal','Cannot tell'],a:'0.302',e:'0.302 = 0.302, 0.32 = 0.320. So 0.302 < 0.320'},
+{id:'mpv4_10',s:'maths',t:'Place Value & Number',l:4,q:'Round 4.847 to 2 decimal places.',o:['4.84','4.85','4.9','5.0'],a:'4.85',e:'4.847 — third decimal is 7 (≥5), round up: 4.85'},
+{id:'mpv4_11',s:'maths',t:'Place Value & Number',l:4,q:'What is the value of 6 in 562,841?',o:['6,000','60,000','600,000','6,000,000'],a:'60,000',e:'In 562,841: the 6 is in the ten-thousands column = 60,000'},
+{id:'mpv4_12',s:'maths',t:'Place Value & Number',l:4,q:'0.5 + 0.25 + 0.125 = ?',o:['0.750','0.825','0.875','0.900'],a:'0.875',e:'0.500 + 0.250 + 0.125 = 0.875'},
+{id:'mpv4_13',s:'maths',t:'Place Value & Number',l:4,q:'What comes next: 2.5, 3.0, 3.5, ___?',o:['3.8','4.0','4.5','5.0'],a:'4.0',e:'The sequence adds 0.5 each time. 3.5 + 0.5 = 4.0'},
+{id:'mpv4_14',s:'maths',t:'Place Value & Number',l:4,q:'Which is greatest: 4.099, 4.1, 4.09, 4.0999?',o:['4.099','4.1','4.09','4.0999'],a:'4.1',e:'4.1 = 4.1000, which is largest of all four'},
+{id:'mpv4_15',s:'maths',t:'Place Value & Number',l:4,q:'What is 9.25 − 3.8?',o:['5.35','5.45','6.15','6.45'],a:'5.45',e:'9.25 − 3.80 = 5.45'},
+{id:'mpv4_16',s:'maths',t:'Place Value & Number',l:4,q:'Write 40,000 + 3,000 + 70 + 8 as a single number.',o:['4,378','43,078','43,780','430,078'],a:'43,078',e:'40,000 + 3,000 = 43,000 + 70 = 43,070 + 8 = 43,078'},
+{id:'mpv4_17',s:'maths',t:'Place Value & Number',l:4,q:'What is 0.08 × 10?',o:['0.008','0.08','0.8','8'],a:'0.8',e:'0.08 × 10: move decimal one place right → 0.8'},
+{id:'mpv4_18',s:'maths',t:'Place Value & Number',l:4,q:'Round 67,455 to the nearest 1,000.',o:['67,000','67,400','67,500','68,000'],a:'67,000',e:'67,455: hundreds digit is 4 (< 5), round down → 67,000'},
+{id:'mpv4_19',s:'maths',t:'Place Value & Number',l:4,q:'What is the product of 0.4 × 0.3?',o:['0.07','0.12','1.2','12'],a:'0.12',e:'4 × 3 = 12; both have 1 decimal place each → 0.12'},
+{id:'mpv4_20',s:'maths',t:'Place Value & Number',l:4,q:'A number has 4 in the millions place. What is the smallest it could be?',o:['400,000','4,000,000','4,000,001','4,999,999'],a:'4,000,000',e:'The smallest number with 4 in the millions column is 4,000,000'},
+// ── L3: Addition & Subtraction ────────────────────────────
+{id:'mas3_01',s:'maths',t:'Addition & Subtraction',l:3,q:'345 + 267 = ?',o:['502','602','612','622'],a:'612',e:'345 + 267 = 612'},
+{id:'mas3_02',s:'maths',t:'Addition & Subtraction',l:3,q:'500 − 237 = ?',o:['263','273','283','363'],a:'263',e:'500 − 237 = 263'},
+{id:'mas3_03',s:'maths',t:'Addition & Subtraction',l:3,q:'628 + 145 = ?',o:['763','773','783','793'],a:'773',e:'628 + 145 = 773'},
 {id:'mas3_04',s:'maths',t:'Addition & Subtraction',l:3,q:'A shop has 432 apples. 178 are sold. How many left?',o:['244','254','264','274'],a:'254',e:'432 − 178 = 254'},
 {id:'mas3_05',s:'maths',t:'Addition & Subtraction',l:3,q:'867 − 349 = ?',o:['418','508','518','528'],a:'518',e:'867 − 349 = 518'},
 {id:'mas3_06',s:'maths',t:'Addition & Subtraction',l:3,q:'What is 999 + 1?',o:['1,000','1,009','1,099','1,999'],a:'1,000',e:'999 + 1 = 1,000'},
-{id:'mas3_07',s:'maths',t:'Addition & Subtraction',l:3,q:'274 + 358 = ?',o:['522','622','632','642'],a:'632',e:'274 + 358: 4+8=12 carry 1, 7+5+1=13 carry 1, 2+3+1=6 → 632'},
+{id:'mas3_07',s:'maths',t:'Addition & Subtraction',l:3,q:'274 + 358 = ?',o:['522','622','632','642'],a:'632',e:'274 + 358 = 632'},
 {id:'mas3_08',s:'maths',t:'Addition & Subtraction',l:3,q:'700 − 456 = ?',o:['234','244','254','264'],a:'244',e:'700 − 456 = 244'},
 {id:'mas3_09',s:'maths',t:'Addition & Subtraction',l:3,q:'453 + 229 = ?',o:['672','682','692','782'],a:'682',e:'453 + 229 = 682'},
 {id:'mas3_10',s:'maths',t:'Addition & Subtraction',l:3,q:'1,000 − 375 = ?',o:['525','625','635','725'],a:'625',e:'1,000 − 375 = 625'},
-
-// ── MATHS: Decimals ───────────────────────────────────
-{id:'mdc3_01',s:'maths',t:'Decimals',l:3,q:'What is 0.5 + 0.5?',o:['0.1','0.55','1.0','5.5'],a:'1.0',e:'0.5 + 0.5 = 1.0 (five tenths + five tenths = one whole)'},
-{id:'mdc3_02',s:'maths',t:'Decimals',l:3,q:'Which is larger: 0.7 or 0.3?',o:['0.7','0.3','They are equal','Cannot tell'],a:'0.7',e:'0.7 = 7 tenths, 0.3 = 3 tenths. 7 > 3 so 0.7 is larger.'},
+// ── L3: Decimals ──────────────────────────────────────────
+{id:'mdc3_01',s:'maths',t:'Decimals',l:3,q:'What is 0.5 + 0.5?',o:['0.1','0.55','1.0','5.5'],a:'1.0',e:'0.5 + 0.5 = 1.0'},
+{id:'mdc3_02',s:'maths',t:'Decimals',l:3,q:'Which is larger: 0.7 or 0.3?',o:['0.7','0.3','They are equal','Cannot tell'],a:'0.7',e:'7 tenths > 3 tenths'},
 {id:'mdc3_03',s:'maths',t:'Decimals',l:3,q:'What is 1.5 + 2.5?',o:['3.0','3.5','4.0','4.5'],a:'4.0',e:'1.5 + 2.5 = 4.0'},
 {id:'mdc3_04',s:'maths',t:'Decimals',l:3,q:'Write 0.25 as a fraction.',o:['1/2','1/4','1/5','1/8'],a:'1/4',e:'0.25 = 25/100 = 1/4'},
-{id:'mdc3_05',s:'maths',t:'Decimals',l:3,q:'Order from smallest: 0.6, 0.1, 0.4',o:['0.6, 0.4, 0.1','0.1, 0.4, 0.6','0.4, 0.1, 0.6','0.1, 0.6, 0.4'],a:'0.1, 0.4, 0.6',e:'0.1 < 0.4 < 0.6'},
-{id:'mdc3_06',s:'maths',t:'Decimals',l:3,q:'What is 2.4 + 1.6?',o:['3.0','3.8','4.0','4.2'],a:'4.0',e:'2.4 + 1.6 = 4.0 (tenths: 4+6=10, carry 1)'},
+{id:'mdc3_05',s:'maths',t:'Decimals',l:3,q:'Order smallest first: 0.6, 0.1, 0.4',o:['0.6,0.4,0.1','0.1,0.4,0.6','0.4,0.1,0.6','0.1,0.6,0.4'],a:'0.1,0.4,0.6',e:'0.1 < 0.4 < 0.6'},
+{id:'mdc3_06',s:'maths',t:'Decimals',l:3,q:'What is 2.4 + 1.6?',o:['3.0','3.8','4.0','4.2'],a:'4.0',e:'2.4 + 1.6 = 4.0'},
 {id:'mdc3_07',s:'maths',t:'Decimals',l:3,q:'What is 0.1 as a percentage?',o:['1%','10%','100%','0.1%'],a:'10%',e:'0.1 = 1/10 = 10%'},
-{id:'mdc3_08',s:'maths',t:'Decimals',l:3,q:'A pencil is 15.5 cm. Round to the nearest cm.',o:['15 cm','16 cm','15.5 cm','20 cm'],a:'16 cm',e:'15.5 → tenths digit is 5 (≥5), round up to 16 cm'},
-
-// ── MATHS: Percentages ────────────────────────────────
+{id:'mdc3_08',s:'maths',t:'Decimals',l:3,q:'A pencil is 15.5 cm. Round to the nearest cm.',o:['15 cm','16 cm','15.5 cm','20 cm'],a:'16 cm',e:'15.5 → round up to 16 cm'},
+// ── L3: Percentages ───────────────────────────────────────
 {id:'mpc3_01',s:'maths',t:'Percentages',l:3,q:'What is 50% of 80?',o:['20','30','40','50'],a:'40',e:'50% = half. 80 ÷ 2 = 40'},
 {id:'mpc3_02',s:'maths',t:'Percentages',l:3,q:'What is 25% of 40?',o:['5','8','10','15'],a:'10',e:'25% = quarter. 40 ÷ 4 = 10'},
-{id:'mpc3_03',s:'maths',t:'Percentages',l:3,q:'What is 10% of 70?',o:['7','17','70','700'],a:'7',e:'10% means divide by 10. 70 ÷ 10 = 7'},
-{id:'mpc3_04',s:'maths',t:'Percentages',l:3,q:'What is 100% of 55?',o:['5','50','55','100'],a:'55',e:'100% of a number = the number itself'},
-{id:'mpc3_05',s:'maths',t:'Percentages',l:3,q:'In a class of 30 pupils, 60% are girls. How many girls?',o:['6','12','18','20'],a:'18',e:'60% of 30 = 10% × 6 = 3 × 6 = 18'},
+{id:'mpc3_03',s:'maths',t:'Percentages',l:3,q:'What is 10% of 70?',o:['7','17','70','700'],a:'7',e:'10%: divide by 10. 70 ÷ 10 = 7'},
+{id:'mpc3_04',s:'maths',t:'Percentages',l:3,q:'What is 100% of 55?',o:['5','50','55','100'],a:'55',e:'100% of any number = the number itself'},
+{id:'mpc3_05',s:'maths',t:'Percentages',l:3,q:'30 pupils, 60% are girls. How many girls?',o:['6','12','18','20'],a:'18',e:'10% of 30 = 3, × 6 = 18'},
 {id:'mpc3_06',s:'maths',t:'Percentages',l:3,q:'What is 10% of 250?',o:['2.5','25','250','2,500'],a:'25',e:'250 ÷ 10 = 25'},
 {id:'mpc3_07',s:'maths',t:'Percentages',l:3,q:'What is 50% of 130?',o:['13','50','65','130'],a:'65',e:'130 ÷ 2 = 65'},
 {id:'mpc3_08',s:'maths',t:'Percentages',l:3,q:'What percentage is 3 out of 10?',o:['3%','10%','30%','33%'],a:'30%',e:'3/10 = 30/100 = 30%'},
-
-// ── MATHS: Geometry – Shapes ──────────────────────────
-{id:'mgs3_01',s:'maths',t:'Geometry – Shapes',l:3,q:'How many sides does a hexagon have?',o:['4','5','6','7'],a:'6',e:'Hexagon = 6 sides (hex = 6 in Greek)'},
-{id:'mgs3_02',s:'maths',t:'Geometry – Shapes',l:3,q:'What is the name of a 3-sided shape?',o:['Square','Rectangle','Triangle','Pentagon'],a:'Triangle',e:'Triangle = 3 sides (tri = 3)'},
+// ── L3: Geometry – Shapes ─────────────────────────────────
+{id:'mgs3_01',s:'maths',t:'Geometry – Shapes',l:3,q:'How many sides does a hexagon have?',o:['4','5','6','7'],a:'6',e:'Hexagon = 6 sides'},
+{id:'mgs3_02',s:'maths',t:'Geometry – Shapes',l:3,q:'What is the name of a 3-sided shape?',o:['Square','Rectangle','Triangle','Pentagon'],a:'Triangle',e:'Triangle = 3 sides'},
 {id:'mgs3_03',s:'maths',t:'Geometry – Shapes',l:3,q:'How many faces does a cube have?',o:['4','5','6','8'],a:'6',e:'A cube has 6 square faces'},
-{id:'mgs3_04',s:'maths',t:'Geometry – Shapes',l:3,q:'What is a quadrilateral?',o:['A 3-sided shape','A 4-sided shape','A 5-sided shape','A 6-sided shape'],a:'A 4-sided shape',e:'Quadrilateral = 4 sides (quad = 4)'},
-{id:'mgs3_05',s:'maths',t:'Geometry – Shapes',l:3,q:'How many lines of symmetry does a square have?',o:['1','2','3','4'],a:'4',e:'A square has 4 lines of symmetry: 2 diagonals and 2 through midpoints'},
-{id:'mgs3_06',s:'maths',t:'Geometry – Shapes',l:3,q:'How many vertices (corners) does a cuboid have?',o:['4','6','8','12'],a:'8',e:'A cuboid has 8 vertices (corners)'},
-{id:'mgs3_07',s:'maths',t:'Geometry – Shapes',l:3,q:'What shape has 5 faces, 5 vertices, and 8 edges?',o:['Cube','Triangular prism','Square-based pyramid','Cylinder'],a:'Square-based pyramid',e:'Square-based pyramid: 1 square + 4 triangular faces = 5 faces'},
-{id:'mgs3_08',s:'maths',t:'Geometry – Shapes',l:3,q:'An equilateral triangle has…',o:['All sides different','2 equal sides','All sides equal','No equal sides'],a:'All sides equal',e:'Equilateral = all sides and angles are equal'},
-
-// ── MATHS: Angles ─────────────────────────────────────
-{id:'mang3_01',s:'maths',t:'Angles',l:3,q:'How many degrees are in a right angle?',o:['45°','90°','180°','360°'],a:'90°',e:'A right angle = 90 degrees, shown by a small square'},
+{id:'mgs3_04',s:'maths',t:'Geometry – Shapes',l:3,q:'What is a quadrilateral?',o:['3-sided','4-sided','5-sided','6-sided'],a:'4-sided',e:'Quadrilateral = 4 sides'},
+{id:'mgs3_05',s:'maths',t:'Geometry – Shapes',l:3,q:'How many lines of symmetry does a square have?',o:['1','2','3','4'],a:'4',e:'A square has 4 lines of symmetry'},
+{id:'mgs3_06',s:'maths',t:'Geometry – Shapes',l:3,q:'How many vertices does a cuboid have?',o:['4','6','8','12'],a:'8',e:'A cuboid has 8 vertices'},
+{id:'mgs3_07',s:'maths',t:'Geometry – Shapes',l:3,q:'5 faces, 5 vertices, 8 edges — which shape?',o:['Cube','Triangular prism','Square-based pyramid','Cylinder'],a:'Square-based pyramid',e:'Square-based pyramid: 1 square + 4 triangular faces'},
+{id:'mgs3_08',s:'maths',t:'Geometry – Shapes',l:3,q:'An equilateral triangle has…',o:['All sides different','2 equal sides','All sides equal','No equal sides'],a:'All sides equal',e:'Equilateral = all sides and angles equal'},
+// ── L3: Angles ────────────────────────────────────────────
+{id:'mang3_01',s:'maths',t:'Angles',l:3,q:'How many degrees in a right angle?',o:['45°','90°','180°','360°'],a:'90°',e:'A right angle = 90°'},
 {id:'mang3_02',s:'maths',t:'Angles',l:3,q:'An angle less than 90° is called…',o:['Acute','Right','Obtuse','Reflex'],a:'Acute',e:'Acute angles are less than 90°'},
 {id:'mang3_03',s:'maths',t:'Angles',l:3,q:'An angle between 90° and 180° is called…',o:['Acute','Right','Obtuse','Straight'],a:'Obtuse',e:'Obtuse angles are between 90° and 180°'},
-{id:'mang3_04',s:'maths',t:'Angles',l:3,q:'Angles in a triangle add up to…',o:['90°','180°','270°','360°'],a:'180°',e:'The three angles in any triangle always sum to 180°'},
-{id:'mang3_05',s:'maths',t:'Angles',l:3,q:'Angles on a straight line add up to…',o:['90°','180°','270°','360°'],a:'180°',e:'Angles on a straight line always sum to 180°'},
-{id:'mang3_06',s:'maths',t:'Angles',l:3,q:'A triangle has angles 60° and 80°. What is the third angle?',o:['30°','40°','50°','60°'],a:'40°',e:'60 + 80 + ? = 180. So ? = 180 - 140 = 40°'},
-{id:'mang3_07',s:'maths',t:'Angles',l:3,q:'How many degrees are in a full turn?',o:['90°','180°','270°','360°'],a:'360°',e:'A full turn (complete rotation) = 360°'},
-{id:'mang3_08',s:'maths',t:'Angles',l:3,q:'Two angles on a straight line are 110° and ?',o:['60°','70°','80°','90°'],a:'70°',e:'110 + ? = 180. So ? = 70°'},
-
-// ── MATHS: Measurement & Units ────────────────────────
-{id:'mmu3_01',s:'maths',t:'Measurement & Units',l:3,q:'How many centimetres are in 1 metre?',o:['10','100','1,000','10,000'],a:'100',e:'1 metre = 100 centimetres'},
-{id:'mmu3_02',s:'maths',t:'Measurement & Units',l:3,q:'How many grams are in 1 kilogram?',o:['10','100','1,000','10,000'],a:'1,000',e:'1 kg = 1,000 g'},
-{id:'mmu3_03',s:'maths',t:'Measurement & Units',l:3,q:'How many millilitres are in 1 litre?',o:['10','100','1,000','10,000'],a:'1,000',e:'1 litre = 1,000 ml'},
-{id:'mmu3_04',s:'maths',t:'Measurement & Units',l:3,q:'Convert 2.5 kg into grams.',o:['25 g','250 g','2,500 g','25,000 g'],a:'2,500 g',e:'2.5 × 1,000 = 2,500 g'},
-{id:'mmu3_05',s:'maths',t:'Measurement & Units',l:3,q:'A film starts at 3:15 pm and lasts 90 minutes. When does it end?',o:['4:00 pm','4:30 pm','4:45 pm','5:00 pm'],a:'4:45 pm',e:'3:15 + 90 min: +45 min = 4:00 pm, +45 more = 4:45 pm'},
-{id:'mmu3_06',s:'maths',t:'Measurement & Units',l:3,q:'How many minutes are in 2 hours?',o:['60','90','100','120'],a:'120',e:'2 × 60 minutes = 120 minutes'},
-{id:'mmu3_07',s:'maths',t:'Measurement & Units',l:3,q:'Convert 350 cm into metres.',o:['0.35 m','3.5 m','35 m','3,500 m'],a:'3.5 m',e:'350 ÷ 100 = 3.5 m'},
-{id:'mmu3_08',s:'maths',t:'Measurement & Units',l:3,q:'Which is heavier: 1.5 kg or 1,450 g?',o:['1.5 kg','1,450 g','They are equal','Cannot tell'],a:'1.5 kg',e:'1.5 kg = 1,500 g. 1,500 g > 1,450 g'},
-
-// ── MATHS: Perimeter & Area ───────────────────────────
-{id:'mpa3_01',s:'maths',t:'Perimeter & Area',l:3,q:'What is the perimeter of a rectangle 6 cm long and 4 cm wide?',o:['10 cm','20 cm','24 cm','48 cm'],a:'20 cm',e:'Perimeter = 2(l+w) = 2(6+4) = 20 cm'},
-{id:'mpa3_02',s:'maths',t:'Perimeter & Area',l:3,q:'What is the area of a rectangle 5 cm long and 3 cm wide?',o:['8 cm²','15 cm²','16 cm²','30 cm²'],a:'15 cm²',e:'Area = length × width = 5 × 3 = 15 cm²'},
-{id:'mpa3_03',s:'maths',t:'Perimeter & Area',l:3,q:'A square has sides of 7 cm. What is its perimeter?',o:['14 cm','21 cm','28 cm','49 cm'],a:'28 cm',e:'Perimeter of square = 4 × side = 4 × 7 = 28 cm'},
-{id:'mpa3_04',s:'maths',t:'Perimeter & Area',l:3,q:'What is the area of a square with 8 cm sides?',o:['32 cm²','48 cm²','64 cm²','16 cm²'],a:'64 cm²',e:'Area = 8 × 8 = 64 cm²'},
-{id:'mpa3_05',s:'maths',t:'Perimeter & Area',l:3,q:'A rectangle has area 24 cm² and width 4 cm. What is its length?',o:['4 cm','6 cm','8 cm','20 cm'],a:'6 cm',e:'Length = Area ÷ Width = 24 ÷ 4 = 6 cm'},
-{id:'mpa3_06',s:'maths',t:'Perimeter & Area',l:3,q:'What is the perimeter of a square with 9 cm sides?',o:['18 cm','27 cm','36 cm','81 cm'],a:'36 cm',e:'4 × 9 = 36 cm'},
-
-// ── MATHS: Data & Statistics ──────────────────────────
-{id:'mds3_01',s:'maths',t:'Data & Statistics',l:3,q:'What is the mean of: 2, 4, 6, 8?',o:['4','5','6','20'],a:'5',e:'Mean = sum ÷ count = (2+4+6+8) ÷ 4 = 20 ÷ 4 = 5'},
-{id:'mds3_02',s:'maths',t:'Data & Statistics',l:3,q:'A bar chart shows: Mon=5, Tue=8, Wed=3. What is the total?',o:['13','14','16','18'],a:'16',e:'5 + 8 + 3 = 16'},
-{id:'mds3_03',s:'maths',t:'Data & Statistics',l:3,q:'What is the mode of: 3, 5, 3, 7, 5, 3?',o:['3','5','7','4.3'],a:'3',e:'Mode = most frequent value. 3 appears 3 times.'},
-{id:'mds3_04',s:'maths',t:'Data & Statistics',l:3,q:'What is the median of: 1, 3, 5, 7, 9?',o:['3','5','7','9'],a:'5',e:'Median = middle value when ordered. Middle of 5 values is 3rd = 5'},
-{id:'mds3_05',s:'maths',t:'Data & Statistics',l:3,q:'In a pictogram each symbol = 4. There are 5 symbols. What is the total?',o:['5','9','20','25'],a:'20',e:'5 symbols × 4 each = 20'},
-{id:'mds3_06',s:'maths',t:'Data & Statistics',l:3,q:'What is the range of: 4, 7, 2, 9, 1?',o:['5','7','8','9'],a:'8',e:'Range = largest − smallest = 9 − 1 = 8'},
-
-// ── MATHS: Problem Solving ────────────────────────────
-{id:'mps3_01',s:'maths',t:'Problem Solving',l:3,q:'Tom has £5.00 and buys a pen for £1.75. How much change?',o:['£2.75','£3.00','£3.25','£3.75'],a:'£3.25',e:'£5.00 − £1.75 = £3.25'},
-{id:'mps3_02',s:'maths',t:'Problem Solving',l:3,q:'A box holds 6 eggs. How many boxes for 42 eggs?',o:['6','7','8','9'],a:'7',e:'42 ÷ 6 = 7 boxes'},
-{id:'mps3_03',s:'maths',t:'Problem Solving',l:3,q:'There are 24 children in 4 equal groups. How many per group?',o:['4','5','6','8'],a:'6',e:'24 ÷ 4 = 6 children per group'},
-{id:'mps3_04',s:'maths',t:'Problem Solving',l:3,q:'A car travels 60 km/h for 3 hours. How far does it travel?',o:['63 km','120 km','180 km','200 km'],a:'180 km',e:'Distance = speed × time = 60 × 3 = 180 km'},
-{id:'mps3_05',s:'maths',t:'Problem Solving',l:3,q:'Sara has 3 times as many stickers as Priya. Priya has 12. How many does Sara have?',o:['9','24','36','48'],a:'36',e:'3 × 12 = 36 stickers'},
-{id:'mps3_06',s:'maths',t:'Problem Solving',l:3,q:'What is the next number in the sequence: 4, 8, 12, 16, …?',o:['18','19','20','24'],a:'20',e:'The sequence adds 4 each time. 16 + 4 = 20'},
-
-// ── ENGLISH: Vocabulary ───────────────────────────────
-{id:'ev3_01',s:'english',t:'Vocabulary',l:3,q:'What does "enormous" mean?',o:['Tiny','Beautiful','Very large','Dangerous'],a:'Very large',e:'"Enormous" means extremely large or huge'},
+{id:'mang3_04',s:'maths',t:'Angles',l:3,q:'Angles in a triangle add up to…',o:['90°','180°','270°','360°'],a:'180°',e:'All three angles in any triangle sum to 180°'},
+{id:'mang3_05',s:'maths',t:'Angles',l:3,q:'Angles on a straight line add up to…',o:['90°','180°','270°','360°'],a:'180°',e:'Angles on a straight line = 180°'},
+{id:'mang3_06',s:'maths',t:'Angles',l:3,q:'A triangle has angles 60° and 80°. What is the third?',o:['30°','40°','50°','60°'],a:'40°',e:'180 − 60 − 80 = 40°'},
+{id:'mang3_07',s:'maths',t:'Angles',l:3,q:'How many degrees in a full turn?',o:['90°','180°','270°','360°'],a:'360°',e:'A full rotation = 360°'},
+{id:'mang3_08',s:'maths',t:'Angles',l:3,q:'One angle on a straight line is 110°. What is the other?',o:['60°','70°','80°','90°'],a:'70°',e:'180 − 110 = 70°'},
+// ── L3: Measurement & Units ───────────────────────────────
+{id:'mmu3_01',s:'maths',t:'Measurement & Units',l:3,q:'How many centimetres in 1 metre?',o:['10','100','1,000','10,000'],a:'100',e:'1 m = 100 cm'},
+{id:'mmu3_02',s:'maths',t:'Measurement & Units',l:3,q:'How many grams in 1 kilogram?',o:['10','100','1,000','10,000'],a:'1,000',e:'1 kg = 1,000 g'},
+{id:'mmu3_03',s:'maths',t:'Measurement & Units',l:3,q:'How many millilitres in 1 litre?',o:['10','100','1,000','10,000'],a:'1,000',e:'1 litre = 1,000 ml'},
+{id:'mmu3_04',s:'maths',t:'Measurement & Units',l:3,q:'Convert 2.5 kg to grams.',o:['25 g','250 g','2,500 g','25,000 g'],a:'2,500 g',e:'2.5 × 1,000 = 2,500 g'},
+{id:'mmu3_05',s:'maths',t:'Measurement & Units',l:3,q:'Film starts 3:15 pm, lasts 90 min. When does it end?',o:['4:00 pm','4:30 pm','4:45 pm','5:00 pm'],a:'4:45 pm',e:'3:15 + 45 min = 4:00, + 45 more = 4:45 pm'},
+{id:'mmu3_06',s:'maths',t:'Measurement & Units',l:3,q:'How many minutes in 2 hours?',o:['60','90','100','120'],a:'120',e:'2 × 60 = 120 minutes'},
+{id:'mmu3_07',s:'maths',t:'Measurement & Units',l:3,q:'Convert 350 cm to metres.',o:['0.35 m','3.5 m','35 m','3,500 m'],a:'3.5 m',e:'350 ÷ 100 = 3.5 m'},
+{id:'mmu3_08',s:'maths',t:'Measurement & Units',l:3,q:'Which is heavier: 1.5 kg or 1,450 g?',o:['1.5 kg','1,450 g','They are equal','Cannot tell'],a:'1.5 kg',e:'1.5 kg = 1,500 g > 1,450 g'},
+// ── L3: Perimeter & Area ──────────────────────────────────
+{id:'mpa3_01',s:'maths',t:'Perimeter & Area',l:3,q:'Perimeter of a rectangle 6 cm × 4 cm?',o:['10 cm','20 cm','24 cm','48 cm'],a:'20 cm',e:'Perimeter = 2(6+4) = 20 cm'},
+{id:'mpa3_02',s:'maths',t:'Perimeter & Area',l:3,q:'Area of a rectangle 5 cm × 3 cm?',o:['8 cm²','15 cm²','16 cm²','30 cm²'],a:'15 cm²',e:'Area = 5 × 3 = 15 cm²'},
+{id:'mpa3_03',s:'maths',t:'Perimeter & Area',l:3,q:'A square has 7 cm sides. What is its perimeter?',o:['14 cm','21 cm','28 cm','49 cm'],a:'28 cm',e:'4 × 7 = 28 cm'},
+{id:'mpa3_04',s:'maths',t:'Perimeter & Area',l:3,q:'Area of a square with 8 cm sides?',o:['32 cm²','48 cm²','64 cm²','16 cm²'],a:'64 cm²',e:'8 × 8 = 64 cm²'},
+{id:'mpa3_05',s:'maths',t:'Perimeter & Area',l:3,q:'Rectangle: area 24 cm², width 4 cm. What is the length?',o:['4 cm','6 cm','8 cm','20 cm'],a:'6 cm',e:'Length = 24 ÷ 4 = 6 cm'},
+{id:'mpa3_06',s:'maths',t:'Perimeter & Area',l:3,q:'Perimeter of a square with 9 cm sides?',o:['18 cm','27 cm','36 cm','81 cm'],a:'36 cm',e:'4 × 9 = 36 cm'},
+// ── L3: Data & Statistics ─────────────────────────────────
+{id:'mds3_01',s:'maths',t:'Data & Statistics',l:3,q:'Mean of 2, 4, 6, 8?',o:['4','5','6','20'],a:'5',e:'(2+4+6+8) ÷ 4 = 20 ÷ 4 = 5'},
+{id:'mds3_02',s:'maths',t:'Data & Statistics',l:3,q:'Bar chart: Mon=5, Tue=8, Wed=3. Total?',o:['13','14','16','18'],a:'16',e:'5 + 8 + 3 = 16'},
+{id:'mds3_03',s:'maths',t:'Data & Statistics',l:3,q:'Mode of 3, 5, 3, 7, 5, 3?',o:['3','5','7','4.3'],a:'3',e:'Mode = most frequent. 3 appears 3 times.'},
+{id:'mds3_04',s:'maths',t:'Data & Statistics',l:3,q:'Median of 1, 3, 5, 7, 9?',o:['3','5','7','9'],a:'5',e:'Middle value of 5 numbers = 3rd = 5'},
+{id:'mds3_05',s:'maths',t:'Data & Statistics',l:3,q:'Pictogram: each symbol = 4, there are 5 symbols. Total?',o:['5','9','20','25'],a:'20',e:'5 × 4 = 20'},
+{id:'mds3_06',s:'maths',t:'Data & Statistics',l:3,q:'Range of 4, 7, 2, 9, 1?',o:['5','7','8','9'],a:'8',e:'Range = 9 − 1 = 8'},
+// ── L3: Problem Solving ───────────────────────────────────
+{id:'mps3_01',s:'maths',t:'Problem Solving',l:3,q:'Tom has £5.00, buys a pen for £1.75. Change?',o:['£2.75','£3.00','£3.25','£3.75'],a:'£3.25',e:'£5.00 − £1.75 = £3.25'},
+{id:'mps3_02',s:'maths',t:'Problem Solving',l:3,q:'Box holds 6 eggs. How many boxes for 42 eggs?',o:['6','7','8','9'],a:'7',e:'42 ÷ 6 = 7'},
+{id:'mps3_03',s:'maths',t:'Problem Solving',l:3,q:'24 children in 4 equal groups. How many per group?',o:['4','5','6','8'],a:'6',e:'24 ÷ 4 = 6'},
+{id:'mps3_04',s:'maths',t:'Problem Solving',l:3,q:'Car travels 60 km/h for 3 hours. How far?',o:['63 km','120 km','180 km','200 km'],a:'180 km',e:'60 × 3 = 180 km'},
+{id:'mps3_05',s:'maths',t:'Problem Solving',l:3,q:'Sara has 3× as many stickers as Priya. Priya has 12. Sara has…?',o:['9','24','36','48'],a:'36',e:'3 × 12 = 36'},
+{id:'mps3_06',s:'maths',t:'Problem Solving',l:3,q:'Next in sequence: 4, 8, 12, 16, ___?',o:['18','19','20','24'],a:'20',e:'Adds 4 each time. 16 + 4 = 20'},
+// ── L3: Vocabulary ────────────────────────────────────────
+{id:'ev3_01',s:'english',t:'Vocabulary',l:3,q:'What does "enormous" mean?',o:['Tiny','Beautiful','Very large','Dangerous'],a:'Very large',e:'"Enormous" means extremely large'},
 {id:'ev3_02',s:'english',t:'Vocabulary',l:3,q:'What does "ancient" mean?',o:['Modern','Very old','Broken','Hidden'],a:'Very old',e:'"Ancient" means belonging to the very distant past'},
-{id:'ev3_03',s:'english',t:'Vocabulary',l:3,q:'What does "timid" mean?',o:['Brave','Clever','Shy and nervous','Loud'],a:'Shy and nervous',e:'"Timid" means lacking confidence; easily frightened'},
-{id:'ev3_04',s:'english',t:'Vocabulary',l:3,q:'What does "transparent" mean?',o:['Colourful','See-through','Heavy','Invisible'],a:'See-through',e:'"Transparent" means able to be seen through clearly'},
+{id:'ev3_03',s:'english',t:'Vocabulary',l:3,q:'What does "timid" mean?',o:['Brave','Clever','Shy and nervous','Loud'],a:'Shy and nervous',e:'"Timid" means lacking confidence, easily frightened'},
+{id:'ev3_04',s:'english',t:'Vocabulary',l:3,q:'What does "transparent" mean?',o:['Colourful','See-through','Heavy','Invisible'],a:'See-through',e:'"Transparent" means able to be seen through'},
 {id:'ev3_05',s:'english',t:'Vocabulary',l:3,q:'What does "reluctant" mean?',o:['Excited','Unhappy','Unwilling','Confused'],a:'Unwilling',e:'"Reluctant" means not wanting to do something'},
-{id:'ev3_06',s:'english',t:'Vocabulary',l:3,q:'What does "summit" mean?',o:['Valley','River','Top of a mountain','Bottom of a hill'],a:'Top of a mountain',e:'"Summit" means the highest point of a hill or mountain'},
-{id:'ev3_07',s:'english',t:'Vocabulary',l:3,q:'What does "villain" mean?',o:['Hero','Bad character','Side character','King'],a:'Bad character',e:'A villain is an evil or wicked character in a story'},
-{id:'ev3_08',s:'english',t:'Vocabulary',l:3,q:'What does "predict" mean?',o:['To look back','To say what will happen','To explain','To describe'],a:'To say what will happen',e:'"Predict" means to say what you think will happen in the future'},
-{id:'ev3_09',s:'english',t:'Vocabulary',l:3,q:'What does "magnificent" mean?',o:['Ordinary','Very good or impressive','Small','Frightening'],a:'Very good or impressive',e:'"Magnificent" means impressively beautiful or grand'},
-{id:'ev3_10',s:'english',t:'Vocabulary',l:3,q:'What does "exhausted" mean?',o:['Happy','Bored','Very tired','Angry'],a:'Very tired',e:'"Exhausted" means extremely tired'},
-{id:'ev3_11',s:'english',t:'Vocabulary',l:3,q:'Choose the best word: "The detective ___ the clues carefully." (examined/ignored/lost)',o:['ignored','lost','examined','dropped'],a:'examined',e:'"Examined" fits best — a detective would look at clues carefully'},
-{id:'ev3_12',s:'english',t:'Vocabulary',l:3,q:'What is a synonym for "happy"?',o:['Sad','Angry','Joyful','Tired'],a:'Joyful',e:'A synonym has the same (or similar) meaning. Happy = joyful'},
-{id:'ev3_13',s:'english',t:'Vocabulary',l:3,q:'What is an antonym for "cold"?',o:['Warm','Icy','Freezing','Cool'],a:'Warm',e:'An antonym has the opposite meaning. Cold ↔ warm'},
-{id:'ev3_14',s:'english',t:'Vocabulary',l:3,q:'What is a synonym for "fast"?',o:['Slow','Quick','Lazy','Heavy'],a:'Quick',e:'Fast and quick both mean moving rapidly'},
-{id:'ev3_15',s:'english',t:'Vocabulary',l:3,q:'What does "cunning" mean?',o:['Clumsy','Clever at tricking others','Generous','Boring'],a:'Clever at tricking others',e:'"Cunning" means clever at achieving goals in a crafty way'},
-
-// ── ENGLISH: Punctuation ──────────────────────────────
-{id:'ep3_01',s:'english',t:'Punctuation',l:3,q:'Which sentence uses a capital letter correctly?',o:['the dog barked.','The dog barked.','the Dog Barked.','THE dog barked.'],a:'The dog barked.',e:'Sentences begin with a capital letter.'},
-{id:'ep3_02',s:'english',t:'Punctuation',l:3,q:'Where does an apostrophe go in: "The cats toy"?',o:["cat's toy","cats' toy","cats toy","cat toy"],a:"cat's toy",e:"One cat owns the toy: cat's toy (apostrophe before s)"},
-{id:'ep3_03',s:'english',t:'Punctuation',l:3,q:'Which is the correct contraction of "do not"?',o:["don't","do'nt","dont'","d'ont"],a:"don't",e:"don't: the apostrophe replaces the missing 'o' in 'not'"},
-{id:'ep3_04',s:'english',t:'Punctuation',l:3,q:'Which sentence needs an exclamation mark?',o:['What is your name','Please sit down','Watch out','The sky is blue'],a:'Watch out',e:'"Watch out" is an exclamation showing urgency.'},
-{id:'ep3_05',s:'english',t:'Punctuation',l:3,q:'Which sentence is punctuated correctly?',o:['I like dogs cats and rabbits.','I like dogs, cats, and rabbits.','I, like dogs cats and rabbits.','I like, dogs, cats and rabbits.'],a:'I like dogs, cats, and rabbits.',e:'Commas separate items in a list.'},
-{id:'ep3_06',s:'english',t:'Punctuation',l:3,q:'What punctuation ends a question?',o:['Full stop','Exclamation mark','Question mark','Comma'],a:'Question mark',e:'Questions end with a question mark (?)'},
-{id:'ep3_07',s:'english',t:'Punctuation',l:3,q:'Which is correct: "its" or "it\'s" in "The dog wagged ___ tail"?',o:["it's","its","its'","it is"],a:"its",e:'"its" is possessive (belonging to it). "it\'s" = "it is"'},
-{id:'ep3_08',s:'english',t:'Punctuation',l:3,q:'Where do you need a comma in: "After breakfast she went to school"?',o:['After "After"','After "breakfast"','After "she"','After "to"'],a:'After "breakfast"',e:'A comma after an introductory clause: "After breakfast, she went to school"'},
-{id:'ep3_09',s:'english',t:'Punctuation',l:3,q:'Which is correct: "The girls dresses" referring to two girls?',o:["The girl's dresses","The girls' dresses","The girls dresses","The girls's dresses"],a:"The girls' dresses",e:'Multiple girls → plural possessive: girls\' (apostrophe after the s)'},
-{id:'ep3_10',s:'english',t:'Punctuation',l:3,q:'What is wrong with: "The cat sat on it\'s mat"?',o:["it's should be its","The capital is wrong","The full stop is missing","Nothing is wrong"],a:"it's should be its",e:'"its" (possessive) not "it\'s" (it is)'},
-{id:'ep3_11',s:'english',t:'Punctuation',l:3,q:'Which sentence uses speech marks correctly?',o:['"I am hungry," said Tom.','I am hungry, "said Tom."','"I am hungry" said Tom.','"I am hungry, said Tom"'],a:'"I am hungry," said Tom.',e:'Speech marks enclose spoken words; punctuation goes inside the closing speech mark'},
-{id:'ep3_12',s:'english',t:'Punctuation',l:3,q:'Which word should have a capital letter? "my favourite subject is science."',o:['favourite','subject','science','my'],a:'my',e:'"My" starts the sentence and needs a capital letter'},
-{id:'ep3_13',s:'english',t:'Punctuation',l:3,q:'What does a comma do in a list?',o:['Ends the sentence','Separates items','Adds excitement','Shows ownership'],a:'Separates items',e:'Commas are used to separate items in a list'},
-{id:'ep3_14',s:'english',t:'Punctuation',l:3,q:'Choose the correct sentence:',o:["I went to london last summer.","I went to London last summer.","i went to london last summer.","I went to london Last summer."],a:"I went to London last summer.",e:'Place names (London) are proper nouns and need capital letters'},
-{id:'ep3_15',s:'english',t:'Punctuation',l:3,q:'What is the contraction of "I am"?',o:["I'm","Im'","I'am","Iam"],a:"I'm",e:"I'm: the apostrophe replaces the 'a' in 'am'"},
-
-// ── ENGLISH: Grammar ──────────────────────────────────
-{id:'eg3_01',s:'english',t:'Grammar',l:3,q:'What is a noun?',o:['An action word','A describing word','A naming word','A joining word'],a:'A naming word',e:'A noun names a person, place, thing or idea (e.g., dog, school, happiness)'},
-{id:'eg3_02',s:'english',t:'Grammar',l:3,q:'What is a verb?',o:['A naming word','An action word','A describing word','A connecting word'],a:'An action word',e:'A verb expresses an action or state (e.g., run, is, think)'},
-{id:'eg3_03',s:'english',t:'Grammar',l:3,q:'What is an adjective?',o:['A naming word','An action word','A word that describes a noun','A joining word'],a:'A word that describes a noun',e:'Adjectives describe nouns (e.g., big, red, happy dog)'},
-{id:'eg3_04',s:'english',t:'Grammar',l:3,q:'Which word is an adjective in: "The tall tree swayed"?',o:['The','tall','tree','swayed'],a:'tall',e:'"Tall" describes the tree → it is an adjective'},
-{id:'eg3_05',s:'english',t:'Grammar',l:3,q:'What tense is: "She walked to school"?',o:['Present','Future','Past','Conditional'],a:'Past',e:'"Walked" is past tense (the action has already happened)'},
-{id:'eg3_06',s:'english',t:'Grammar',l:3,q:'What is an adverb?',o:['Describes a noun','Describes a verb','Names a thing','Joins sentences'],a:'Describes a verb',e:'An adverb modifies a verb (e.g., ran quickly, spoke softly)'},
-{id:'eg3_07',s:'english',t:'Grammar',l:3,q:'Which is a proper noun?',o:['city','school','London','teacher'],a:'London',e:'A proper noun is the specific name of a person, place or thing — always capitalised'},
-{id:'eg3_08',s:'english',t:'Grammar',l:3,q:'Choose the correct word: "There are ___ biscuits left" (fewer/less)',o:['fewer','less','lesser','fewest'],a:'fewer',e:'Use "fewer" for countable nouns (biscuits you can count)'},
-{id:'eg3_09',s:'english',t:'Grammar',l:3,q:'What is a conjunction?',o:['A naming word','An action word','A word that joins clauses','A describing word'],a:'A word that joins clauses',e:'Conjunctions join clauses or sentences (e.g., and, but, because, although)'},
-{id:'eg3_10',s:'english',t:'Grammar',l:3,q:'Which sentence is in the present tense?',o:['She ran fast.','She will run fast.','She runs fast.','She had run fast.'],a:'She runs fast.',e:'"Runs" is present tense — the action is happening now'},
-{id:'eg3_11',s:'english',t:'Grammar',l:3,q:'Identify the adverb: "The boy shouted loudly"',o:['The','boy','shouted','loudly'],a:'loudly',e:'"Loudly" describes how the boy shouted — it is an adverb'},
-{id:'eg3_12',s:'english',t:'Grammar',l:3,q:'Which word is a pronoun in: "She left her bag at home"?',o:['left','bag','home','She'],a:'She',e:'"She" is a pronoun — it takes the place of a noun (a person\'s name)'},
-
-// ── ENGLISH: Spelling ─────────────────────────────────
-{id:'es3_01',s:'english',t:'Spelling',l:3,q:'Which is spelled correctly?',o:['recieve','receive','receve','recieve'],a:'receive',e:'Remember: i before e except after c → receive'},
-{id:'es3_02',s:'english',t:'Spelling',l:3,q:'Which spelling is correct?',o:['necessary','nessecary','necesary','neccessary'],a:'necessary',e:'Necessary: one collar (c) and two socks (ss)'},
-{id:'es3_03',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['beleive','believe','belive','beleeve'],a:'believe',e:'Believe: b-e-l-i-e-v-e. "Never beLIEve a lie"'},
-{id:'es3_04',s:'english',t:'Spelling',l:3,q:'Which is spelled correctly?',o:['separate','seperate','separete','seperete'],a:'separate',e:'Separate: there\'s "a rat" in sepaRate'},
-{id:'es3_05',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['wierd','wired','weird','werid'],a:'weird',e:'Weird: w-e-i-r-d. Exception to i-before-e rule'},
-{id:'es3_06',s:'english',t:'Spelling',l:3,q:'Which is spelled correctly?',o:['accomodate','accommodate','acommodate','acomodate'],a:'accommodate',e:'Accommodate has double c AND double m'},
-{id:'es3_07',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['occured','occurred','ocurred','occured'],a:'occurred',e:'Occurred: double c and double r (oc-cur-red)'},
-{id:'es3_08',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['definately','definetly','definitely','definitly'],a:'definitely',e:'Definitely: de-fi-nite-ly. There is "finite" inside it'},
-{id:'es3_09',s:'english',t:'Spelling',l:3,q:'Which is spelled correctly?',o:['environment','enviroment','enviornment','enviorment'],a:'environment',e:'Environment: en-vi-ron-ment. Note the "ron" in the middle'},
-{id:'es3_10',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['grammer','gramar','grammar','gramer'],a:'grammar',e:'Grammar: ends in -ar not -er'},
-
-// ── ENGLISH: Verbal Reasoning ─────────────────────────
-{id:'evr3_01',s:'english',t:'Verbal Reasoning',l:3,q:'Find the odd one out: apple, banana, carrot, grape',o:['apple','banana','carrot','grape'],a:'carrot',e:'Apple, banana and grape are fruits. Carrot is a vegetable.'},
+{id:'ev3_06',s:'english',t:'Vocabulary',l:3,q:'What does "summit" mean?',o:['Valley','River','Top of a mountain','Bottom'],a:'Top of a mountain',e:'"Summit" = the highest point'},
+{id:'ev3_07',s:'english',t:'Vocabulary',l:3,q:'What does "villain" mean?',o:['Hero','Bad character','Side character','King'],a:'Bad character',e:'A villain is an evil or wicked character'},
+{id:'ev3_08',s:'english',t:'Vocabulary',l:3,q:'What does "predict" mean?',o:['To look back','To say what will happen','To explain','To describe'],a:'To say what will happen',e:'"Predict" = say what you think will happen'},
+{id:'ev3_09',s:'english',t:'Vocabulary',l:3,q:'What does "magnificent" mean?',o:['Ordinary','Very impressive','Small','Frightening'],a:'Very impressive',e:'"Magnificent" = impressively beautiful or grand'},
+{id:'ev3_10',s:'english',t:'Vocabulary',l:3,q:'What does "exhausted" mean?',o:['Happy','Bored','Very tired','Angry'],a:'Very tired',e:'"Exhausted" = extremely tired'},
+{id:'ev3_11',s:'english',t:'Vocabulary',l:3,q:'"The detective ___ the clues carefully." Best word?',o:['ignored','lost','examined','dropped'],a:'examined',e:'"Examined" = looked at carefully, fits a detective'},
+{id:'ev3_12',s:'english',t:'Vocabulary',l:3,q:'Synonym for "happy"?',o:['Sad','Angry','Joyful','Tired'],a:'Joyful',e:'Happy = joyful (same meaning)'},
+{id:'ev3_13',s:'english',t:'Vocabulary',l:3,q:'Antonym for "cold"?',o:['Warm','Icy','Freezing','Cool'],a:'Warm',e:'Cold ↔ warm are opposites'},
+{id:'ev3_14',s:'english',t:'Vocabulary',l:3,q:'Synonym for "fast"?',o:['Slow','Quick','Lazy','Heavy'],a:'Quick',e:'Fast and quick both mean rapid'},
+{id:'ev3_15',s:'english',t:'Vocabulary',l:3,q:'What does "cunning" mean?',o:['Clumsy','Clever at tricking','Generous','Boring'],a:'Clever at tricking',e:'"Cunning" = craftily clever'},
+// ── L3: Punctuation ───────────────────────────────────────
+{id:'ep3_01',s:'english',t:'Punctuation',l:3,q:'Which sentence uses a capital letter correctly?',o:['the dog barked.','The dog barked.','the Dog Barked.','THE dog barked.'],a:'The dog barked.',e:'Sentences begin with a capital letter'},
+{id:'ep3_02',s:'english',t:'Punctuation',l:3,q:"Where does the apostrophe go: 'The cats toy' (one cat)?",o:["cat's toy","cats' toy","cats toy","cat toy"],a:"cat's toy",e:"One cat owns the toy: cat's (apostrophe before s)"},
+{id:'ep3_03',s:'english',t:'Punctuation',l:3,q:'Correct contraction of "do not"?',o:["don't","do'nt","dont'","d'ont"],a:"don't",e:"don't: apostrophe replaces the missing 'o'"},
+{id:'ep3_04',s:'english',t:'Punctuation',l:3,q:'Which sentence needs an exclamation mark?',o:['What is your name','Please sit down','Watch out','The sky is blue'],a:'Watch out',e:'"Watch out" shows urgency — needs !'},
+{id:'ep3_05',s:'english',t:'Punctuation',l:3,q:'Which is punctuated correctly?',o:['I like dogs cats and rabbits.','I like dogs, cats, and rabbits.','I, like dogs cats and rabbits.','I like, dogs, cats and rabbits.'],a:'I like dogs, cats, and rabbits.',e:'Commas separate items in a list'},
+{id:'ep3_06',s:'english',t:'Punctuation',l:3,q:'What punctuation ends a question?',o:['Full stop','Exclamation mark','Question mark','Comma'],a:'Question mark',e:'Questions end with ?'},
+{id:'ep3_07',s:'english',t:'Punctuation',l:3,q:'"The dog wagged ___ tail." its or it\'s?',o:["it's","its","its'","it is"],a:"its",e:'"its" = possessive. "it\'s" = it is'},
+{id:'ep3_08',s:'english',t:'Punctuation',l:3,q:'Where does a comma go: "After breakfast she went to school"?',o:['After "After"','After "breakfast"','After "she"','After "to"'],a:'After "breakfast"',e:'Comma after introductory clause: "After breakfast, she..."'},
+{id:'ep3_09',s:'english',t:'Punctuation',l:3,q:'"The girls dresses" — two girls. Correct form?',o:["The girl's dresses","The girls' dresses","The girls dresses","The girls's dresses"],a:"The girls' dresses",e:"Multiple girls → girls' (apostrophe after s)"},
+{id:'ep3_10',s:'english',t:'Punctuation',l:3,q:'What is wrong: "The cat sat on it\'s mat"?',o:["it's should be its","Wrong capital","Missing full stop","Nothing is wrong"],a:"it's should be its",e:'"its" (possessive) not "it\'s" (it is)'},
+{id:'ep3_11',s:'english',t:'Punctuation',l:3,q:'Which uses speech marks correctly?',o:['"I am hungry," said Tom.','I am hungry, "said Tom."','"I am hungry" said Tom.','"I am hungry, said Tom"'],a:'"I am hungry," said Tom.',e:'Speech marks enclose spoken words; punctuation goes inside'},
+{id:'ep3_12',s:'english',t:'Punctuation',l:3,q:'Which word needs a capital? "my favourite subject is science."',o:['favourite','subject','science','my'],a:'my',e:'"My" starts the sentence — needs a capital'},
+{id:'ep3_13',s:'english',t:'Punctuation',l:3,q:'What does a comma do in a list?',o:['Ends the sentence','Separates items','Adds excitement','Shows ownership'],a:'Separates items',e:'Commas separate items in a list'},
+{id:'ep3_14',s:'english',t:'Punctuation',l:3,q:'Correct sentence?',o:["I went to london last summer.","I went to London last summer.","i went to london last summer.","I went to london Last summer."],a:"I went to London last summer.",e:'London is a proper noun — always capitalised'},
+{id:'ep3_15',s:'english',t:'Punctuation',l:3,q:'Contraction of "I am"?',o:["I'm","Im'","I'am","Iam"],a:"I'm",e:"I'm: apostrophe replaces 'a' in 'am'"},
+// ── L3: Grammar ───────────────────────────────────────────
+{id:'eg3_01',s:'english',t:'Grammar',l:3,q:'What is a noun?',o:['An action word','A describing word','A naming word','A joining word'],a:'A naming word',e:'A noun names a person, place, thing or idea'},
+{id:'eg3_02',s:'english',t:'Grammar',l:3,q:'What is a verb?',o:['A naming word','An action word','A describing word','A connecting word'],a:'An action word',e:'A verb expresses an action or state'},
+{id:'eg3_03',s:'english',t:'Grammar',l:3,q:'What is an adjective?',o:['A naming word','An action word','A word that describes a noun','A joining word'],a:'A word that describes a noun',e:'Adjectives describe nouns'},
+{id:'eg3_04',s:'english',t:'Grammar',l:3,q:'Which word is an adjective in "The tall tree swayed"?',o:['The','tall','tree','swayed'],a:'tall',e:'"Tall" describes the tree = adjective'},
+{id:'eg3_05',s:'english',t:'Grammar',l:3,q:'Tense of "She walked to school"?',o:['Present','Future','Past','Conditional'],a:'Past',e:'"Walked" is past tense'},
+{id:'eg3_06',s:'english',t:'Grammar',l:3,q:'What is an adverb?',o:['Describes a noun','Describes a verb','Names a thing','Joins sentences'],a:'Describes a verb',e:'An adverb modifies a verb (e.g. ran quickly)'},
+{id:'eg3_07',s:'english',t:'Grammar',l:3,q:'Which is a proper noun?',o:['city','school','London','teacher'],a:'London',e:'A proper noun is a specific name — always capitalised'},
+{id:'eg3_08',s:'english',t:'Grammar',l:3,q:'"There are ___ biscuits left." fewer or less?',o:['fewer','less','lesser','fewest'],a:'fewer',e:'Use "fewer" for countable things'},
+{id:'eg3_09',s:'english',t:'Grammar',l:3,q:'What is a conjunction?',o:['A naming word','An action word','A word that joins clauses','A describing word'],a:'A word that joins clauses',e:'Conjunctions join clauses (and, but, because)'},
+{id:'eg3_10',s:'english',t:'Grammar',l:3,q:'Which sentence is present tense?',o:['She ran fast.','She will run fast.','She runs fast.','She had run fast.'],a:'She runs fast.',e:'"Runs" is present tense'},
+{id:'eg3_11',s:'english',t:'Grammar',l:3,q:'Identify the adverb: "The boy shouted loudly"',o:['The','boy','shouted','loudly'],a:'loudly',e:'"Loudly" describes how = adverb'},
+{id:'eg3_12',s:'english',t:'Grammar',l:3,q:'Which word is a pronoun in "She left her bag at home"?',o:['left','bag','home','She'],a:'She',e:'"She" is a pronoun replacing a person\'s name'},
+// ── L3: Spelling ──────────────────────────────────────────
+{id:'es3_01',s:'english',t:'Spelling',l:3,q:'Which is spelled correctly?',o:['recieve','receive','receve','receeve'],a:'receive',e:'i before e except after c → receive'},
+{id:'es3_02',s:'english',t:'Spelling',l:3,q:'Which spelling is correct?',o:['necessary','nessecary','necesary','neccessary'],a:'necessary',e:'One c, two s: necessary'},
+{id:'es3_03',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['beleive','believe','belive','beleeve'],a:'believe',e:'believe: never beLIEve a lie'},
+{id:'es3_04',s:'english',t:'Spelling',l:3,q:'Which is spelled correctly?',o:['separate','seperate','separete','seperete'],a:'separate',e:'sep-a-rate: there\'s "a rat" in sepaRate'},
+{id:'es3_05',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['wierd','wired','weird','werid'],a:'weird',e:'weird: exception to i-before-e rule'},
+{id:'es3_06',s:'english',t:'Spelling',l:3,q:'Which is spelled correctly?',o:['accomodate','accommodate','acommodate','acomodate'],a:'accommodate',e:'Accommodate: double c AND double m'},
+{id:'es3_07',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['occured','occurred','ocurred','occured'],a:'occurred',e:'occurred: double c and double r'},
+{id:'es3_08',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['definately','definetly','definitely','definitly'],a:'definitely',e:'definitely: there is "finite" inside it'},
+{id:'es3_09',s:'english',t:'Spelling',l:3,q:'Which is spelled correctly?',o:['environment','enviroment','enviornment','enviorment'],a:'environment',e:'en-vi-ron-ment'},
+{id:'es3_10',s:'english',t:'Spelling',l:3,q:'Which is correct?',o:['grammer','gramar','grammar','gramer'],a:'grammar',e:'grammar ends in -ar not -er'},
+// ── L3: Verbal Reasoning ──────────────────────────────────
+{id:'evr3_01',s:'english',t:'Verbal Reasoning',l:3,q:'Odd one out: apple, banana, carrot, grape',o:['apple','banana','carrot','grape'],a:'carrot',e:'Apple, banana, grape are fruits. Carrot is a vegetable.'},
 {id:'evr3_02',s:'english',t:'Verbal Reasoning',l:3,q:'"Dog" is to "puppy" as "cat" is to…',o:['kitten','kitty','cub','foal'],a:'kitten',e:'A puppy is a young dog; a kitten is a young cat'},
-{id:'evr3_03',s:'english',t:'Verbal Reasoning',l:3,q:'Find the odd one out: red, blue, circle, green',o:['red','blue','circle','green'],a:'circle',e:'Red, blue and green are colours. Circle is a shape.'},
-{id:'evr3_04',s:'english',t:'Verbal Reasoning',l:3,q:'"Hot" is to "cold" as "day" is to…',o:['sun','morning','night','week'],a:'night',e:'Hot and cold are opposites; day and night are opposites'},
-{id:'evr3_05',s:'english',t:'Verbal Reasoning',l:3,q:'What is the next word? BIG, BIGGER, _____',o:['BIGGEST','BIGGESTEST','MORE BIG','MOST BIG'],a:'BIGGEST',e:'Comparative: big → bigger → biggest (superlative)'},
-{id:'evr3_06',s:'english',t:'Verbal Reasoning',l:3,q:'Find the word that means the same as both: "flat" and "even"?',o:['bumpy','level','high','curved'],a:'level',e:'"Level" means both flat and even'},
-{id:'evr3_07',s:'english',t:'Verbal Reasoning',l:3,q:'"Pen" is to "write" as "brush" is to…',o:['clean','draw/paint','cut','build'],a:'draw/paint',e:'A pen is used to write; a brush is used to draw or paint'},
-{id:'evr3_08',s:'english',t:'Verbal Reasoning',l:3,q:'Find the odd one out: swimming, running, reading, cycling',o:['swimming','running','reading','cycling'],a:'reading',e:'Swimming, running and cycling are physical exercises. Reading is not.'},
-{id:'evr3_09',s:'english',t:'Verbal Reasoning',l:3,q:'"Slow" is to "fast" as "cold" is to…',o:['icy','cool','hot','warm'],a:'hot',e:'Slow and fast are direct opposites; cold and hot are direct opposites'},
-{id:'evr3_10',s:'english',t:'Verbal Reasoning',l:3,q:'Which word does NOT belong: piano, guitar, violin, flute, drum?',o:['piano','guitar','flute','drum'],a:'flute',e:'Piano, guitar, violin and drum are common orchestral/band instruments. Flute is also common, but the question is: drum is the only percussion instrument. Actually, all are valid… let me pick: piano, guitar, violin, drum are all common — flute is a wind instrument. But wait, violin, piano, guitar are string; drum is percussion; flute is wind. Actually, the odd one out is "drum" as it\'s the only percussion instrument. Let me fix this question.',x:'drum'},
-{id:'evr3_10b',s:'english',t:'Verbal Reasoning',l:3,q:'Which comes next: Monday, Tuesday, Wednesday, ___?',o:['Friday','Thursday','Saturday','Sunday'],a:'Thursday',e:'The days of the week in order: Mon, Tue, Wed, Thu, Fri, Sat, Sun'},
-
-// ── ENGLISH: Synonyms & Antonyms ──────────────────────
-{id:'esa3_01',s:'english',t:'Synonyms & Antonyms',l:3,q:'Which word is a synonym for "big"?',o:['tiny','small','large','narrow'],a:'large',e:'Synonym = same meaning. Big = large'},
-{id:'esa3_02',s:'english',t:'Synonyms & Antonyms',l:3,q:'Which word is an antonym for "brave"?',o:['bold','courageous','fearless','cowardly'],a:'cowardly',e:'Antonym = opposite meaning. Brave ↔ cowardly'},
-{id:'esa3_03',s:'english',t:'Synonyms & Antonyms',l:3,q:'Which is a synonym for "begin"?',o:['finish','end','start','stop'],a:'start',e:'Begin and start mean the same thing'},
-{id:'esa3_04',s:'english',t:'Synonyms & Antonyms',l:3,q:'Which is an antonym for "noisy"?',o:['loud','rowdy','quiet','busy'],a:'quiet',e:'Noisy ↔ quiet (opposites)'},
-{id:'esa3_05',s:'english',t:'Synonyms & Antonyms',l:3,q:'Which is a synonym for "smart"?',o:['slow','dull','clever','lazy'],a:'clever',e:'Smart and clever both mean intelligent'},
-{id:'esa3_06',s:'english',t:'Synonyms & Antonyms',l:3,q:'Which is an antonym for "ancient"?',o:['old','historic','modern','aged'],a:'modern',e:'Ancient (very old) ↔ modern (new)'},
-{id:'esa3_07',s:'english',t:'Synonyms & Antonyms',l:3,q:'Which word is closest in meaning to "frightened"?',o:['happy','scared','angry','surprised'],a:'scared',e:'Frightened and scared both mean afraid'},
-{id:'esa3_08',s:'english',t:'Synonyms & Antonyms',l:3,q:'Which is an antonym for "arrive"?',o:['come','appear','enter','depart'],a:'depart',e:'Arrive (come) ↔ depart (leave) are opposites'},
-
-// ── ENGLISH: Sentence Structure ───────────────────────
-{id:'ess3_01',s:'english',t:'Sentence Structure',l:3,q:'Which is a complete sentence?',o:['Running fast.','The big dog.','The cat sat on the mat.','Because it rained.'],a:'The cat sat on the mat.',e:'A complete sentence has a subject (the cat) and a verb (sat)'},
-{id:'ess3_02',s:'english',t:'Sentence Structure',l:3,q:'Which joining word makes this a compound sentence: "I like football ___ I hate rain."',o:['because','although','but','if'],a:'but',e:'A compound sentence uses a coordinating conjunction (and, but, or, so)'},
-{id:'ess3_03',s:'english',t:'Sentence Structure',l:3,q:'Which is a complex sentence?',o:['The dog ran.','She sang and danced.','Although it was cold, she swam.','I ate fish.'],a:'Although it was cold, she swam.',e:'A complex sentence has a main clause and a subordinate clause joined by a subordinating conjunction'},
-{id:'ess3_04',s:'english',t:'Sentence Structure',l:3,q:'What type of sentence is: "Please sit down."?',o:['Statement','Question','Exclamation','Command'],a:'Command',e:'Commands (imperatives) tell someone to do something'},
-{id:'ess3_05',s:'english',t:'Sentence Structure',l:3,q:'What type of sentence is: "The sun is shining."?',o:['Statement','Question','Command','Exclamation'],a:'Statement',e:'A statement gives information. It ends with a full stop.'},
-{id:'ess3_06',s:'english',t:'Sentence Structure',l:3,q:'Identify the subordinating conjunction: "She cried because she was sad."',o:['She','cried','because','sad'],a:'because',e:'"Because" is a subordinating conjunction — it introduces the reason'},
-
-// ── ENGLISH: Reading Comprehension ────────────────────
-{id:'erc3_01',s:'english',t:'Reading Comprehension',l:3,q:'"The old woman shuffled slowly along the icy path, clutching her coat." What does "shuffled" suggest about her?',o:['She was in a hurry','She moved with short, unsteady steps','She was dancing','She was running'],a:'She moved with short, unsteady steps',e:'"Shuffle" means to walk slowly, dragging feet — implying difficulty or age'},
-{id:'erc3_02',s:'english',t:'Reading Comprehension',l:3,q:'"The children\'s faces fell when they saw the cancelled sign." What does "faces fell" mean?',o:['Their faces dropped off','They looked downwards','They became disappointed','They were surprised'],a:'They became disappointed',e:'"Faces fell" is an idiom meaning they became visibly disappointed'},
-{id:'erc3_03',s:'english',t:'Reading Comprehension',l:3,q:'In a story, the \'setting\' is…',o:['What happens in the story','Who is in the story','Where and when the story takes place','Why the character acts as they do'],a:'Where and when the story takes place',e:'The setting describes the time and place of the story'},
-{id:'erc3_04',s:'english',t:'Reading Comprehension',l:3,q:'"Despite the rain, Maya smiled." What does "despite" mean here?',o:['Because of','In addition to','Even though','Thanks to'],a:'Even though',e:'"Despite" means even though / in spite of'},
-{id:'erc3_05',s:'english',t:'Reading Comprehension',l:3,q:'What is "inference" in reading?',o:['Finding facts stated in the text','Guessing meaning from clues in the text','Copying sentences from the text','Summarising the text'],a:'Guessing meaning from clues in the text',e:'Inference means reading between the lines — using clues to work out what isn\'t directly stated'},
-
+{id:'evr3_03',s:'english',t:'Verbal Reasoning',l:3,q:'Odd one out: red, blue, circle, green',o:['red','blue','circle','green'],a:'circle',e:'Red, blue, green are colours. Circle is a shape.'},
+{id:'evr3_04',s:'english',t:'Verbal Reasoning',l:3,q:'"Hot" is to "cold" as "day" is to…',o:['sun','morning','night','week'],a:'night',e:'Hot/cold are opposites; day/night are opposites'},
+{id:'evr3_05',s:'english',t:'Verbal Reasoning',l:3,q:'What comes next: BIG, BIGGER, ___?',o:['BIGGEST','BIGGESTEST','MORE BIG','MOST BIG'],a:'BIGGEST',e:'big → bigger → biggest (superlative)'},
+{id:'evr3_06',s:'english',t:'Verbal Reasoning',l:3,q:'Word meaning both "flat" and "even"?',o:['bumpy','level','high','curved'],a:'level',e:'"Level" means both flat and even'},
+{id:'evr3_07',s:'english',t:'Verbal Reasoning',l:3,q:'"Pen" is to "write" as "brush" is to…',o:['clean','paint','cut','build'],a:'paint',e:'A pen writes; a brush paints'},
+{id:'evr3_08',s:'english',t:'Verbal Reasoning',l:3,q:'Odd one out: swimming, running, reading, cycling',o:['swimming','running','reading','cycling'],a:'reading',e:'Swimming, running, cycling are physical exercise. Reading is not.'},
+{id:'evr3_09',s:'english',t:'Verbal Reasoning',l:3,q:'"Slow" is to "fast" as "cold" is to…',o:['icy','cool','hot','warm'],a:'hot',e:'Slow/fast are opposites; cold/hot are opposites'},
+{id:'evr3_10',s:'english',t:'Verbal Reasoning',l:3,q:'What comes next: Monday, Tuesday, Wednesday, ___?',o:['Friday','Thursday','Saturday','Sunday'],a:'Thursday',e:'Mon, Tue, Wed, Thu, Fri, Sat, Sun'},
+// ── L3: Synonyms & Antonyms ───────────────────────────────
+{id:'esa3_01',s:'english',t:'Synonyms & Antonyms',l:3,q:'Synonym for "big"?',o:['tiny','small','large','narrow'],a:'large',e:'Big = large (same meaning)'},
+{id:'esa3_02',s:'english',t:'Synonyms & Antonyms',l:3,q:'Antonym for "brave"?',o:['bold','courageous','fearless','cowardly'],a:'cowardly',e:'Brave ↔ cowardly (opposites)'},
+{id:'esa3_03',s:'english',t:'Synonyms & Antonyms',l:3,q:'Synonym for "begin"?',o:['finish','end','start','stop'],a:'start',e:'Begin and start mean the same thing'},
+{id:'esa3_04',s:'english',t:'Synonyms & Antonyms',l:3,q:'Antonym for "noisy"?',o:['loud','rowdy','quiet','busy'],a:'quiet',e:'Noisy ↔ quiet (opposites)'},
+{id:'esa3_05',s:'english',t:'Synonyms & Antonyms',l:3,q:'Synonym for "smart"?',o:['slow','dull','clever','lazy'],a:'clever',e:'Smart and clever both mean intelligent'},
+{id:'esa3_06',s:'english',t:'Synonyms & Antonyms',l:3,q:'Antonym for "ancient"?',o:['old','historic','modern','aged'],a:'modern',e:'Ancient ↔ modern (opposites)'},
+{id:'esa3_07',s:'english',t:'Synonyms & Antonyms',l:3,q:'Synonym for "frightened"?',o:['happy','scared','angry','surprised'],a:'scared',e:'Frightened and scared both mean afraid'},
+{id:'esa3_08',s:'english',t:'Synonyms & Antonyms',l:3,q:'Antonym for "arrive"?',o:['come','appear','enter','depart'],a:'depart',e:'Arrive ↔ depart (opposites)'},
+// ── L3: Sentence Structure ────────────────────────────────
+{id:'ess3_01',s:'english',t:'Sentence Structure',l:3,q:'Which is a complete sentence?',o:['Running fast.','The big dog.','The cat sat on the mat.','Because it rained.'],a:'The cat sat on the mat.',e:'A complete sentence has a subject and a verb'},
+{id:'ess3_02',s:'english',t:'Sentence Structure',l:3,q:'"I like football ___ I hate rain." Which word makes it compound?',o:['because','although','but','if'],a:'but',e:'Compound sentences use coordinating conjunctions (and, but, or, so)'},
+{id:'ess3_03',s:'english',t:'Sentence Structure',l:3,q:'Which is a complex sentence?',o:['The dog ran.','She sang and danced.','Although it was cold, she swam.','I ate fish.'],a:'Although it was cold, she swam.',e:'Complex = main clause + subordinate clause'},
+{id:'ess3_04',s:'english',t:'Sentence Structure',l:3,q:'What type of sentence is "Please sit down"?',o:['Statement','Question','Exclamation','Command'],a:'Command',e:'Commands (imperatives) tell someone to do something'},
+{id:'ess3_05',s:'english',t:'Sentence Structure',l:3,q:'What type is "The sun is shining"?',o:['Statement','Question','Command','Exclamation'],a:'Statement',e:'A statement gives information and ends with a full stop'},
+{id:'ess3_06',s:'english',t:'Sentence Structure',l:3,q:'Subordinating conjunction in "She cried because she was sad"?',o:['She','cried','because','sad'],a:'because',e:'"Because" introduces the reason clause'},
+// ── L3: Reading Comprehension ─────────────────────────────
+{id:'erc3_01',s:'english',t:'Reading Comprehension',l:3,q:'"The old woman shuffled slowly along the icy path." What does shuffled suggest?',o:['She was in a hurry','She moved with short unsteady steps','She was dancing','She was running'],a:'She moved with short unsteady steps',e:'"Shuffle" = slow, dragging steps'},
+{id:'erc3_02',s:'english',t:'Reading Comprehension',l:3,q:'"The children\'s faces fell when they saw the cancelled sign." What does this mean?',o:['Faces dropped off','They looked down','They became disappointed','They were surprised'],a:'They became disappointed',e:'"Faces fell" = idiom meaning they became disappointed'},
+{id:'erc3_03',s:'english',t:'Reading Comprehension',l:3,q:'In a story, the "setting" is…',o:['What happens','Who is in it','Where and when it takes place','Why characters act as they do'],a:'Where and when it takes place',e:'Setting = the time and place of the story'},
+{id:'erc3_04',s:'english',t:'Reading Comprehension',l:3,q:'"Despite the rain, Maya smiled." What does despite mean?',o:['Because of','In addition to','Even though','Thanks to'],a:'Even though',e:'"Despite" = even though / in spite of'},
+{id:'erc3_05',s:'english',t:'Reading Comprehension',l:3,q:'What is "inference" in reading?',o:['Finding stated facts','Reading between the lines','Copying sentences','Summarising'],a:'Reading between the lines',e:'Inference = working out what is not directly stated'},
 ]; // end QUESTIONS
 
 // ════════════════════════════════════════════════════════
 // APP STATE
 // ════════════════════════════════════════════════════════
+let PLAYER_ID = null;
 let state = {
-  // Setup
   subject: 'maths',
-  topic: null,
-  qCount: 20,
-  // Session
-  session: null,   // { questions[], current, correct, wrong[], startTime, topicTimes }
-  // Progress (loaded from Firestore)
+  session: null,
   profile: {
-    xp: 0,
-    level: 1,
-    streak: 0,
-    lastSessionDate: null,
-    weekSessions: [],
-    topicProgress: {},  // { topicKey: { correct3,correct4,correct5,correct6, attempts, totalTime } }
-    badges: {},         // { topicKey: 'bronze'|'silver'|'gold' }
-    personalBest: {}    // { topicKey: accuracy }
+    xp:0, streak:0, lastSessionDate:null,
+    weekSessions:[], topicProgress:{}, badges:{}, personalBest:{}
   },
   dashFilter: 'maths',
   dashTab: 'progress'
@@ -651,7 +737,36 @@ const XP_PER_QUESTION = 5;
 const XP_PER_LEVEL = 200;
 
 // ════════════════════════════════════════════════════════
-// FIRESTORE HELPERS
+// PAGE VISIBILITY — TIMER PAUSE
+// ════════════════════════════════════════════════════════
+let hiddenAt = null;
+const MAX_AWAY_MS = 30 * 60 * 1000;
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    hiddenAt = Date.now();
+  } else {
+    if (hiddenAt && state.session) {
+      const away = Date.now() - hiddenAt;
+      if (away > MAX_AWAY_MS) {
+        hiddenAt = null;
+        document.getElementById('expired-overlay').classList.add('show');
+      } else {
+        state.session.startTime += away; // compensate timer
+      }
+    }
+    hiddenAt = null;
+  }
+});
+
+window.dismissExpired = function() {
+  document.getElementById('expired-overlay').classList.remove('show');
+  state.session = null;
+  showHome();
+};
+
+// ════════════════════════════════════════════════════════
+// FIRESTORE
 // ════════════════════════════════════════════════════════
 async function loadProfile() {
   try {
@@ -662,118 +777,101 @@ async function loadProfile() {
     } else {
       await setDoc(ref, state.profile);
     }
-  } catch(e) { console.warn('Firestore load failed, using local state', e); }
+  } catch(e) { console.warn('Load failed', e); }
 }
 
 async function saveProfile() {
   try {
-    const ref = doc(db, 'players', PLAYER_ID);
-    await setDoc(ref, state.profile, { merge: true });
-  } catch(e) { console.warn('Firestore save failed', e); }
+    await setDoc(doc(db, 'players', PLAYER_ID), state.profile, { merge: true });
+  } catch(e) { console.warn('Save failed', e); }
 }
 
 async function saveSessionResult(result) {
   try {
-    await addDoc(collection(db, 'sessions'), {
-      playerId: PLAYER_ID,
-      ...result,
-      timestamp: serverTimestamp()
-    });
+    await addDoc(collection(db, 'sessions'), { playerId: PLAYER_ID, ...result, timestamp: serverTimestamp() });
   } catch(e) { console.warn('Session save failed', e); }
 }
 
 // ════════════════════════════════════════════════════════
-// TOPIC CONFIG
+// LOGIN
 // ════════════════════════════════════════════════════════
-const TOPICS = {
-  maths: [
-    'Fractions','Multiplication & Division','Place Value & Number',
-    'Addition & Subtraction','Decimals','Percentages',
-    'Geometry – Shapes','Angles','Measurement & Units',
-    'Perimeter & Area','Data & Statistics','Problem Solving'
-  ],
-  english: [
-    'Vocabulary','Punctuation','Grammar','Spelling',
-    'Verbal Reasoning','Synonyms & Antonyms',
-    'Sentence Structure','Reading Comprehension'
-  ]
+let selectedStudentId = null;
+
+window.selectStudent = function(id, name, avatar) {
+  selectedStudentId = id;
+  document.querySelectorAll('.student-btn').forEach(b => b.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  document.getElementById('pw-label').textContent = `${avatar} ${name} — enter your secret word`;
+  const ps = document.getElementById('password-section');
+  ps.classList.add('visible');
+  document.getElementById('password-input').value = '';
+  document.getElementById('password-input').classList.remove('error');
+  setTimeout(() => document.getElementById('password-input').focus(), 100);
 };
 
+window.submitLogin = async function() {
+  if (!selectedStudentId) return;
+  const entered = document.getElementById('password-input').value.trim().toUpperCase();
+  const expected = STUDENTS[selectedStudentId].password;
+  if (entered !== expected) {
+    const inp = document.getElementById('password-input');
+    inp.classList.add('error');
+    setTimeout(() => inp.classList.remove('error'), 500);
+    toast('Wrong secret word — try again!');
+    return;
+  }
+  PLAYER_ID = selectedStudentId;
+  document.getElementById('loading-overlay').classList.remove('hidden');
+  await loadProfile();
+  document.getElementById('loading-overlay').classList.add('hidden');
+  showHome();
+};
+
+// ════════════════════════════════════════════════════════
+// TOPIC PROGRESS HELPERS
+// ════════════════════════════════════════════════════════
 function getTopicProgress(topic) {
-  return state.profile.topicProgress[topic] || {
-    correct3:0, correct4:0, correct5:0, correct6:0,
-    attempts:0, totalTime:0, sessions:0
-  };
+  return state.profile.topicProgress[topic] || { correct3:0, correct4:0, attempts:0, totalTime:0, sessions:0 };
 }
 
 function getTopicPhase(topic) {
   const p = getTopicProgress(topic);
-  if (p.correct3 >= 30 && p.correct4 >= 30) return 5; // L4+L5
-  if (p.correct3 >= 30 && p.correct4 >= 20) return 4; // L3+L4+L5
-  if (p.correct3 >= 30) return 3;   // L3+L4
-  if (p.correct3 >= 21) return 2;   // mostly L3, intro L4
-  return 1;                          // all L3
-}
-
-function getTopicLevel(topic) {
-  const phase = getTopicPhase(topic);
-  if (phase >= 5) return 4;
-  if (phase >= 3) return 3;
-  return 3;
+  if (p.correct3 >= 30 && p.correct4 >= 30) return 5;
+  if (p.correct3 >= 30 && p.correct4 >= 20) return 4;
+  if (p.correct3 >= 30) return 3;
+  if (p.correct3 >= 21) return 2;
+  return 1;
 }
 
 function getLevelLabel(topic) {
-  const phase = getTopicPhase(topic);
-  if (phase >= 5) return 'L4+';
-  if (phase >= 4) return 'L3–5';
-  if (phase >= 3) return 'L3–4';
-  if (phase >= 2) return 'L3*';
-  return 'L3';
+  const ph = getTopicPhase(topic);
+  if (ph >= 5) return 'L4+'; if (ph >= 4) return 'L3–5'; if (ph >= 3) return 'L3–4';
+  if (ph >= 2) return 'L3*'; return 'L3';
 }
 
 // ════════════════════════════════════════════════════════
-// ADAPTIVE QUESTION SELECTOR
+// AUTO-TOPIC SELECTION
 // ════════════════════════════════════════════════════════
-function buildSessionPool(topic, subject, count) {
-  const phase = getTopicPhase(topic);
-  // Level mix ratios based on phase
-  const mixes = {
-    1: [[3,1.0]],
-    2: [[3,0.8],[4,0.2]],
-    3: [[3,0.6],[4,0.4]],
-    4: [[3,0.2],[4,0.6],[5,0.2]],
-    5: [[4,0.7],[5,0.3]]
-  };
-  const mix = mixes[phase] || mixes[1];
+function pickWeakestTopics(preferredSubject, count = 5) {
+  const pool = preferredSubject === 'mix'
+    ? [...TOPICS.maths, ...TOPICS.english]
+    : TOPICS[preferredSubject];
 
-  // Get available questions per level for this topic
-  const byLevel = {};
-  QUESTIONS.filter(q => q.t === topic && q.s === subject && !q.x).forEach(q => {
-    if (!byLevel[q.l]) byLevel[q.l] = [];
-    byLevel[q.l].push(q);
+  const scored = pool.map(t => {
+    const p = getTopicProgress(t);
+    if (!p.sessions) return { t, score: 200 };
+    const daysSince = p.lastSession
+      ? Math.min(30, (Date.now() - new Date(p.lastSession)) / 86400000)
+      : 30;
+    return { t, score: daysSince * 2 + (100 - (p.lastAccuracy || 0)) };
   });
-
-  // Build pool according to mix
-  let pool = [];
-  for (const [lvl, ratio] of mix) {
-    const available = byLevel[lvl] || [];
-    const needed = Math.round(count * ratio);
-    if (available.length === 0) continue;
-    // Shuffle and take needed
-    const shuffled = shuffle([...available]);
-    pool.push(...shuffled.slice(0, needed));
-  }
-
-  // Fill to count if needed (use L3)
-  if (pool.length < count) {
-    const l3 = byLevel[3] || [];
-    const extras = shuffle([...l3]).filter(q => !pool.find(p => p.id === q.id));
-    pool.push(...extras.slice(0, count - pool.length));
-  }
-
-  return shuffle(pool).slice(0, count);
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, count).map(x => x.t);
 }
 
+// ════════════════════════════════════════════════════════
+// ADAPTIVE QUESTION POOL
+// ════════════════════════════════════════════════════════
 function shuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -782,144 +880,87 @@ function shuffle(arr) {
   return arr;
 }
 
+function buildTopicPool(topic, count) {
+  const phase = getTopicPhase(topic);
+  const subj = TOPICS.maths.includes(topic) ? 'maths' : 'english';
+  const mixes = {1:[[3,1.0]],2:[[3,0.8],[4,0.2]],3:[[3,0.6],[4,0.4]],4:[[3,0.2],[4,0.6]],5:[[4,0.7],[5,0.3]]};
+  const mix = mixes[phase] || mixes[1];
+  const byLevel = {};
+  QUESTIONS.filter(q => q.t === topic && q.s === subj && !q.x).forEach(q => {
+    if (!byLevel[q.l]) byLevel[q.l] = [];
+    byLevel[q.l].push(q);
+  });
+  let pool = [];
+  for (const [lvl, ratio] of mix) {
+    const avail = byLevel[lvl] || [];
+    const needed = Math.round(count * ratio);
+    pool.push(...shuffle([...avail]).slice(0, needed));
+  }
+  if (pool.length < count) {
+    const extras = shuffle([...(byLevel[3]||[])]).filter(q => !pool.find(p => p.id === q.id));
+    pool.push(...extras.slice(0, count - pool.length));
+  }
+  return shuffle(pool).slice(0, count);
+}
+
 // ════════════════════════════════════════════════════════
-// QUIZ SESSION LOGIC
+// QUIZ SESSION
 // ════════════════════════════════════════════════════════
-function startSession(topic, subject, count) {
-  const questions = buildSessionPool(topic, subject, count);
+window.startAutoSession = function() {
+  const topics = pickWeakestTopics(state.subject, 5);
+  const questions = [];
+  topics.forEach(t => questions.push(...buildTopicPool(t, 4)));
+  if (questions.length === 0) { toast('No questions available!'); return; }
   state.session = {
-    topic, subject, count,
-    questions,
-    current: 0,
-    correct: 0,
-    wrong: [],    // { q, chosen }
-    skipped: [],
-    startTime: Date.now(),
-    selectedAnswer: null,
-    answered: false
+    topics, questions: shuffle(questions),
+    count: questions.length, current: 0,
+    correct: 0, wrong: [], skipped: [],
+    startTime: Date.now(), answered: false
   };
-}
+  renderQuestion();
+  showScreen('quiz');
+};
 
-function getCurrentQuestion() {
-  return state.session.questions[state.session.current];
-}
+function getCurrentQuestion() { return state.session.questions[state.session.current]; }
 
-function answerQuestion(chosen) {
+window.handleAnswer = function(chosen, btn) {
   if (state.session.answered) return;
   state.session.answered = true;
-  state.session.selectedAnswer = chosen;
   const q = getCurrentQuestion();
-  const correct = chosen === q.a;
-  if (correct) {
-    state.session.correct++;
-  } else {
-    state.session.wrong.push({ q, chosen });
-  }
-  return correct;
-}
+  btn.classList.add('picked');
+  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+  if (chosen !== q.a) state.session.wrong.push({ q, chosen });
+  else state.session.correct++;
+  setTimeout(() => {
+    state.session.current++;
+    state.session.answered = false;
+    if (state.session.current >= state.session.count) finishSession();
+    else renderQuestion();
+  }, 350);
+};
 
-function advanceQuestion() {
-  state.session.answered = false;
-  state.session.selectedAnswer = null;
+window.skipQuestion = function() {
+  if (state.session.answered) return;
+  state.session.wrong.push({ q: getCurrentQuestion(), chosen: '(skipped)' });
   state.session.current++;
-}
+  if (state.session.current >= state.session.count) finishSession();
+  else renderQuestion();
+};
 
-async function endSession() {
-  const s = state.session;
-  const duration = Math.round((Date.now() - s.startTime) / 1000);
-  const accuracy = Math.round((s.correct / s.count) * 100);
-  const xpEarned = s.correct * XP_PER_CORRECT + s.count * XP_PER_QUESTION;
-
-  // Update topic progress
-  const tp = getTopicProgress(s.topic);
-  const phase = getTopicPhase(s.topic);
-  // Count correct at current dominant level
-  const rightByLevel = {};
-  s.questions.forEach((q, i) => {
-    const wrongItem = s.wrong.find(w => w.q.id === q.id);
-    if (!wrongItem) {
-      rightByLevel[q.l] = (rightByLevel[q.l] || 0) + 1;
-    }
-  });
-  if (rightByLevel[3]) tp.correct3 = (tp.correct3||0) + rightByLevel[3];
-  if (rightByLevel[4]) tp.correct4 = (tp.correct4||0) + rightByLevel[4];
-  tp.attempts = (tp.attempts||0) + s.count;
-  tp.totalTime = (tp.totalTime||0) + duration;
-  tp.sessions = (tp.sessions||0) + 1;
-  tp.lastAccuracy = accuracy;
-  tp.lastSession = new Date().toISOString();
-
-  state.profile.topicProgress[s.topic] = tp;
-
-  // XP + Level
-  state.profile.xp = (state.profile.xp || 0) + xpEarned;
-
-  // Streak
-  const today = new Date().toDateString();
-  const last = state.profile.lastSessionDate;
-  if (last !== today) {
-    const yesterday = new Date(Date.now() - 86400000).toDateString();
-    if (last === yesterday) {
-      state.profile.streak = (state.profile.streak || 0) + 1;
-    } else if (!last) {
-      state.profile.streak = 1;
-    } else {
-      state.profile.streak = 1; // reset
-    }
-    state.profile.lastSessionDate = today;
-  }
-
-  // Weekly sessions
-  const week = getWeekDates();
-  if (!state.profile.weekSessions) state.profile.weekSessions = [];
-  if (!state.profile.weekSessions.includes(today)) {
-    state.profile.weekSessions.push(today);
-  }
-  // Keep only this week
-  state.profile.weekSessions = state.profile.weekSessions.filter(d => week.includes(d));
-
-  // Personal best
-  const pb = state.profile.personalBest || {};
-  if (!pb[s.topic] || accuracy > pb[s.topic]) {
-    pb[s.topic] = accuracy;
-  }
-  state.profile.personalBest = pb;
-
-  // Badges
-  checkBadges(s.topic, accuracy);
-
-  await saveProfile();
-  await saveSessionResult({ topic: s.topic, subject: s.subject, correct: s.correct, total: s.count, accuracy, duration, xpEarned });
-
-  return { accuracy, xpEarned, duration };
-}
-
-function checkBadges(topic, accuracy) {
-  const b = state.profile.badges || {};
-  const sessions = state.profile.topicProgress[topic]?.sessions || 0;
-  const current = b[topic];
-  if (accuracy >= 90 && sessions >= 3 && current !== 'gold') {
-    b[topic] = 'gold';
-  } else if (accuracy >= 75 && sessions >= 2 && !current) {
-    b[topic] = 'silver';
-  } else if (accuracy >= 60 && !current) {
-    b[topic] = 'bronze';
-  }
-  state.profile.badges = b;
-}
+window.confirmQuit = function() {
+  if (confirm('Quit this session? Progress will be saved.')) { finishSession(); }
+};
 
 // ════════════════════════════════════════════════════════
 // GAMIFICATION HELPERS
 // ════════════════════════════════════════════════════════
 function getWeekDates() {
-  const dates = [];
-  const now = new Date();
-  const day = now.getDay(); // 0=Sun
+  const dates = [], now = new Date();
+  const day = now.getDay();
   const monday = new Date(now);
   monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
   for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
+    const d = new Date(monday); d.setDate(monday.getDate() + i);
     dates.push(d.toDateString());
   }
   return dates;
@@ -927,183 +968,17 @@ function getWeekDates() {
 
 function getXPLevel() {
   const xp = state.profile.xp || 0;
-  const level = Math.floor(xp / XP_PER_LEVEL) + 1;
-  const xpInLevel = xp % XP_PER_LEVEL;
-  return { level, xpInLevel, xpForLevel: XP_PER_LEVEL };
+  return { level: Math.floor(xp / XP_PER_LEVEL) + 1, xpInLevel: xp % XP_PER_LEVEL, xpForLevel: XP_PER_LEVEL };
 }
 
-// ════════════════════════════════════════════════════════
-// SCREEN NAVIGATION
-// ════════════════════════════════════════════════════════
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
-  window.scrollTo(0,0);
-}
-
-window.showHome = function() {
-  renderHome();
-  showScreen('home');
-};
-
-window.showSetup = function() {
-  renderSetup();
-  showScreen('setup');
-};
-
-window.showDashboard = function() {
-  renderDashboard();
-  showScreen('dashboard');
-};
-
-// ════════════════════════════════════════════════════════
-// HOME RENDER
-// ════════════════════════════════════════════════════════
-function renderHome() {
-  const { level, xpInLevel, xpForLevel } = getXPLevel();
-  document.getElementById('home-streak').textContent = state.profile.streak || 0;
-  document.getElementById('home-xp').textContent = state.profile.xp || 0;
-  document.getElementById('xp-label').textContent = `${xpInLevel} / ${xpForLevel}`;
-  document.getElementById('xp-bar').style.width = Math.round((xpInLevel / xpForLevel) * 100) + '%';
-
-  const week = getWeekDates();
-  const done = state.profile.weekSessions || [];
-  const days = ['M','T','W','T','F','S','S'];
-  const today = new Date().toDateString();
-  const dotsEl = document.getElementById('weekly-dots');
-  dotsEl.innerHTML = week.map((d, i) => {
-    const isDone = done.includes(d);
-    const isToday = d === today;
-    return `<div class="day-dot${isDone?' done':''}${isToday?' today':''}">${days[i]}</div>`;
-  }).join('');
-
-  const weekDone = week.filter(d => done.includes(d)).length;
-  document.getElementById('weekly-count').textContent = weekDone;
-}
-
-// ════════════════════════════════════════════════════════
-// SETUP RENDER
-// ════════════════════════════════════════════════════════
-function renderSetup() {
-  selectSubject(state.subject);
-}
-
-window.selectSubject = function(subj) {
-  state.subject = subj;
-  document.getElementById('subj-maths').classList.toggle('selected', subj === 'maths');
-  document.getElementById('subj-english').classList.toggle('selected', subj === 'english');
-
-  const list = document.getElementById('topic-list');
-  const topics = TOPICS[subj];
-  list.innerHTML = topics.map(t => {
-    const sel = t === state.topic ? ' selected' : '';
-    const lvl = getLevelLabel(t);
-    return `<div class="topic-item${sel}" onclick="selectTopic('${t}')">
-      <span class="topic-name">${t}</span>
-      <span class="topic-level">${lvl}</span>
-    </div>`;
-  }).join('');
-
-  // Auto-select first topic if current not in this subject
-  if (!topics.includes(state.topic)) {
-    state.topic = topics[0];
-    list.querySelector('.topic-item').classList.add('selected');
-  }
-};
-
-window.selectTopic = function(t) {
-  state.topic = t;
-  document.querySelectorAll('.topic-item').forEach(el => {
-    el.classList.toggle('selected', el.querySelector('.topic-name').textContent === t);
-  });
-};
-
-window.selectQCount = function(n) {
-  state.qCount = n;
-  document.querySelectorAll('.qcount-btn').forEach(el => {
-    el.classList.toggle('selected', parseInt(el.textContent) === n);
-  });
-};
-
-window.startQuiz = function() {
-  if (!state.topic) { toast('Please select a topic!'); return; }
-  const avail = QUESTIONS.filter(q => q.t === state.topic && q.s === state.subject && !q.x);
-  if (avail.length < 5) {
-    toast('Not enough questions for this topic yet!');
-    return;
-  }
-  startSession(state.topic, state.subject, Math.min(state.qCount, avail.length));
-  renderQuestion();
-  showScreen('quiz');
-};
-
-// ════════════════════════════════════════════════════════
-// QUIZ RENDER
-// ════════════════════════════════════════════════════════
-function renderQuestion() {
-  const s = state.session;
-  const q = getCurrentQuestion();
-  const progress = ((s.current) / s.count) * 100;
-
-  document.getElementById('q-topic-tag').textContent = s.topic;
-  document.getElementById('q-level-tag').textContent = 'L' + q.l;
-  document.getElementById('quiz-progress').style.width = progress + '%';
-  document.getElementById('q-number').textContent = `Q${s.current + 1} of ${s.count}`;
-  document.getElementById('question-text').textContent = q.q;
-  document.getElementById('next-btn').style.display = 'none';
-
-  const opts = document.getElementById('options-grid');
-  opts.innerHTML = q.o.map((opt, i) =>
-    `<button class="option-btn" onclick="handleAnswer('${opt.replace(/'/g,"\\'")}', this)">${opt}</button>`
-  ).join('');
-}
-
-window.handleAnswer = function(chosen, btn) {
-  if (state.session.answered) return;
-  const correct = answerQuestion(chosen);
-  const q = getCurrentQuestion();
-
-  // Disable all options, style them
-  document.querySelectorAll('.option-btn').forEach(b => {
-    b.disabled = true;
-    if (b.textContent === q.a) b.classList.add('correct');
-    if (b === btn && !correct) b.classList.add('wrong');
-  });
-
-  document.getElementById('next-btn').style.display = 'block';
-  if (correct) showXPPop();
-};
-
-window.skipQuestion = function() {
-  if (state.session.answered) {
-    nextQuestion();
-    return;
-  }
-  state.session.skipped.push(getCurrentQuestion());
-  state.session.wrong.push({ q: getCurrentQuestion(), chosen: '(skipped)' });
-  state.session.current++;
-  if (state.session.current >= state.session.count) {
-    finishSession();
-  } else {
-    renderQuestion();
-  }
-};
-
-window.nextQuestion = function() {
-  advanceQuestion();
-  if (state.session.current >= state.session.count) {
-    finishSession();
-  } else {
-    renderQuestion();
-  }
-};
-
-window.confirmQuit = function() {
-  if (confirm('Quit this session? Progress will be lost.')) showHome();
-};
-
-function showXPPop() {
-  toast(`✅ Correct! +${XP_PER_CORRECT} XP`);
+function checkBadges(topic, accuracy) {
+  const b = state.profile.badges || {};
+  const sessions = state.profile.topicProgress[topic]?.sessions || 0;
+  const cur = b[topic];
+  if (accuracy >= 90 && sessions >= 3 && cur !== 'gold') b[topic] = 'gold';
+  else if (accuracy >= 75 && sessions >= 2 && !cur) b[topic] = 'silver';
+  else if (accuracy >= 60 && !cur) b[topic] = 'bronze';
+  state.profile.badges = b;
 }
 
 // ════════════════════════════════════════════════════════
@@ -1111,15 +986,67 @@ function showXPPop() {
 // ════════════════════════════════════════════════════════
 async function finishSession() {
   showScreen('end');
-  const { accuracy, xpEarned, duration } = await endSession();
   const s = state.session;
+  const duration = Math.round((Date.now() - s.startTime) / 1000);
+  const accuracy = Math.round((s.correct / s.count) * 100);
+  const xpEarned = s.correct * XP_PER_CORRECT + s.count * XP_PER_QUESTION;
 
+  // Update topic progress for each topic in session
+  const topicSet = [...new Set(s.questions.map(q => q.t))];
+  topicSet.forEach(topic => {
+    const tp = getTopicProgress(topic);
+    const topicQs = s.questions.filter(q => q.t === topic);
+    const topicWrong = s.wrong.filter(w => w.q.t === topic).map(w => w.q.id);
+    topicQs.forEach(q => {
+      if (!topicWrong.includes(q.id)) {
+        if (q.l === 3) tp.correct3 = (tp.correct3||0) + 1;
+        if (q.l === 4) tp.correct4 = (tp.correct4||0) + 1;
+      }
+    });
+    tp.attempts = (tp.attempts||0) + topicQs.length;
+    const topicCorrect = topicQs.length - topicQs.filter(q => topicWrong.includes(q.id)).length;
+    tp.lastAccuracy = Math.round((topicCorrect / topicQs.length) * 100);
+    tp.sessions = (tp.sessions||0) + 1;
+    tp.totalTime = (tp.totalTime||0) + Math.round(duration / topicSet.length);
+    tp.lastSession = new Date().toISOString();
+    state.profile.topicProgress[topic] = tp;
+    checkBadges(topic, tp.lastAccuracy);
+  });
+
+  state.profile.xp = (state.profile.xp || 0) + xpEarned;
+
+  // Streak
+  const today = new Date().toDateString();
+  const last = state.profile.lastSessionDate;
+  if (last !== today) {
+    const yest = new Date(Date.now() - 86400000).toDateString();
+    state.profile.streak = (last === yest) ? (state.profile.streak||0)+1 : 1;
+    state.profile.lastSessionDate = today;
+  }
+
+  // Weekly
+  const week = getWeekDates();
+  if (!state.profile.weekSessions) state.profile.weekSessions = [];
+  if (!state.profile.weekSessions.includes(today)) state.profile.weekSessions.push(today);
+  state.profile.weekSessions = state.profile.weekSessions.filter(d => week.includes(d));
+
+  // Personal best per topic
+  const pb = state.profile.personalBest || {};
+  topicSet.forEach(t => {
+    const tp = getTopicProgress(t);
+    if (!pb[t] || tp.lastAccuracy > pb[t]) pb[t] = tp.lastAccuracy;
+  });
+  state.profile.personalBest = pb;
+
+  await saveProfile();
+  await saveSessionResult({ topics: topicSet, correct: s.correct, total: s.count, accuracy, duration, xpEarned });
+
+  // Render end screen
   document.getElementById('end-score').textContent = `${s.correct}/${s.count}`;
   document.getElementById('end-accuracy').textContent = accuracy + '%';
   document.getElementById('end-xp').textContent = '+' + xpEarned;
   document.getElementById('end-time').textContent = Math.ceil(duration/60) + 'm';
 
-  // Trophy
   let trophy = '📋';
   if (accuracy >= 90) trophy = '🏆';
   else if (accuracy >= 75) trophy = '🥇';
@@ -1127,15 +1054,18 @@ async function finishSession() {
   else if (accuracy >= 40) trophy = '🥉';
   document.getElementById('end-trophy').textContent = trophy;
 
-  // Badge earned?
-  const badge = state.profile.badges[s.topic];
-  if (badge) {
-    const icons = { bronze:'🥉', silver:'🥈', gold:'🏅' };
+  // Badge
+  const newBadges = topicSet.filter(t => state.profile.badges[t]);
+  if (newBadges.length > 0) {
+    const icons = {bronze:'🥉',silver:'🥈',gold:'🏅'};
+    const b = state.profile.badges[newBadges[0]];
     document.getElementById('new-badge-section').style.display = 'block';
-    document.getElementById('new-badge-content').textContent = `${icons[badge]} ${badge.toUpperCase()} badge for ${s.topic}!`;
+    document.getElementById('new-badge-content').textContent = `${icons[b]} ${b.toUpperCase()} badge for ${newBadges[0]}!`;
+  } else {
+    document.getElementById('new-badge-section').style.display = 'none';
   }
 
-  // Wrong answers review
+  // Wrong answer review
   document.getElementById('wrong-count').textContent = s.wrong.length;
   const reviewList = document.getElementById('review-list');
   if (s.wrong.length === 0) {
@@ -1150,8 +1080,43 @@ async function finishSession() {
       </div>`
     ).join('');
   }
+  renderHome();
+}
 
-  renderHome(); // update XP/streak in background
+// ════════════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ════════════════════════════════════════════════════════
+function renderQuestion() {
+  const s = state.session;
+  const q = getCurrentQuestion();
+  const progress = (s.current / s.count) * 100;
+  document.getElementById('q-topic-tag').textContent = q.t;
+  document.getElementById('q-level-tag').textContent = 'L' + q.l;
+  document.getElementById('quiz-progress').style.width = progress + '%';
+  document.getElementById('q-number').textContent = `Q${s.current + 1} of ${s.count}`;
+  document.getElementById('question-text').textContent = q.q;
+  document.getElementById('options-grid').innerHTML = q.o.map(opt =>
+    `<button class="option-btn" onclick="handleAnswer('${opt.replace(/'/g,"\\'")}', this)">${opt}</button>`
+  ).join('');
+}
+
+function renderHome() {
+  const st = STUDENTS[PLAYER_ID] || {};
+  const { level, xpInLevel, xpForLevel } = getXPLevel();
+  document.getElementById('home-welcome').textContent = `${st.avatar || ''} ${st.name || 'Champion'}!`;
+  document.getElementById('home-streak').textContent = state.profile.streak || 0;
+  document.getElementById('home-xp').textContent = state.profile.xp || 0;
+  document.getElementById('home-level-label').textContent = `⭐ ${state.profile.xp||0} XP · Level ${level}`;
+  document.getElementById('xp-bar').style.width = Math.round((xpInLevel / xpForLevel) * 100) + '%';
+
+  const week = getWeekDates();
+  const done = state.profile.weekSessions || [];
+  const days = ['M','T','W','T','F','S','S'];
+  const today = new Date().toDateString();
+  document.getElementById('weekly-dots').innerHTML = week.map((d, i) =>
+    `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`
+  ).join('');
+  document.getElementById('weekly-count').textContent = week.filter(d => done.includes(d)).length;
 }
 
 // ════════════════════════════════════════════════════════
@@ -1165,87 +1130,97 @@ function renderDashboard() {
 
 window.switchDashTab = function(tab) {
   state.dashTab = tab;
-  document.querySelectorAll('.nav-tab').forEach((el, i) => {
-    el.classList.toggle('active', ['progress','badges','tips'][i] === tab);
-  });
-  document.getElementById('dash-progress').style.display = tab === 'progress' ? 'block' : 'none';
-  document.getElementById('dash-badges').style.display = tab === 'badges' ? 'block' : 'none';
-  document.getElementById('dash-tips').style.display = tab === 'tips' ? 'block' : 'none';
+  document.querySelectorAll('.nav-tab').forEach((el,i) =>
+    el.classList.toggle('active', ['progress','badges','tips'][i] === tab));
+  document.getElementById('dash-progress').style.display = tab==='progress'?'block':'none';
+  document.getElementById('dash-badges').style.display = tab==='badges'?'block':'none';
+  document.getElementById('dash-tips').style.display = tab==='tips'?'block':'none';
 };
 
 window.setDashFilter = function(filter) {
   state.dashFilter = filter;
   ['maths','english','all'].forEach(f => {
     const btn = document.getElementById('dash-filter-'+f);
-    if (btn) {
-      btn.className = f === filter ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
-    }
+    if (btn) btn.className = f===filter ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm';
   });
-
-  const subjects = filter === 'all' ? ['maths','english'] : [filter];
-  const topics = subjects.flatMap(s => TOPICS[s].map(t => ({t, s})));
-
-  const container = document.getElementById('dash-topics-list');
-  container.innerHTML = topics.map(({t, s}) => {
+  const subjects = filter==='all' ? ['maths','english'] : [filter];
+  const topics = subjects.flatMap(s => TOPICS[s]);
+  document.getElementById('dash-topics-list').innerHTML = topics.map(t => {
     const p = getTopicProgress(t);
-    const acc = p.attempts > 0 ? Math.round(((p.attempts - (p.attempts - (p.correct3||0) - (p.correct4||0))) / p.attempts) * 100) : 0;
-    // Better accuracy calc
-    const sessions = p.sessions || 0;
-    const displayAcc = p.lastAccuracy !== undefined ? p.lastAccuracy : (sessions > 0 ? acc : 0);
-    const colour = displayAcc >= 80 ? 'var(--success)' : displayAcc >= 60 ? 'var(--warning)' : 'var(--danger)';
+    const acc = p.lastAccuracy !== undefined ? p.lastAccuracy : 0;
+    const meta = TOPIC_META[t] || { icon:'📌', grad:'linear-gradient(135deg,#667eea,#764ba2)' };
     const lvl = getLevelLabel(t);
-    const timeMin = p.totalTime ? Math.ceil(p.totalTime/60) : 0;
-    return `<div class="topic-row">
-      <div class="t-name">${t}<div style="font-size:0.7rem;color:var(--text-muted)">${sessions} sessions · ${timeMin}m</div></div>
-      <div class="t-bar-wrap"><div class="t-bar-fill" style="width:${displayAcc}%;background:${colour}"></div></div>
-      <div class="t-pct" style="color:${colour}">${displayAcc}%</div>
-      <div class="t-lvl">${lvl}</div>
+    const sessions = p.sessions || 0;
+    return `<div class="topic-card" style="background:${meta.grad}">
+      <div class="tc-level">${lvl}</div>
+      <div class="tc-icon">${meta.icon}</div>
+      <div class="tc-name">${t}</div>
+      <div class="tc-bar-bg"><div class="tc-bar-fill" style="width:${acc}%"></div></div>
+      <div class="tc-pct">${acc}%</div>
+      <div class="tc-sessions">${sessions} session${sessions!==1?'s':''}</div>
     </div>`;
   }).join('');
 };
 
 function renderBadges() {
   const badges = state.profile.badges || {};
-  const allTopics = [...TOPICS.maths, ...TOPICS.english];
-  const icons = { bronze:'🥉', silver:'🥈', gold:'🏅' };
-  document.getElementById('badge-grid').innerHTML = allTopics.slice(0,12).map(t => {
+  const all = [...TOPICS.maths, ...TOPICS.english];
+  const icons = {bronze:'🥉',silver:'🥈',gold:'🏅'};
+  document.getElementById('badge-grid').innerHTML = all.slice(0,12).map(t => {
     const b = badges[t];
+    const meta = TOPIC_META[t] || {icon:'📌'};
     return `<div class="badge-item${b?' earned':''}">
-      <div class="b-icon">${b ? icons[b] : '⬜'}</div>
-      <div class="b-name">${t.length > 12 ? t.slice(0,11)+'…' : t}</div>
+      <div class="b-icon">${b ? icons[b] : meta.icon}</div>
+      <div class="b-name">${t.length>12?t.slice(0,11)+'…':t}</div>
     </div>`;
   }).join('');
 }
 
 function renderRecs() {
-  const recs = generateRecs();
-  document.getElementById('recs-list').innerHTML = recs.length
-    ? recs.map(r => `<div class="rec-card"><div class="rec-type">${r.type}</div><div class="rec-text">${r.text}</div></div>`).join('')
-    : '<div style="color:var(--text-muted);text-align:center;padding:16px">Complete some sessions to get personalised tips!</div>';
-}
-
-function generateRecs() {
+  const all = [...TOPICS.maths, ...TOPICS.english];
   const recs = [];
-  const allTopics = [...TOPICS.maths, ...TOPICS.english];
-
-  // Find neglected topics
-  const now = new Date();
-  allTopics.forEach(t => {
+  const now = Date.now();
+  all.forEach(t => {
     const p = getTopicProgress(t);
+    if (!p.sessions) { recs.push({type:'🆕 Try it!', text:`You haven't tried ${t} yet — give it a go!`}); return; }
     if (p.lastSession) {
       const days = Math.round((now - new Date(p.lastSession)) / 86400000);
-      if (days >= 7) recs.push({ type: '⏰ Neglected', text: `You haven't practised ${t} in ${days} days. Time to revisit!` });
+      if (days >= 7) recs.push({type:'⏰ Neglected', text:`You haven't practised ${t} in ${days} days. Time to revisit!`});
     }
-    if (p.lastAccuracy !== undefined && p.lastAccuracy < 60 && p.sessions >= 2) {
-      recs.push({ type: '📈 Needs work', text: `Your accuracy in ${t} is ${p.lastAccuracy}%. Keep practising — you'll get there!` });
-    }
-    if (p.sessions >= 3 && p.lastAccuracy >= 85) {
-      recs.push({ type: '⭐ Ready to level up', text: `Great work on ${t}! You may be ready for Level 4 questions soon.` });
-    }
+    if (p.lastAccuracy < 60 && p.sessions >= 2) recs.push({type:'📈 Needs work', text:`${t}: ${p.lastAccuracy}% accuracy. Keep practising!`});
+    if (p.sessions >= 3 && p.lastAccuracy >= 85) recs.push({type:'⭐ Level up', text:`Great work on ${t}! You may be ready for harder questions.`});
   });
-
-  return recs.slice(0, 5);
+  const recsList = document.getElementById('recs-list');
+  recsList.innerHTML = recs.slice(0,5).length
+    ? recs.slice(0,5).map(r => `<div style="background:linear-gradient(135deg,#EEF2FF,#E0E7FF);border-radius:14px;padding:14px 16px;margin-bottom:8px;border-left:4px solid var(--primary)">
+        <div style="font-size:0.7rem;font-weight:700;color:var(--primary);margin-bottom:4px">${r.type}</div>
+        <div style="font-size:0.9rem">${r.text}</div>
+      </div>`).join('')
+    : '<div style="color:var(--text-muted);text-align:center;padding:16px">Complete some sessions to get tips!</div>';
 }
+
+// ════════════════════════════════════════════════════════
+// SUBJECT TOGGLE
+// ════════════════════════════════════════════════════════
+window.setSubject = function(s) {
+  state.subject = s;
+  ['maths','mix','english'].forEach(id => {
+    document.getElementById('subj-'+id).classList.toggle('active', id===s);
+  });
+};
+
+// ════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+window.showHome = function() { renderHome(); showScreen('home'); };
+window.showLogin = function() { selectedStudentId=null; document.getElementById('password-section').classList.remove('visible'); document.querySelectorAll('.student-btn').forEach(b=>b.classList.remove('selected')); showScreen('login'); };
+window.showDashboard = function() { renderDashboard(); showScreen('dashboard'); };
 
 // ════════════════════════════════════════════════════════
 // TOAST
@@ -1263,10 +1238,8 @@ window.toast = function(msg) {
 // INIT
 // ════════════════════════════════════════════════════════
 async function init() {
-  await loadProfile();
   document.getElementById('loading-overlay').classList.add('hidden');
-  renderHome();
-  showScreen('home');
+  showScreen('login');
 }
 
 init();
