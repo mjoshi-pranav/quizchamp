@@ -434,6 +434,33 @@ window.addEventListener('DOMContentLoaded', function(){
 <script>
 var _toastTimer;
 var PARENT_PASSWORD = 'CHAMPION99';
+var STUDENTS = {
+  pranav:    {name:'Pranav',    password:'SOAR',   avatar:'🦁'},
+  lily:      {name:'Lily',      password:'BLOOM',  avatar:'🌸'},
+  mithran:   {name:'Mithran',   password:'BRAVE',  avatar:'⚡'},
+  kabir:     {name:'Kabir',     password:'APEX',   avatar:'🚀'},
+  trial:     {name:'Trial',     password:'SPARK',  avatar:'⭐'},
+  student06: {name:'Student06', password:'RISE',   avatar:'🌟'},
+  student07: {name:'Student07', password:'BOLD',   avatar:'🔥'},
+  student08: {name:'Student08', password:'SHINE',  avatar:'💫'},
+  student09: {name:'Student09', password:'LEAP',   avatar:'🎯'},
+  student10: {name:'Student10', password:'FORGE',  avatar:'⚡'},
+  student11: {name:'Student11', password:'QUEST',  avatar:'🧩'},
+  student12: {name:'Student12', password:'GLOW',   avatar:'✨'},
+  student13: {name:'Student13', password:'SWIFT',  avatar:'🦅'},
+  student14: {name:'Student14', password:'DARE',   avatar:'💪'},
+  student15: {name:'Student15', password:'CREST',  avatar:'🏔️'},
+  student16: {name:'Student16', password:'BLAZE',  avatar:'🔥'},
+  student17: {name:'Student17', password:'PEAK',   avatar:'🏆'},
+  student18: {name:'Student18', password:'STORM',  avatar:'⛈️'},
+  student19: {name:'Student19', password:'FLARE',  avatar:'🌠'},
+  student20: {name:'Student20', password:'NOVA',   avatar:'🌌'},
+  student21: {name:'Student21', password:'TITAN',  avatar:'🦾'},
+  student22: {name:'Student22', password:'PRISM',  avatar:'🌈'},
+  student23: {name:'Student23', password:'VALOR',  avatar:'🛡️'},
+  student24: {name:'Student24', password:'SCOUT',  avatar:'🧭'},
+  student25: {name:'Student25', password:'ZENITH', avatar:'🌙'},
+};
 
 window.showScreen = function(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
@@ -472,6 +499,27 @@ window.agreeAndViewDashboard = function() {
 window.parentSignOut = function() {
   localStorage.removeItem('qc_parent_approved');
   window.showScreen('parent-login');
+};
+
+window.submitLogin = function() {
+  var nameRaw = document.getElementById('login-name').value.trim();
+  var pw = document.getElementById('login-password').value.trim().toUpperCase();
+  if(!nameRaw){ window.toast('Please enter your name'); return; }
+  var entry = Object.entries(STUDENTS).find(function(e){ return e[1].name.toLowerCase()===nameRaw.toLowerCase(); });
+  if(!entry){ _shake('login-name'); window.toast('Name not found — check spelling'); return; }
+  var id=entry[0], student=entry[1];
+  if(pw!==student.password){ _shake('login-password'); window.toast('Wrong secret word — try again!'); return; }
+  // Delegate Firebase loading to module; retry up to 5s if not ready
+  if(typeof window._doLogin==='function'){
+    window._doLogin(id);
+  } else {
+    window.toast('Loading… please tap again in a moment');
+    var tries=0;
+    var wait=setInterval(function(){
+      if(typeof window._doLogin==='function'){ clearInterval(wait); window._doLogin(id); }
+      else if(++tries>10){ clearInterval(wait); window.toast('Connection slow — try again'); }
+    },500);
+  }
 };
 </script>
 
@@ -897,17 +945,9 @@ async function saveSessionResult(r){
 }
 
 // ════════════════════════════════════════════════════════
-// LOGIN — STUDENT
+// LOGIN — STUDENT (validation in instant script, Firebase here)
 // ════════════════════════════════════════════════════════
-window.submitLogin=async function(){
-  const nameRaw=document.getElementById('login-name').value.trim();
-  const pw=document.getElementById('login-password').value.trim().toUpperCase();
-  if(!nameRaw){toast('Please enter your name'); return;}
-  // Find student by name (case-insensitive)
-  const entry=Object.entries(STUDENTS).find(([id,s])=>s.name.toLowerCase()===nameRaw.toLowerCase());
-  if(!entry){ shakeInput('login-name'); toast('Name not found — check spelling'); return; }
-  const [id,student]=entry;
-  if(pw!==student.password){ shakeInput('login-password'); toast('Wrong secret word — try again!'); return; }
+window._doLogin=async function(id){
   PLAYER_ID=id;
   document.getElementById('loading-overlay').classList.remove('hidden');
   await loadProfile();
@@ -1213,41 +1253,4 @@ function renderHome(){
   const week=getWeekDates(),done=state.profile.weekSessions||[],today=new Date().toDateString();
   const days=['M','T','W','T','F','S','S'];
   document.getElementById('weekly-dots').innerHTML=week.map((d,i)=>
-    `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`).join('');
-  document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).length;
-}
-
-// ════════════════════════════════════════════════════════
-// DASHBOARD
-// ════════════════════════════════════════════════════════
-function renderDashboard(){ setDashFilter(state.dashFilter); renderBadges(); renderRecs(); }
-
-window.switchDashTab=function(tab){
-  state.dashTab=tab;
-  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',['progress','badges','tips'][i]===tab));
-  document.getElementById('dash-progress').style.display=tab==='progress'?'block':'none';
-  document.getElementById('dash-badges').style.display=tab==='badges'?'block':'none';
-  document.getElementById('dash-tips').style.display=tab==='tips'?'block':'none';
-};
-
-window.setDashFilter=function(filter){
-  state.dashFilter=filter;
-  ['maths','english','all'].forEach(f=>{ const btn=document.getElementById('dash-filter-'+f); if(btn)btn.className=f===filter?'btn btn-primary btn-sm':'btn btn-outline btn-sm'; });
-  const topics=(filter==='all'?['maths','english']:[filter]).flatMap(s=>TOPICS[s]);
-  document.getElementById('dash-topics-list').innerHTML=topics.map(t=>{
-    const p=getTopicProgress(t),acc=p.lastAccuracy!==undefined?p.lastAccuracy:0;
-    const meta=TOPIC_META[t]||{icon:'📌',grad:'linear-gradient(135deg,#667eea,#764ba2)'};
-    return `<div class="topic-card" style="background:${meta.grad}">
-      <div class="tc-level">${getLevelLabel(t)}</div>
-      <div class="tc-icon">${meta.icon}</div>
-      <div class="tc-name">${t}</div>
-      <div class="tc-bar-bg"><div class="tc-bar-fill" style="width:${acc}%"></div></div>
-      <div class="tc-pct">${acc}%</div>
-      <div class="tc-sessions">${p.sessions||0} session${(p.sessions||0)!==1?'s':''}</div>
-    </div>`;
-  }).join('');
-};
-
-function renderBadges(){
-  const badges=state.profile.badges||{},icons={bronze:'🥉',silver:'🥈',gold:'🏅'};
-  document.getElementByI
+    `<div class="day-dot${done.
