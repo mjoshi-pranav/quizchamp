@@ -188,6 +188,18 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 <body>
 
 <div id="loading-overlay"><div class="spinner"></div><div style="color:var(--text-muted);font-weight:700;font-size:0.9rem">Loading QuizChamp…</div></div>
+<script>
+// Fallback: if Firebase CDN fails to load within 8s, show the app anyway
+setTimeout(function(){
+  var ov=document.getElementById('loading-overlay');
+  if(ov&&!ov.classList.contains('hidden')){
+    ov.classList.add('hidden');
+    document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+    var target=localStorage.getItem('qc_parent_approved')?'screen-login':'screen-parent-login';
+    document.getElementById(target).classList.add('active');
+  }
+},8000);
+</script>
 <div id="toast"></div>
 <div id="expired-overlay">
   <div class="expired-box">
@@ -433,8 +445,14 @@ const firebaseConfig = {
   messagingSenderId:"103805774245",
   appId:"1:103805774245:web:f72a952f8774e0f81f204c"
 };
-const fbApp = initializeApp(firebaseConfig);
-const db = getFirestore(fbApp);
+let db;
+try {
+  const fbApp = initializeApp(firebaseConfig);
+  db = getFirestore(fbApp);
+} catch(e) {
+  console.warn('Firebase init failed:', e);
+  db = null;
+}
 
 // ════════════════════════════════════════════════════════
 // STUDENTS — 25 accounts
@@ -1212,8 +1230,4 @@ function renderRecs(){
 
 // ════════════════════════════════════════════════════════
 // NAVIGATION & TOAST
-// ════════════════════════════════════════════════════════
-function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); window.scrollTo(0,0); }
-window.showHome=function(){ renderHome(); showScreen('home'); };
-window.showLogin=function(){ document.getElementById('login-name').value=''; document.getElementById('login-password').value=''; showScreen('login'); };
-window.showDashboard=function(){ renderDashboard(); showScreen('dashboard
+// ═══════════════════�
