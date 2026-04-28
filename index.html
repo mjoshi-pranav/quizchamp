@@ -430,6 +430,51 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 
+<!-- ══ INSTANT SCRIPT: runs immediately, no Firebase needed ══ -->
+<script>
+var _toastTimer;
+var PARENT_PASSWORD = 'CHAMPION99';
+
+window.showScreen = function(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+};
+window.toast = function(msg) {
+  var el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(_toastTimer); _toastTimer=setTimeout(function(){ el.classList.remove('show'); },2400);
+};
+function _shake(id){ var el=document.getElementById(id); el.classList.add('error'); setTimeout(function(){ el.classList.remove('error'); },500); }
+
+window.showLogin = function() {
+  var n=document.getElementById('login-name'); var p=document.getElementById('login-password');
+  if(n) n.value=''; if(p) p.value='';
+  window.showScreen('login');
+};
+window.showParentLogin = function() { window.showScreen('parent-login'); };
+
+window.submitParentLogin = function() {
+  var pw=document.getElementById('parent-password').value.trim().toUpperCase();
+  if(pw!==PARENT_PASSWORD){ _shake('parent-password'); window.toast('Wrong parent password'); return; }
+  window.showScreen('disclaimer');
+};
+window.agreeDisclaimer = function() {
+  if(!document.getElementById('agree-cb').checked){ window.toast('Please tick the box to agree'); return; }
+  localStorage.setItem('qc_parent_approved','true');
+  window.showLogin();
+};
+window.agreeAndViewDashboard = function() {
+  if(!document.getElementById('agree-cb').checked){ window.toast('Please tick the box to agree'); return; }
+  localStorage.setItem('qc_parent_approved','true');
+  if(typeof loadParentDashboard==='function') loadParentDashboard();
+  window.showScreen('parent');
+};
+window.parentSignOut = function() {
+  localStorage.removeItem('qc_parent_approved');
+  window.showScreen('parent-login');
+};
+</script>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -1205,26 +1250,4 @@ window.setDashFilter=function(filter){
 
 function renderBadges(){
   const badges=state.profile.badges||{},icons={bronze:'🥉',silver:'🥈',gold:'🏅'};
-  document.getElementById('badge-grid').innerHTML=[...TOPICS.maths,...TOPICS.english].slice(0,12).map(t=>{
-    const b=badges[t],meta=TOPIC_META[t]||{icon:'📌'};
-    return `<div class="badge-item${b?' earned':''}"><div class="b-icon">${b?icons[b]:meta.icon}</div><div class="b-name">${t.length>12?t.slice(0,11)+'…':t}</div></div>`;
-  }).join('');
-}
-
-function renderRecs(){
-  const all=[...TOPICS.maths,...TOPICS.english],recs=[],now=Date.now();
-  all.forEach(t=>{
-    const p=getTopicProgress(t);
-    if(!p.sessions){recs.push({type:'🆕 Try it!',text:`You haven't tried ${t} yet!`});return;}
-    if(p.lastSession&&Math.round((now-new Date(p.lastSession))/86400000)>=7) recs.push({type:'⏰ Neglected',text:`${t} not practised in ${Math.round((now-new Date(p.lastSession))/86400000)} days.`});
-    if(p.lastAccuracy<60&&p.sessions>=2) recs.push({type:'📈 Needs work',text:`${t}: ${p.lastAccuracy}% accuracy. Keep going!`});
-    if(p.sessions>=3&&p.lastAccuracy>=85) recs.push({type:'⭐ Level up',text:`Great work on ${t}! Ready for harder questions.`});
-  });
-  document.getElementById('recs-list').innerHTML=recs.slice(0,5).length
-    ?recs.slice(0,5).map(r=>`<div style="background:linear-gradient(135deg,#EEF0FF,#E8EAFF);border-radius:14px;padding:14px 16px;margin-bottom:8px;border-left:4px solid var(--primary)"><div style="font-size:0.7rem;font-weight:800;color:var(--primary);margin-bottom:4px">${r.type}</div><div style="font-size:0.9rem;font-weight:600">${r.text}</div></div>`).join('')
-    :'<div style="color:var(--text-muted);text-align:center;padding:16px;font-weight:600">Complete some sessions to get personalised tips!</div>';
-}
-
-// ════════════════════════════════════════════════════════
-// NAVIGATION & TOAST
-// ═════════════════════════════════════
+  document.getElementByI
