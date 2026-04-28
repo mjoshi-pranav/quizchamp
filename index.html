@@ -207,9 +207,8 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 window.addEventListener('DOMContentLoaded', function(){
   document.getElementById('loading-overlay').classList.add('hidden');
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  var target = localStorage.getItem('qc_parent_approved') ? 'screen-login' : 'screen-parent-login';
-  document.getElementById(target).classList.add('active');
-  renderStudentGrid();
+  // Always start at parent login — no bypass
+  document.getElementById('screen-parent-login').classList.add('active');
 });
 </script>
 <div id="toast"></div>
@@ -222,33 +221,39 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 
-<!-- ═══ STUDENT LOGIN ═══ -->
+<!-- ═══ STUDENT LOGIN (single student — no other names shown) ═══ -->
 <div id="screen-login" class="screen">
   <div class="hero-gradient" style="margin-top:16px">
     <div class="hero-trophy">🏆</div>
     <div class="hero-title">Quiz<em>Champ</em></div>
-    <div class="hero-sub">Who's playing today?</div>
+    <div class="hero-sub">Time to practise!</div>
   </div>
-  <div class="card">
-    <div class="card-title">Choose your name</div>
-    <div class="student-grid" id="student-grid"></div>
-    <div class="pw-panel" id="pw-panel">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <span id="pw-avatar" style="font-size:1.8rem"></span>
-        <div>
-          <div style="font-weight:800;font-size:1rem" id="pw-name"></div>
-          <div style="font-size:0.78rem;color:var(--text-muted)">Enter your secret word</div>
-        </div>
-        <button onclick="deselectStudent()" style="margin-left:auto;background:none;border:none;color:var(--text-muted);font-size:1.2rem;cursor:pointer">✕</button>
-      </div>
-      <input type="password" id="login-password" class="text-input" placeholder="••••••" maxlength="12"
-        oninput="this.value=this.value.toUpperCase()"
-        onkeydown="if(event.key==='Enter')submitLogin()">
-      <button class="btn btn-primary" onclick="submitLogin()">Let's Go! 🚀</button>
-    </div>
+  <div class="card" style="text-align:center;padding:28px 20px">
+    <div style="font-size:3.8rem;margin-bottom:10px" id="pw-avatar">🏆</div>
+    <div style="font-size:1.5rem;font-weight:900;margin-bottom:4px" id="pw-name">Student</div>
+    <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:20px">Enter your secret word to start</div>
+    <input type="password" id="login-password" class="text-input" placeholder="••••••" maxlength="12"
+      oninput="this.value=this.value.toUpperCase()"
+      onkeydown="if(event.key==='Enter')submitLogin()">
+    <button class="btn btn-primary" onclick="submitLogin()">Let's Go! 🚀</button>
   </div>
-  <div style="text-align:center;margin-top:8px">
-    <button onclick="showParentLogin()" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600;text-decoration:underline">Parent / Tutor Login</button>
+  <div style="text-align:center;margin-top:10px">
+    <button onclick="showScreen('student-picker')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600">‹ Wrong student?</button>
+  </div>
+</div>
+
+<!-- ═══ STUDENT PICKER (parent selects who to hand device to) ═══ -->
+<div id="screen-student-picker" class="screen">
+  <div style="padding:28px 0 16px;text-align:center">
+    <div style="font-size:2.5rem">👦</div>
+    <div style="font-size:1.4rem;font-weight:900;color:var(--primary);margin-top:8px">Hand to Student</div>
+    <div style="color:var(--text-muted);font-size:0.9rem;margin-top:4px">Select the student who will play</div>
+  </div>
+  <div class="card" style="padding:8px 20px">
+    <div id="picker-student-list"></div>
+  </div>
+  <div style="text-align:center;margin-top:10px">
+    <button onclick="showScreen('parent')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600">‹ Back to Dashboard</button>
   </div>
 </div>
 
@@ -267,7 +272,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <button class="btn btn-primary" onclick="submitParentLogin()">Access Dashboard</button>
   </div>
   <div style="text-align:center;margin-top:8px">
-    <button onclick="showScreen('login')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600">‹ Back to Student Login</button>
+    <button onclick="showScreen('parent-login')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600">‹ Back</button>
   </div>
 </div>
 
@@ -332,7 +337,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <div id="flagged-list"></div>
   </div>
   <div style="margin-top:16px">
-    <button class="btn btn-primary" onclick="showLogin()" style="margin-bottom:10px">👦 Hand to Student →</button>
+    <button class="btn btn-primary" onclick="showStudentPicker()" style="margin-bottom:10px">👦 Hand to Student →</button>
     <button class="btn btn-ghost" onclick="parentSignOut()" style="font-size:0.85rem">🔒 Sign Out (Lock App)</button>
   </div>
 </div>
@@ -504,54 +509,52 @@ window.toast = function(msg) {
 };
 function _shake(id){ var el=document.getElementById(id); el.classList.add('error'); setTimeout(function(){ el.classList.remove('error'); },500); }
 
-// Track selected student ID in instant script
+// Track selected student ID
 var _selectedStudentId = null;
 
-function renderStudentGrid(){
-  var grid=document.getElementById('student-grid');
-  if(!grid) return;
-  // Only show "real" named students, not the reserve slots
-  var named=['pranav','lily','mithran','kabir','trial'];
-  grid.innerHTML=named.map(function(id){
-    var s=STUDENTS[id];
-    return '<div class="student-tile" id="tile-'+id+'" onclick="selectStudent(\''+id+'\')">'
-      +'<div class="st-avatar">'+s.avatar+'</div>'
-      +'<div class="st-name">'+s.name+'</div>'
-      +'</div>';
+// Parent taps "Hand to Student →" — show picker with student names
+window.showStudentPicker = function() {
+  var named = ['pranav','lily','mithran','kabir','trial'];
+  var list = document.getElementById('picker-student-list');
+  list.innerHTML = named.map(function(id) {
+    var s = STUDENTS[id];
+    return '<div onclick="handToStudent(\''+id+'\')" style="display:flex;align-items:center;gap:16px;padding:16px 4px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background=\'#EEF0FF\'" onmouseout="this.style.background=\'\'">'
+      + '<span style="font-size:2.2rem">'+s.avatar+'</span>'
+      + '<span style="font-weight:800;font-size:1.1rem;color:var(--text)">'+s.name+'</span>'
+      + '<span style="margin-left:auto;color:var(--primary);font-size:1.2rem;font-weight:900">›</span>'
+      + '</div>';
   }).join('');
-}
+  window.showScreen('student-picker');
+};
 
-window.selectStudent = function(id) {
+// Parent picks a student — show that student's login screen only (no other names)
+window.handToStudent = function(id) {
   _selectedStudentId = id;
   var s = STUDENTS[id];
-  // Highlight tile
-  document.querySelectorAll('.student-tile').forEach(function(t){ t.classList.remove('selected'); });
-  var tile=document.getElementById('tile-'+id); if(tile) tile.classList.add('selected');
-  // Show password panel
   document.getElementById('pw-avatar').textContent = s.avatar;
   document.getElementById('pw-name').textContent = s.name;
   document.getElementById('login-password').value = '';
-  document.getElementById('pw-panel').classList.add('open');
-  setTimeout(function(){ document.getElementById('login-password').focus(); }, 100);
-};
-
-window.deselectStudent = function() {
-  _selectedStudentId = null;
-  document.querySelectorAll('.student-tile').forEach(function(t){ t.classList.remove('selected'); });
-  document.getElementById('pw-panel').classList.remove('open');
-  document.getElementById('login-password').value = '';
-};
-
-window.showLogin = function() {
-  deselectStudent();
   window.showScreen('login');
+  setTimeout(function(){ document.getElementById('login-password').focus(); }, 300);
+};
+
+// "Switch Player" from home goes back to parent login (full re-auth required)
+window.showLogin = function() {
+  _selectedStudentId = null;
+  window.showScreen('parent-login');
 };
 window.showParentLogin = function() { window.showScreen('parent-login'); };
 
 window.submitParentLogin = function() {
   var pw=document.getElementById('parent-password').value.trim().toUpperCase();
   if(pw!==PARENT_PASSWORD){ _shake('parent-password'); window.toast('Wrong parent password'); return; }
-  window.showScreen('disclaimer');
+  // Skip disclaimer if already accepted
+  if(localStorage.getItem('qc_parent_approved')){
+    if(typeof loadParentDashboard==='function') loadParentDashboard();
+    window.showScreen('parent');
+  } else {
+    window.showScreen('disclaimer');
+  }
 };
 window.agreeDisclaimer = function() {
   if(!document.getElementById('agree-cb').checked){ window.toast('Please tick the box to agree'); return; }
@@ -698,13 +701,20 @@ window.showParentLogin=function(){ showScreen('parent-login'); };
 window.submitParentLogin=function(){
   const pw=document.getElementById('parent-password').value.trim().toUpperCase();
   if(pw!==PARENT_PASSWORD){ shakeInput('parent-password'); toast('Wrong parent password'); return; }
-  showScreen('disclaimer');
+  // Skip disclaimer if already accepted; show it on first login only
+  if(localStorage.getItem('qc_parent_approved')){
+    loadParentDashboard();
+    showScreen('parent');
+  } else {
+    showScreen('disclaimer');
+  }
 };
 
 window.agreeDisclaimer=function(){
   if(!document.getElementById('agree-cb').checked){ toast('Please tick the box to agree'); return; }
   localStorage.setItem('qc_parent_approved','true');
-  showLogin();
+  loadParentDashboard();
+  showScreen('parent');
 };
 
 window.agreeAndViewDashboard=function(){
@@ -1013,14 +1023,4 @@ function renderQuestion(){
 
 function renderHome(){
   const st=STUDENTS[PLAYER_ID]||{};
-  const {level,xpInLevel,xpForLevel}=getXPLevel();
-  document.getElementById('home-welcome').textContent=`${st.avatar||''} ${st.name||'Champion'}!`;
-  document.getElementById('home-streak').textContent=state.profile.streak||0;
-  document.getElementById('home-xp').textContent=state.profile.xp||0;
-  document.getElementById('home-level-label').textContent=`⭐ ${state.profile.xp||0} XP · Level ${level}`;
-  document.getElementById('xp-bar').style.width=Math.round((xpInLevel/xpForLevel)*100)+'%';
-  const week=getWeekDates(),done=state.profile.weekSessions||[],today=new Date().toDateString();
-  const days=['M','T','W','T','F','S','S'];
-  document.getElementById('weekly-dots').innerHTML=week.map((d,i)=>
-    `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`).join('');
-  document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).
+  const {level,xpInLevel,xpForLe
