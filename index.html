@@ -960,7 +960,28 @@ function renderBadges(){
 }
 
 
-    ?recs.slice(0,5).map(r=>`<div style="background:linear-gradient(135deg,#EEF0FF,#E8EAFF);border-radius:14px;padding:14px 16px;margin-bottom:8px;border-left:4px solid var(--primary)"><div style="font-size:0.7rem;font-weight:800;color:var(--primary);margin-bottom:4px">${r.type}</div><div style="font-size:0.9rem;font-weight:600">${r.text}</div></div>`).join('')
+function computeRecs(){
+  var recs=[];
+  var subj=state.dashFilter;
+  var topics=subj==='all'?[].concat(TOPICS.maths,TOPICS.english):(TOPICS[subj]||[]);
+  topics.forEach(function(t){
+    var p=getTopicProgress(t);
+    var sessions=p.sessions||0;
+    var acc=p.lastAccuracy!==undefined?p.lastAccuracy:0;
+    if(sessions===0){
+      recs.push({type:"Try This",text:"Start practising "+t+" - no sessions yet!"});
+    } else if(acc<60){
+      recs.push({type:"Needs Work",text:t+" accuracy is "+Math.round(acc)+"% - keep going!"});
+    } else if(acc>=80){
+      recs.push({type:"Great Work",text:"You are nailing "+t+"! Keep the streak going."});
+    }
+  });
+  return recs;
+}
+function renderRecs(){
+  var recs=computeRecs();
+  document.getElementById('recs-list').innerHTML=recs.length>0
+    ?recs.slice(0,5).map(function(r){return '<div style="background:linear-gradient(135deg,#EEF0FF,#E8EAFF);border-radius:14px;padding:14px 16px;margin-bottom:8px;border-left:4px solid var(--primary)"><div style="font-size:0.7rem;font-weight:800;color:var(--primary);margin-bottom:4px">'+r.type+'</div><div style="font-size:0.9rem;font-weight:600">'+r.text+'</div></div>';}).join('')
     :'<div style="color:var(--text-muted);text-align:center;padding:16px;font-weight:600">Complete some sessions to get personalised tips!</div>';
 }
 
