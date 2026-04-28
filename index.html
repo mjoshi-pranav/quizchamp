@@ -221,39 +221,23 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
 </div>
 
-<!-- ═══ STUDENT LOGIN (single student — no other names shown) ═══ -->
+<!-- ═══ STUDENT LOGIN — student types own name + password, no names shown ═══ -->
 <div id="screen-login" class="screen">
   <div class="hero-gradient" style="margin-top:16px">
     <div class="hero-trophy">🏆</div>
     <div class="hero-title">Quiz<em>Champ</em></div>
-    <div class="hero-sub">Time to practise!</div>
+    <div class="hero-sub">Ready to practise?</div>
   </div>
-  <div class="card" style="text-align:center;padding:28px 20px">
-    <div style="font-size:3.8rem;margin-bottom:10px" id="pw-avatar">🏆</div>
-    <div style="font-size:1.5rem;font-weight:900;margin-bottom:4px" id="pw-name">Student</div>
-    <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:20px">Enter your secret word to start</div>
+  <div class="card">
+    <label class="input-label">Your Name</label>
+    <input type="text" id="login-name" class="text-input" placeholder="Type your name…" maxlength="20"
+      autocomplete="off" autocorrect="off" spellcheck="false"
+      onkeydown="if(event.key==='Enter')document.getElementById('login-password').focus()">
+    <label class="input-label">Secret Word</label>
     <input type="password" id="login-password" class="text-input" placeholder="••••••" maxlength="12"
       oninput="this.value=this.value.toUpperCase()"
       onkeydown="if(event.key==='Enter')submitLogin()">
     <button class="btn btn-primary" onclick="submitLogin()">Let's Go! 🚀</button>
-  </div>
-  <div style="text-align:center;margin-top:10px">
-    <button onclick="showScreen('student-picker')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600">‹ Wrong student?</button>
-  </div>
-</div>
-
-<!-- ═══ STUDENT PICKER (parent selects who to hand device to) ═══ -->
-<div id="screen-student-picker" class="screen">
-  <div style="padding:28px 0 16px;text-align:center">
-    <div style="font-size:2.5rem">👦</div>
-    <div style="font-size:1.4rem;font-weight:900;color:var(--primary);margin-top:8px">Hand to Student</div>
-    <div style="color:var(--text-muted);font-size:0.9rem;margin-top:4px">Select the student who will play</div>
-  </div>
-  <div class="card" style="padding:8px 20px">
-    <div id="picker-student-list"></div>
-  </div>
-  <div style="text-align:center;margin-top:10px">
-    <button onclick="showScreen('parent')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600">‹ Back to Dashboard</button>
   </div>
 </div>
 
@@ -337,7 +321,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <div id="flagged-list"></div>
   </div>
   <div style="margin-top:16px">
-    <button class="btn btn-primary" onclick="showStudentPicker()" style="margin-bottom:10px">👦 Hand to Student →</button>
+    <button class="btn btn-primary" onclick="showStudentLogin()" style="margin-bottom:10px">👦 Hand to Student →</button>
     <button class="btn btn-ghost" onclick="parentSignOut()" style="font-size:0.85rem">🔒 Sign Out (Lock App)</button>
   </div>
 </div>
@@ -509,36 +493,18 @@ window.toast = function(msg) {
 };
 function _shake(id){ var el=document.getElementById(id); el.classList.add('error'); setTimeout(function(){ el.classList.remove('error'); },500); }
 
-// Track selected student ID
+// Track the matched student ID after login
 var _selectedStudentId = null;
 
-// Parent taps "Hand to Student →" — show picker with student names
-window.showStudentPicker = function() {
-  var named = ['pranav','lily','mithran','kabir','trial'];
-  var list = document.getElementById('picker-student-list');
-  list.innerHTML = named.map(function(id) {
-    var s = STUDENTS[id];
-    return '<div onclick="handToStudent(\''+id+'\')" style="display:flex;align-items:center;gap:16px;padding:16px 4px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background=\'#EEF0FF\'" onmouseout="this.style.background=\'\'">'
-      + '<span style="font-size:2.2rem">'+s.avatar+'</span>'
-      + '<span style="font-weight:800;font-size:1.1rem;color:var(--text)">'+s.name+'</span>'
-      + '<span style="margin-left:auto;color:var(--primary);font-size:1.2rem;font-weight:900">›</span>'
-      + '</div>';
-  }).join('');
-  window.showScreen('student-picker');
-};
-
-// Parent picks a student — show that student's login screen only (no other names)
-window.handToStudent = function(id) {
-  _selectedStudentId = id;
-  var s = STUDENTS[id];
-  document.getElementById('pw-avatar').textContent = s.avatar;
-  document.getElementById('pw-name').textContent = s.name;
+// Parent taps "Hand to Student →" — go straight to blank student login
+window.showStudentLogin = function() {
+  document.getElementById('login-name').value = '';
   document.getElementById('login-password').value = '';
   window.showScreen('login');
-  setTimeout(function(){ document.getElementById('login-password').focus(); }, 300);
+  setTimeout(function(){ document.getElementById('login-name').focus(); }, 200);
 };
 
-// "Switch Player" from home goes back to parent login (full re-auth required)
+// "Switch Player" from home always requires parent re-login
 window.showLogin = function() {
   _selectedStudentId = null;
   window.showScreen('parent-login');
@@ -573,19 +539,34 @@ window.parentSignOut = function() {
 };
 
 window.submitLogin = function() {
-  if(!_selectedStudentId){ window.toast('Please tap your name first'); return; }
+  var nameInput = document.getElementById('login-name').value.trim().toLowerCase();
   var pw = document.getElementById('login-password').value.trim().toUpperCase();
-  var student = STUDENTS[_selectedStudentId];
-  if(pw!==student.password){ _shake('login-password'); window.toast('Wrong secret word — try again! 🔒'); return; }
-  var id = _selectedStudentId;
+  if(!nameInput){ _shake('login-name'); window.toast('Please type your name'); return; }
+  if(!pw){ _shake('login-password'); window.toast('Please enter your secret word'); return; }
+
+  // Find matching student by name (case-insensitive) + password
+  var matchId = null;
+  var ids = Object.keys(STUDENTS);
+  for(var i=0; i<ids.length; i++){
+    var s = STUDENTS[ids[i]];
+    if(s.name.toLowerCase() === nameInput && s.password === pw){
+      matchId = ids[i]; break;
+    }
+  }
+  if(!matchId){
+    _shake('login-password');
+    window.toast('Name or secret word not recognised 🔒');
+    return;
+  }
+  _selectedStudentId = matchId;
   // Delegate Firebase loading to module; retry up to 5s if not ready
   if(typeof window._doLogin==='function'){
-    window._doLogin(id);
+    window._doLogin(matchId);
   } else {
-    window.toast('Loading… please tap again in a moment');
+    window.toast('Loading… please try again in a moment');
     var tries=0;
     var wait=setInterval(function(){
-      if(typeof window._doLogin==='function'){ clearInterval(wait); window._doLogin(id); }
+      if(typeof window._doLogin==='function'){ clearInterval(wait); window._doLogin(matchId); }
       else if(++tries>10){ clearInterval(wait); window.toast('Connection slow — try again'); }
     },500);
   }
@@ -1023,4 +1004,26 @@ function renderQuestion(){
 
 function renderHome(){
   const st=STUDENTS[PLAYER_ID]||{};
-  const {level,xpInLevel,xpForLe
+  const {level,xpInLevel,xpForLevel}=getXPLevel();
+  document.getElementById('home-welcome').textContent=`${st.avatar||''} ${st.name||'Champion'}!`;
+  document.getElementById('home-streak').textContent=state.profile.streak||0;
+  document.getElementById('home-xp').textContent=state.profile.xp||0;
+  document.getElementById('home-level-label').textContent=`⭐ ${state.profile.xp||0} XP · Level ${level}`;
+  document.getElementById('xp-bar').style.width=Math.round((xpInLevel/xpForLevel)*100)+'%';
+  const week=getWeekDates(),done=state.profile.weekSessions||[],today=new Date().toDateString();
+  const days=['M','T','W','T','F','S','S'];
+  document.getElementById('weekly-dots').innerHTML=week.map((d,i)=>
+    `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`).join('');
+  document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).length;
+}
+
+// ════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════
+function renderDashboard(){ setDashFilter(state.dashFilter); renderBadges(); renderRecs(); }
+
+window.switchDashTab=function(tab){
+  state.dashTab=tab;
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',['progress','badges','tips'][i]===tab));
+  document.getElementById('dash-progress').style.display=tab==='progress'?'block':'none';
+  document.getElementById
