@@ -523,59 +523,10 @@ window.submitLogin = function() {
 };
 </script>
 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-
-const firebaseConfig = {
-  apiKey:"AIzaSyCx2QVHmIyZabn2--avx0D7c2frfMz-TjI",
-  authDomain:"pranav-11plus-quiz.firebaseapp.com",
-  projectId:"pranav-11plus-quiz",
-  storageBucket:"pranav-11plus-quiz.firebasestorage.app",
-  messagingSenderId:"103805774245",
-  appId:"1:103805774245:web:f72a952f8774e0f81f204c"
-};
-let db;
-try {
-  const fbApp = initializeApp(firebaseConfig);
-  db = getFirestore(fbApp);
-} catch(e) {
-  console.warn('Firebase init failed:', e);
-  db = null;
-}
-
-// ════════════════════════════════════════════════════════
-// STUDENTS — 25 accounts
-// ════════════════════════════════════════════════════════
-const STUDENTS = {
-  pranav:    { name:'Pranav',      password:'SOAR',   avatar:'🦁' },
-  lily:      { name:'Lily',        password:'BLOOM',  avatar:'🌸' },
-  mithran:   { name:'Mithran',     password:'BRAVE',  avatar:'⚡' },
-  kabir:     { name:'Kabir',       password:'APEX',   avatar:'🚀' },
-  trial:     { name:'Trial',       password:'SPARK',  avatar:'⭐' },
-  student06: { name:'Student06',   password:'RISE',   avatar:'🌟' },
-  student07: { name:'Student07',   password:'BOLD',   avatar:'🔥' },
-  student08: { name:'Student08',   password:'SHINE',  avatar:'💫' },
-  student09: { name:'Student09',   password:'LEAP',   avatar:'🎯' },
-  student10: { name:'Student10',   password:'FORGE',  avatar:'⚡' },
-  student11: { name:'Student11',   password:'QUEST',  avatar:'🧩' },
-  student12: { name:'Student12',   password:'GLOW',   avatar:'✨' },
-  student13: { name:'Student13',   password:'SWIFT',  avatar:'🦅' },
-  student14: { name:'Student14',   password:'DARE',   avatar:'💪' },
-  student15: { name:'Student15',   password:'CREST',  avatar:'🏔️' },
-  student16: { name:'Student16',   password:'BLAZE',  avatar:'🔥' },
-  student17: { name:'Student17',   password:'PEAK',   avatar:'🏆' },
-  student18: { name:'Student18',   password:'STORM',  avatar:'⛈️' },
-  student19: { name:'Student19',   password:'FLARE',  avatar:'🌠' },
-  student20: { name:'Student20',   password:'NOVA',   avatar:'🌌' },
-  student21: { name:'Student21',   password:'TITAN',  avatar:'🦾' },
-  student22: { name:'Student22',   password:'PRISM',  avatar:'🌈' },
-  student23: { name:'Student23',   password:'VALOR',  avatar:'🛡️' },
-  student24: { name:'Student24',   password:'SCOUT',  avatar:'🧭' },
-  student25: { name:'Student25',   password:'ZENITH', avatar:'🌙' },
-};
-
-const PARENT_PASSWORD = 'CHAMPION99';
+<script>
+// Firebase functions — set after async load below
+var db=null, doc, getDoc, setDoc, collection, addDoc, serverTimestamp;
+// STUDENTS & PARENT_PASSWORD already defined in instant script above
 
 // ════════════════════════════════════════════════════════
 // TOPIC META
@@ -1253,4 +1204,51 @@ function renderHome(){
   const week=getWeekDates(),done=state.profile.weekSessions||[],today=new Date().toDateString();
   const days=['M','T','W','T','F','S','S'];
   document.getElementById('weekly-dots').innerHTML=week.map((d,i)=>
-    `<div class="day-dot${done.
+    `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`).join('');
+  document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).length;
+}
+
+// ════════════════════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════════════════════
+function renderDashboard(){ setDashFilter(state.dashFilter); renderBadges(); renderRecs(); }
+
+window.switchDashTab=function(tab){
+  state.dashTab=tab;
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',['progress','badges','tips'][i]===tab));
+  document.getElementById('dash-progress').style.display=tab==='progress'?'block':'none';
+  document.getElementById('dash-badges').style.display=tab==='badges'?'block':'none';
+  document.getElementById('dash-tips').style.display=tab==='tips'?'block':'none';
+};
+
+window.setDashFilter=function(filter){
+  state.dashFilter=filter;
+  ['maths','english','all'].forEach(f=>{ const btn=document.getElementById('dash-filter-'+f); if(btn)btn.className=f===filter?'btn btn-primary btn-sm':'btn btn-outline btn-sm'; });
+  const topics=(filter==='all'?['maths','english']:[filter]).flatMap(s=>TOPICS[s]);
+  document.getElementById('dash-topics-list').innerHTML=topics.map(t=>{
+    const p=getTopicProgress(t),acc=p.lastAccuracy!==undefined?p.lastAccuracy:0;
+    const meta=TOPIC_META[t]||{icon:'📌',grad:'linear-gradient(135deg,#667eea,#764ba2)'};
+    return `<div class="topic-card" style="background:${meta.grad}">
+      <div class="tc-level">${getLevelLabel(t)}</div>
+      <div class="tc-icon">${meta.icon}</div>
+      <div class="tc-name">${t}</div>
+      <div class="tc-bar-bg"><div class="tc-bar-fill" style="width:${acc}%"></div></div>
+      <div class="tc-pct">${acc}%</div>
+      <div class="tc-sessions">${p.sessions||0} session${(p.sessions||0)!==1?'s':''}</div>
+    </div>`;
+  }).join('');
+};
+
+function renderBadges(){
+  const badges=state.profile.badges||{},icons={bronze:'🥉',silver:'🥈',gold:'🏅'};
+  document.getElementById('badge-grid').innerHTML=[...TOPICS.maths,...TOPICS.english].slice(0,12).map(t=>{
+    const b=badges[t],meta=TOPIC_META[t]||{icon:'📌'};
+    return `<div class="badge-item${b?' earned':''}"><div class="b-icon">${b?icons[b]:meta.icon}</div><div class="b-name">${t.length>12?t.slice(0,11)+'…':t}</div></div>`;
+  }).join('');
+}
+
+function renderRecs(){
+  const all=[...TOPICS.maths,...TOPICS.english],recs=[],now=Date.now();
+  all.forEach(t=>{
+    const p=getTopicProgress(t);
+    if(!p.sessions){recs.push(
