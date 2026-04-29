@@ -188,6 +188,40 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .expired-box { background: #fff; border-radius: 20px; padding: 32px; text-align: center; max-width: 320px; margin: 16px; }
 
 @media (min-width: 480px) { .question-text { font-size: 1.25rem; } .screen { padding: 20px; } }
+
+/* ── STORY LIBRARY ── */
+#screen-stories { padding-bottom: 24px; }
+.story-filter-bar { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px; -webkit-overflow-scrolling: touch; }
+.story-filter-bar::-webkit-scrollbar { display: none; }
+.sf-btn { flex-shrink: 0; padding: 6px 16px; border-radius: 20px; border: 2px solid var(--border); background: #fff; font-weight: 700; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; transition: all 0.15s; }
+.sf-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.story-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.story-card { background: #fff; border-radius: 16px; border: 2px solid var(--border); padding: 16px 14px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; position: relative; overflow: hidden; }
+.story-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.story-card.locked { opacity: 0.55; cursor: default; }
+.story-card .sc-emoji { font-size: 2.2rem; margin-bottom: 8px; display: block; }
+.story-card .sc-title { font-size: 0.85rem; font-weight: 800; color: var(--navy); line-height: 1.25; margin-bottom: 4px; }
+.story-card .sc-sub { font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+.story-card .sc-level { font-size: 0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; display: inline-block; }
+.sc-level-2 { background: #E1F5EE; color: #085041; }
+.sc-level-3 { background: #E6F1FB; color: #0C447C; }
+.sc-level-4 { background: #FAEEDA; color: #633806; }
+.sc-lock-icon { position: absolute; top: 10px; right: 10px; font-size: 1rem; }
+/* story reader */
+#story-reader { position: fixed; inset: 0; background: #fff; z-index: 500; overflow-y: auto; display: none; padding: 0; }
+#story-reader.open { display: block; }
+.reader-header { position: sticky; top: 0; background: #fff; border-bottom: 2px solid var(--border); padding: 14px 16px; display: flex; align-items: center; gap: 12px; z-index: 10; }
+.reader-back { background: none; border: none; font-size: 1.6rem; cursor: pointer; color: var(--primary); line-height: 1; padding: 0; }
+.reader-title-block { flex: 1; }
+.reader-title-block h2 { font-size: 1rem; font-weight: 900; color: var(--navy); margin: 0; }
+.reader-title-block p { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin: 2px 0 0; }
+.reader-body { padding: 20px 18px 40px; max-width: 640px; margin: 0 auto; }
+.reader-body p { font-size: 0.95rem; line-height: 1.75; color: #222; margin-bottom: 14px; }
+.vocab-word { background: linear-gradient(120deg, rgba(108,99,255,0.15), rgba(108,99,255,0.08)); border-radius: 4px; padding: 1px 4px; font-weight: 700; color: var(--primary); cursor: help; border-bottom: 2px solid rgba(108,99,255,0.3); }
+.reader-vocab { margin-top: 24px; background: #F8F7FF; border-radius: 16px; padding: 16px; border: 2px solid rgba(108,99,255,0.15); }
+.reader-vocab h3 { font-size: 0.85rem; font-weight: 800; color: var(--primary); margin: 0 0 10px; }
+.vocab-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.vocab-chip { background: #fff; border: 2px solid rgba(108,99,255,0.2); border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 700; color: var(--navy); }
 </style>
 </head>
 <body>
@@ -358,6 +392,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
   <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">🚀 Start Session</button>
   <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">📊 My Dashboard</button>
+    <button class="btn btn-outline" onclick="showStories()" style="margin-bottom:12px">📚 Story Library</button>
   <button class="btn btn-ghost btn-sm" onclick="showLogin()" style="display:block;width:100%;margin-bottom:8px">Switch Player</button>
 </div>
 
@@ -439,6 +474,44 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div id="dash-tips" style="display:none">
     <div class="card"><div class="card-title">📌 Recommendations</div><div id="recs-list"></div></div>
+  </div>
+</div>
+
+
+<!-- ═══ STORY LIBRARY SCREEN ═══ -->
+<div id="screen-stories" class="screen">
+  <div class="app-header">
+    <button onclick="showHome()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--primary)">‹</button>
+    <div class="app-logo">Story Library</div>
+    <div></div>
+  </div>
+  <p style="font-size:0.82rem;color:var(--text-muted);font-weight:600;margin-bottom:12px">Read stories packed with vocabulary words. Highlighted words are ones you're learning!</p>
+  <div class="story-filter-bar">
+    <div class="sf-btn active" onclick="filterStories('all')" id="sf-all">📚 All</div>
+    <div class="sf-btn" onclick="filterStories('spy')" id="sf-spy">🕵️ Spy</div>
+    <div class="sf-btn" onclick="filterStories('astronaut')" id="sf-astronaut">🚀 Astronaut</div>
+    <div class="sf-btn" onclick="filterStories('adventure')" id="sf-adventure">🗺️ Adventure</div>
+    <div class="sf-btn" onclick="filterStories('mystery')" id="sf-mystery">🔍 Mystery</div>
+  </div>
+  <div class="story-grid" id="story-grid"></div>
+</div>
+
+<!-- ═══ STORY READER ═══ -->
+<div id="story-reader">
+  <div class="reader-header">
+    <button class="reader-back" onclick="closeStoryReader()">‹</button>
+    <div class="reader-title-block">
+      <h2 id="reader-title">Story Title</h2>
+      <p id="reader-subtitle">Subtitle</p>
+    </div>
+    <span id="reader-level-pill" class="sc-level"></span>
+  </div>
+  <div class="reader-body">
+    <div id="reader-text"></div>
+    <div class="reader-vocab" id="reader-vocab-section">
+      <h3>📖 Vocabulary in this story</h3>
+      <div class="vocab-chips" id="reader-vocab-chips"></div>
+    </div>
   </div>
 </div>
 
@@ -1083,6 +1156,458 @@ function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.class
 window.showHome=function(){ renderHome(); showScreen('home'); };
 window.showLogin=function(){ document.getElementById('login-name').value=''; document.getElementById('login-password').value=''; showScreen('login'); };
 window.showDashboard=function(){ renderDashboard(); showScreen('dashboard'); };
+
+// ════════════════════════════════════════════════════════
+// STORY LIBRARY
+// ════════════════════════════════════════════════════════
+const STORIES_META = [
+  {id:"spy_l2",genre:"spy",level:2,title:"The Shadow File",subtitle:"Agent Riya \u2014 Part 1",emoji:"\ud83d\udd75\ufe0f",vocabWords:["gleaming", "immense", "colossal", "dazzling", "abundant", "concealed", "fragile", "perilous", "solemn", "ferocious", "persevere", "swift", "agile", "extraordinary", "peculiar", "desolate", "eerie", "frail", "treacherous", "cautious", "astonished", "hesitant", "rapid", "serene", "gloomy", "tenacious", "mischievous", "vivid", "jovial"]},
+  {id:"spy_l3",genre:"spy",level:3,title:"The Summit",subtitle:"Agent Riya \u2014 Part 2",emoji:"\ud83d\udd75\ufe0f",vocabWords:["summit", "magnificent", "enormous", "ominous", "consecutive", "notorious", "sinister", "accumulated", "ruthless", "formidable", "persistent", "exhausted", "transparent", "ancient", "perceive", "meticulous", "stealthy", "diminishing", "wary", "evasive", "cunning", "inquisitive", "diligent", "ambiguous", "inevitable", "reluctant", "sinister", "illuminate"]},
+  {id:"spy_l4",genre:"spy",level:4,title:"The Last Code",subtitle:"Agent Riya \u2014 Part 3",emoji:"\ud83d\udd75\ufe0f",vocabWords:["daunting", "precarious", "cryptic", "decipher", "lucid", "furtive", "valiant", "feign", "ponder", "infer", "integrity", "verify", "intricate", "coerced", "momentous", "profound", "adversity", "menacing", "eloquent", "steadfast", "remorse", "empathy", "incessant", "exquisite"]},
+  {id:"space_l2",genre:"astronaut",level:2,title:"The Red Signal",subtitle:"Commander Jax \u2014 Part 1",emoji:"\ud83d\ude80",vocabWords:["desolate", "bleak", "treacherous", "gleaming", "immense", "gloomy", "vivid", "magnificent", "ferocious", "cautious", "eerie", "abundant", "hesitant", "luminous", "peculiar", "serene", "frantic", "rapid", "extraordinary", "sturdy", "solemn", "jubilant"]},
+  {id:"space_l3",genre:"astronaut",level:3,title:"The Deep Station",subtitle:"Commander Jax \u2014 Part 2",emoji:"\ud83d\ude80",vocabWords:["consecutive", "elaborate", "meticulous", "exhausted", "ancient", "persistent", "formidable", "reluctant", "plausible", "ominous", "diminishing", "inquisitive", "sinister", "diligent", "notorious", "oblivious", "accumulate", "enormous", "transparent", "resilient", "perceive", "ambiguous", "zealous"]},
+  {id:"space_l4",genre:"astronaut",level:4,title:"The Keeper",subtitle:"Commander Jax \u2014 Part 3",emoji:"\ud83d\ude80",vocabWords:["steadfast", "profound", "empathy", "defiant", "fervent", "lucid", "erratic", "monotonous", "eloquent", "nonchalant", "adversity", "apprehensive", "coercing", "intricate", "exquisite", "dormant", "obscure", "ponder", "momentous", "incessant"]},
+  {id:"adventure_l2",genre:"adventure",level:2,title:"The Lost City",subtitle:"Zara's Expedition \u2014 Part 1",emoji:"\ud83c\udf3f",vocabWords:["gleaming", "immense", "vivid", "ferocious", "dazzling", "glorious", "gracious", "treacherous", "agile", "serene", "abundant", "concealed", "extraordinary", "fragile", "luminous", "solemn", "voyage", "perilous", "turbulent", "fierce", "eerie", "weary", "tenacious", "colossal", "sturdy", "astonished", "jubilant"]},
+  {id:"adventure_l3",genre:"adventure",level:3,title:"The Guardians",subtitle:"Zara's Expedition \u2014 Part 2",emoji:"\ud83c\udf3f",vocabWords:["enormous", "ancient", "meticulous", "elaborate", "perceive", "accumulated", "resilient", "deteriorate", "jovial", "wary", "inquisitive", "formidable", "persistent", "cunning", "predicted", "diligent", "oblivious", "ambiguous", "benevolent", "stealthy", "ominous", "sinister", "illuminate", "notorious"]},
+  {id:"adventure_l4",genre:"adventure",level:4,title:"The Heart of the City",subtitle:"Zara's Expedition \u2014 Part 3",emoji:"\ud83c\udf3f",vocabWords:["dormant", "intricate", "exquisite", "apprehensive", "lucid", "condescending", "integrity", "coerce", "obscure", "momentous", "enigmatic", "infer", "spontaneous", "profound", "menacing", "nonchalant", "ponder", "feign"]},
+  {id:"mystery_l2",genre:"mystery",level:2,title:"The Missing Trophy",subtitle:"Theo Investigates \u2014 Part 1",emoji:"\ud83d\udd0d",vocabWords:["gleaming", "peculiar", "agile", "hesitant", "hideous", "ferocious", "swift", "vivid", "eerie", "concealed", "tenacious", "persevere", "frantic", "gracious", "solemn", "rapid", "jubilant", "dazzling"]},
+  {id:"mystery_l3",genre:"mystery",level:3,title:"The Bigger Picture",subtitle:"Theo Investigates \u2014 Part 2",emoji:"\ud83d\udd0d",vocabWords:["consecutive", "diligent", "accumulated", "sinister", "ominous", "persistent", "jovial", "meticulous", "stealthy", "inevitable", "plausible", "oblivious", "notorious", "benevolent", "formidable", "cunning", "prominent", "resilient"]},
+  {id:"mystery_l4",genre:"mystery",level:4,title:"The Final Clue",subtitle:"Theo Investigates \u2014 Part 3",emoji:"\ud83d\udd0d",vocabWords:["fervent", "intricate", "lucid", "momentous", "indignant", "empathy", "menacing", "condescending", "erratic", "remorse", "infer", "verify", "furtive", "steadfast", "defiant"]}
+];
+
+const STORY_TEXTS = {
+  "spy_l2":`Agent Riya was twelve years old when she received her first mission.
+
+She stood in the gleaming lobby of the British Museum, her heart hammering. The building was immense — its columns colossal, stretching into the dazzling London sky. Around her, visitors wandered in an abundant crowd. But Riya felt completely alone.
+
+Her mission was simple. Retrieve the Shadow File — a document concealed inside a display case on the third floor. The file was fragile and ancient, and in the wrong hands, it would be perilous for the country. Director Chandra had been solemn when he briefed her. "Do not fail," he said. "And do not be seen."
+
+Riya was ferocious in her determination. She would persevere, no matter what. She was swift on her feet, agile enough to weave through the crowded halls, and she had the extraordinary ability to look completely ordinary.
+
+But as she climbed the stairs, something felt peculiar. The corridor was desolate — no visitors, no guards. Just an eerie silence that made her feel frail and suddenly uncertain.
+
+Then she spotted it. A figure in a dark coat, moving with a treacherous kind of grace — too smooth, too cautious. The figure reached toward the display case with gleaming gloved hands.
+
+Riya was astonished. They were already here.
+
+She felt hesitant for just one moment — then her training kicked in. She moved rapid and quiet along the wall, her breathing serene and controlled despite the gloomy fear rising in her chest. She was tenacious. She would not fail.
+
+The figure withdrew a thin folder and turned.
+
+Riya gasped. Beneath the hood was a mischievous smile and vivid green eyes.
+
+The Phantom.
+
+The most treacherous thief in Europe — standing three metres away.
+
+The Phantom tilted their head, almost jovial. "Hello, Agent Riya," they said softly. "I've been waiting for you."
+
+Then the lights went out.`,
+  "spy_l3":`Three months after the museum, Riya stood at the summit of the Bernese Alps.
+
+Below her, a magnificent valley stretched into the distance, enormous and white with snow. Above her, an ominous grey sky pressed down like a warning. She had tracked the Phantom here across five consecutive days of travel — and now, at last, she was close.
+
+Director Chandra's intelligence suggested the Phantom was meeting with a notorious organisation called The Meridian — a sinister group that had accumulated power across Europe for decades. Their methods were ruthless. Their reach was formidable. And Riya, exhausted and half-frozen, was their most persistent enemy.
+
+She found the meeting place: a transparent glass lodge perched on the edge of a cliff, ancient and creaking in the wind. Through her binoculars she could perceive three figures inside — the Phantom, and two others she did not recognise.
+
+Riya was meticulous. She had planned every detail. She moved with stealthy precision, diminishing any sound her boots made on the snow. She was wary of every shadow.
+
+She was close enough to hear voices when the door opened.
+
+The Phantom stepped out alone. For a moment their evasive eyes scanned the hillside — cunning, inquisitive, probing. Then they looked directly at Riya's hiding place.
+
+"You're very diligent," the Phantom said quietly. "I'll give you that."
+
+Riya stood up. There was no point pretending. "Who are The Meridian?" she asked.
+
+The Phantom's smile was ambiguous — not quite cruel, not quite kind. "The inevitable question." They paused. "I've been reluctant to tell anyone. But you should know this, Riya: the person who sent you here is not who you think they are."
+
+Riya felt a sinister chill that had nothing to do with the cold.
+
+"Director Chandra?" she asked.
+
+The Phantom said nothing. But their eyes were illuminating — full of a truth they hadn't yet decided to share.
+
+Then the lights in the lodge went out.`,
+  "spy_l4":`The truth, when it came, was more daunting than Riya had imagined.
+
+She sat in a precarious safe house in Prague, the Phantom across the table. Between them: the Shadow File, finally opened. Its contents were cryptic — dense columns of names, dates, and a single recurring code that neither of them could fully decipher.
+
+"Director Chandra built The Meridian," the Phantom said. Their voice was lucid, steady, without the furtive games of before. "Twenty years ago. I was valiant enough to walk away. He was not."
+
+Riya tried to feign calm. She pondered each word, inferring the shape of a conspiracy she had never predicted. Her integrity demanded she believe only what she could verify. But the evidence was intricate — and it all pointed the same way.
+
+"He sent me to retrieve the file," she said slowly. "Because he wanted to destroy it."
+
+"Yes." The Phantom leaned forward. "The file doesn't just name The Meridian. It names every government official they've coerced. Every judge. Every minister." A pause. "It's the most momentous document in Europe. And your director wants it gone."
+
+Riya felt a profound shift — as if the floor had moved. The adversity she'd trained for was always meant to be external: criminals, enemies, shadows in the dark. Not this. Not a menacing figure in her own organisation.
+
+She thought of Chandra's eloquent speeches about duty and country. She thought of his steadfast encouragement, his paternal warmth. And she felt something she had never expected: remorse — not for disobeying him, but for having trusted him so completely.
+
+The Phantom watched her with empathy. "What will you do?"
+
+Riya looked at the file. Thousands of names. Years of secrets. An incessant web of lies, finally visible.
+
+"I'll expose it," she said. "All of it."
+
+The Phantom smiled — not mischievous this time. Something more exquisite. Something like relief.
+
+"I was hoping you'd say that," they said. "I've been waiting twelve years for someone with the courage to try."
+
+Outside, the first snow of winter began to fall on Prague.`,
+  "space_l2":`The surface of Mars was the most desolate place Commander Jax had ever seen.
+
+It was bleak and vast and utterly silent — a treacherous landscape of crimson rock and gleaming dust that stretched for an immense distance in every direction. The sky was gloomy and amber, and the light was peculiar, like a vivid sunset that never ended.
+
+"It's magnificent," said Dr. Priya, her voice frail and filled with wonder through the helmet radio. "Ferociously beautiful."
+
+Jax agreed, though something made him cautious. Something about the silence felt eerie — too absolute, too complete.
+
+Their mission was clear: retrieve samples, run tests, return to the shuttle. Abundant data. Zero drama. That was the plan.
+
+But NOVA, their AI companion, had been hesitant since they landed. Her luminous display flickered in a peculiar pattern that Jax had never seen before.
+
+"NOVA, report," he said.
+
+"Commander," she replied, her voice serene but unusually slow, "I am detecting a signal. Originating from approximately forty metres below the surface."
+
+Jax and Priya exchanged a glance through their visors.
+
+"A natural signal?" asked Priya, her scientific mind immediately frantic with possibilities.
+
+"That would be the most logical explanation," said NOVA. "However, I must tell you: the signal is not random. It follows a rapid, repeating pattern. A pattern that is... extraordinary."
+
+Jax crouched down and pressed one gloved hand against the red rock. It was sturdy and solid beneath him. Whatever was down there had been there a very long time.
+
+"What kind of pattern?" he asked.
+
+There was a solemn pause.
+
+"It is spelling something, Commander," said NOVA. "In Morse code. In English."
+
+Jax stood very still. His heart was jubilant and terrified at the same moment.
+
+"What does it say?"
+
+Another pause. Longer.
+
+"It says: HELP US.`,
+  "space_l3":`It took three consecutive days to dig to the source of the signal.
+
+The drilling was an elaborate process — meticulous, slow, and exhausting. Every layer of ancient Martian rock had to be cleared with persistent precision. NOVA monitored every vibration, her sensors formidable and exact.
+
+Jax had been reluctant to report what they had found to Mission Control. The signal was plausible — perhaps a natural phenomenon. But the closer they got to the source, the more ominous it felt. The signal was not diminishing. If anything, it was growing stronger.
+
+"I've been inquisitive about something," said Priya on the second evening, her voice hushed. "The signal started the moment we landed. Not before. It reacted to us."
+
+That was a sinister thought. Jax tried to remain diligent — scientific, rational. But even he, a notorious sceptic, was finding it harder to remain oblivious to the truth accumulating around them.
+
+On the third day, the drill broke through.
+
+Below them: a structure. Enormous. Ancient. Unmistakably built.
+
+It was a station — transparent-roofed, sealed, and completely intact. The design was subtle but unmistakably human. Metal corridors. Numbered doors. A resilient structure that had survived whatever catastrophe had buried it.
+
+Jax perceived something move in the darkness below.
+
+"NOVA," he said carefully. "Are you detecting life signs?"
+
+"Yes," she said. Her voice was ambiguous — torn between her scientific function and something that sounded, remarkably, like fear. "One life sign. Faint, but consistent. Approximately twenty metres inside the structure."
+
+Jax and Priya stared at each other.
+
+"Someone is down there," said Priya.
+
+"Someone has been down there," NOVA corrected, "for approximately forty years."
+
+The station was not a discovery. It was a prison. And its prisoner had been waiting, with zealous, unwavering hope, for someone exactly like them to find it.`,
+  "space_l4":`Her name was Dr. Elara Voss.
+
+She was seventy-one years old, impossibly steadfast, and she had been living alone in the deep station for thirty-eight years.
+
+The moment they brought her into the light, Jax felt a profound, almost overwhelming empathy. She was frail but defiant — her eyes fervent and lucid despite everything. She had not gone erratic with isolation. She had not despaired. She had, instead, spent thirty-eight years recording everything she knew.
+
+"I was part of the first mission," she said, her voice a little monotonous from years without conversation but still eloquent and precise. "We were twelve. Something happened during re-entry. The others made it back. I did not." She was nonchalant about it — as if the adversity of four decades alone was simply something she had filed away.
+
+"Why didn't you tell anyone?" asked Priya, apprehensive and incredulous at once.
+
+"I did," said Elara. "For years I sent signals. But someone was coercing Mission Control into silence. Someone with an intricate interest in what I had found down here." She paused. "Someone who did not want it revealed."
+
+"What did you find?" asked Jax.
+
+Elara handed him a data drive — exquisite in its simplicity, a small silver rectangle that held everything.
+
+"Proof," she said, "that Mars was not always dormant. That something lived here — not microbes, not bacteria. Something that built. Something that thought." She met his eyes. "And proof that certain people on Earth have known this for fifty years and chosen to remain obscure about it. To ponder it privately. To keep it from the rest of humanity."
+
+Jax held the drive and felt the momentous weight of it in his palm.
+
+"This changes everything," he said.
+
+Elara smiled — the first genuine smile she had allowed herself in decades. "That," she said, "is rather the point."
+
+Outside, the Martian wind was incessant, and the signal — finally — had gone quiet.`,
+  "adventure_l2":`Zara had dreamed of the Amazon since she was four years old.
+
+Now she was eleven, and she was really here — standing in the gleaming green heart of the world's most immense rainforest, the air vivid and thick with the scent of a thousand plants. It was ferociously hot. The sunlight was dazzling where it broke through the canopy, turning the ordinary into something glorious and strange.
+
+Her Uncle Felix was a gracious man — patient and cheerful despite the treacherous conditions. Their guide, Kai, was the most agile person Zara had ever seen, moving through the dense undergrowth with a serene, effortless grace.
+
+"The city has been lost for three hundred years," said Felix, his voice hushed with excitement. "Abundant legends. Zero evidence." He grinned. "Until now."
+
+Zara had found the map herself — concealed inside an extraordinary old book in her school library. It was fragile and ancient, the ink faded to a luminous brown. But the markings were clear: a city, deep in the jungle, marked with a solemn symbol she didn't recognise.
+
+The first two days of the voyage were perilous. The river was turbulent and fierce, the path hazardous with roots and mud and the eerie sounds of unseen animals. Zara was weary and her boots were ruined, but she was tenacious.
+
+On the third day, Kai stopped suddenly.
+
+"There," he said.
+
+Through the trees: stone. Colossal, moss-covered walls rising from the jungle floor. A gate, still sturdy, still standing. And carved above it — the same solemn symbol from the map.
+
+They were the first outsiders to see it in three centuries.
+
+Zara ran forward, astonished and jubilant, ready to push the gate open.
+
+Then Felix grabbed her arm.
+
+"Wait," he said quietly. "Look at the gate."
+
+It wasn't locked from the outside.
+
+It was locked from the inside.`,
+  "adventure_l3":`The gate opened from within.
+
+Zara, Felix and Kai stood in stunned silence as the enormous stone door swung inward — slow, deliberate, and completely without explanation.
+
+Inside: a city. Ancient but not ruined. The buildings were meticulous in their construction, their walls adorned with elaborate carvings that depicted scenes Zara could not entirely perceive. Plants had accumulated over the years, creeping through the stones, but the structures were resilient — they had not deteriorated. They had endured.
+
+And they were not alone.
+
+Standing in the courtyard were twelve figures. Their clothes were made of woven plant fibres — simple but not primitive. Their expressions were neither hostile nor jovial. They were wary, inquisitive, watching the newcomers with a formidable, persistent intelligence.
+
+The eldest among them — a tall woman with silver hair — stepped forward. Her voice, when she spoke, was cunning in its precision.
+
+"We have been expecting someone," she said. "We predicted you would come. Eventually."
+
+Felix, ever the diligent scholar, was oblivious to caution. "You speak English?" he said, astonished.
+
+"We have had visitors before," said the woman. Her tone was subtle — ambiguous about whether those visits had been welcome. "None of them were benevolent. But we have been persistent in our hope."
+
+Zara stared at the city. The stealthy, resilient community that had concealed itself for centuries. "How many of you are there?" she asked.
+
+"Fewer than before," said the woman. Her expression became ominous. "Which is why we opened the gate." She looked at Zara — directly, sincerely, as if she could illuminate something in the girl's expression. "We are the Guardians. We have kept this city, and its secret, for twenty generations."
+
+"What secret?" asked Zara.
+
+The woman glanced at the great tower at the city's centre — towering, ancient, sealed shut.
+
+"The secret that your world's most notorious governments have been sending people to find for fifty years," she said. "The secret that some of them have been willing to kill for."
+
+She looked at Zara with an expression that was not quite wary, not quite peaceful, but something between the two.
+
+"And now we must decide whether to trust you with it.`,
+  "adventure_l4":`Inside the tower was a library.
+
+Not the dusty, dormant kind — but a living archive, its shelves intricate and endless, its contents preserved with exquisite care. Every wall held scrolls, tablets, and volumes written in dozens of languages. Zara walked slowly, apprehensive and overwhelmed.
+
+"Twenty generations of knowledge," said the Guardian elder, whose name they had learned was Asha. "Every discovery your world has made, we have made independently. And some things beyond that."
+
+"Why keep it hidden?" asked Felix, his voice lucid with genuine confusion rather than condescension.
+
+Asha looked at him steadily. "Because knowledge without integrity destroys. We have watched what happens when powerful people find something they want to coerce into a weapon." She paused. "This city was founded by scholars who fled persecution. They chose obscurity over annihilation. It was a momentous decision. And it was the right one."
+
+Zara stood before a central plinth. On it: a sphere, perfectly round, enigmatic and dark, about the size of a football. She could infer from the reverence around it that this was the thing governments had been searching for.
+
+"What is it?" she asked.
+
+"A map," said Asha. "Of every dormant resource on Earth — minerals, water, energy — that has not yet been discovered or exploited. In the wrong hands, it would mean the spontaneous destruction of every ecosystem above it." She met Zara's eyes. "In the right hands, it could end scarcity forever."
+
+Zara pondered this for a long time. The weight of it was profound — menacing and hopeful at once.
+
+"What do you want me to do?" she asked finally.
+
+Asha was nonchalant in her certainty. "We want you to tell the world we exist. Not what we hold. Just that we exist. So that the people who have been trying to find us — and silence us — know that it is too late for secrecy."
+
+Zara thought of the governments, the searchers, the ones who had been feigning ignorance for decades.
+
+She nodded.
+
+"Then I will," she said. "I promise." `,
+  "mystery_l2":`The Westfield School trophy had been gleaming on its shelf for forty-three years.
+
+Now it was gone.
+
+Theo discovered the empty case on Monday morning, and immediately felt the peculiar electric sensation that he always got when something was wrong. He was the only person in Year 6 — possibly the only person in the school — who actually enjoyed problems. Especially the difficult kind.
+
+"It's just a trophy," said his friend Mia, who was agile in thought but hesitant about getting involved. "And it's quite hideous. Silver-plated, green around the edges. It was ferociously ugly."
+
+"That's not the point," said Theo. He crouched and examined the empty shelf, being careful not to disturb anything. His gaze was swift and thorough. A vivid red mark on the shelf's edge. A faint, eerie scuff on the floor. The concealed corner of something pale — a receipt? A note? — just visible beneath the cabinet.
+
+He was tenacious. He persevered, ignoring the frantic buzz of students arriving for morning registration.
+
+Inspector Wells — the school's retired police officer who helped with security — appeared in the corridor. He was a gracious man, solemn and deliberate, who had seen rather a lot in his time.
+
+"Morning, Theo," he said.
+
+"Someone took it between eleven last night and six this morning," said Theo without looking up. "The cleaner's shift ends at eleven. The alarm wasn't triggered. Whoever it was knew the building."
+
+Wells raised an eyebrow. "You've been here three minutes."
+
+"Two," said Theo.
+
+He gently extracted the paper from under the cabinet. It wasn't a receipt. It was a note — handwritten in rapid, small letters.
+
+It read: THE TROPHY BELONGS TO US.
+
+Theo stood very still. Then he turned to Mia with a jubilant, dazzling expression that she had learned, over many years, to find quite alarming.
+
+"Now it's interesting," he said.`,
+  "mystery_l3":`The trophy, it turned out, was the sixth object stolen in four consecutive weeks.
+
+Theo was diligent with the evidence. He had accumulated every report, every witness statement, every sinister detail from five previous thefts across the borough — all of them small schools, all of them objects of no great monetary value. A shield. A plaque. A medal from 1987. The pattern was ominous and persistent.
+
+"These aren't valuable," said Mia, spreading the photographs across Theo's desk. "Someone isn't stealing for money."
+
+"Obviously," said Theo, who was never quite jovial when he was working. He was meticulous and stealthy in equal measure — cautious about sharing his theories until they were inevitable, not merely plausible.
+
+Inspector Wells had become a reliable — if somewhat oblivious — ally. He was a notorious sceptic about Theo's methods ("You're eleven, lad"), but he was benevolent enough to share police reports when asked.
+
+"The note said 'belongs to us'," said Theo. "Not 'belongs to me.' A group."
+
+"Former students?" suggested Mia.
+
+"Possibly." He stood and examined the wall chart he had built — a formidable web of dates, locations, and cunning inferences. Each stolen object was connected to a school that had won a prominent regional competition. The same competition. Six consecutive years. All won by different schools.
+
+"Someone," said Theo slowly, "is taking back trophies they believe were won unfairly."
+
+The room went very quiet.
+
+That evening, Theo found an envelope under the front door of his house. Inside was a single sheet of paper with three words written in the same rapid, small handwriting as before.
+
+STOP LOOKING, THEO.
+
+He read it twice. Then he put it carefully into an evidence bag.
+
+"Interesting," he said aloud to the empty hallway. Not afraid. Not reluctant.
+
+Resilient.
+
+He was getting very close indeed.`,
+  "mystery_l4":`Theo set the trap on a Thursday.
+
+He had spent two fervent days constructing it — an intricate chain of inferences, each one lucid and verifiable, each one pointing to a conclusion so momentous that even Mia had gone quiet when he explained it.
+
+The trophies had all been taken from schools that won the Regional Schools Cup between 1978 and 1983. Six schools. Six victories. One problem: there had been a seventh school — Hartley Road Juniors — that should have won in 1979. The evidence was buried but clear. Their team had been the best. Their result had been altered, deliberately, by a man who was now the head teacher of Westfield.
+
+Mr. Graves.
+
+Theo felt something between indignation and empathy. Mr. Graves was not a menacing villain. He was a condescending, erratic man who had spent forty years watching others display trophies that — in the view of some — should have been his school's. His former pupils, now adults, had decided enough was enough.
+
+"They're not criminals," said Mia. "They're people with remorse who chose the wrong way to fix it."
+
+"Remorse is theirs," said Theo carefully. "The method is still theft."
+
+He had inferred — and could now verify — that the ringleader was a woman named Mrs. Cole, a former Hartley Road pupil who now taught at the school next door. She had been furtive, steadfast, and almost impossibly patient in her plan.
+
+Inspector Wells arrested her quietly on Friday morning.
+
+She was defiant but not dishonest. "We just wanted what was ours," she said.
+
+Theo watched from across the corridor. He understood. He didn't agree, but he understood.
+
+The trophies were returned. Mr. Graves resigned. And the 1979 result — forty-four years late — was corrected in the official records.
+
+Theo's name appeared nowhere in any report.
+
+He didn't mind. The solution was the reward. It always was.
+
+"Same time next week?" said Mia.
+
+"Something will turn up," said Theo. And he smiled — not dazzling or theatrical, but small and genuine.
+
+It always did.`
+};
+
+function storyUnlockedForLevel(lvl){
+  const xp = state.profile.xp || 0;
+  if(lvl === 2) return true;
+  if(lvl === 3) return xp >= 50;
+  if(lvl === 4) return xp >= 200;
+  return false;
+}
+
+let _storyFilter = 'all';
+
+window.showStories = function(){
+  _storyFilter = 'all';
+  document.querySelectorAll('.sf-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sf-all').classList.add('active');
+  renderStoryGrid();
+  showScreen('stories');
+};
+
+window.filterStories = function(genre){
+  _storyFilter = genre;
+  document.querySelectorAll('.sf-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('sf-' + genre);
+  if(btn) btn.classList.add('active');
+  renderStoryGrid();
+};
+
+function renderStoryGrid(){
+  const grid = document.getElementById('story-grid');
+  const filtered = _storyFilter === 'all' ? STORIES_META : STORIES_META.filter(s => s.genre === _storyFilter);
+  grid.innerHTML = filtered.map(s => {
+    const unlocked = storyUnlockedForLevel(s.level);
+    const lockMsg = s.level === 3 ? 'Earn 50 XP to unlock' : 'Earn 200 XP to unlock';
+    return `<div class="story-card${unlocked ? '' : ' locked'}" onclick="${unlocked ? 'openStory(\'' + s.id + '\')' : 'window.toast(\'' + lockMsg + '\')' }">
+      ${unlocked ? '' : '<span class=\"sc-lock-icon\">🔒</span>'}
+      <span class="sc-emoji">${s.emoji}</span>
+      <div class="sc-title">${s.title}</div>
+      <div class="sc-sub">${s.subtitle}</div>
+      <span class="sc-level sc-level-${s.level}">Level ${s.level}</span>
+    </div>`;
+  }).join('');
+}
+
+window.openStory = function(id){
+  const meta = STORIES_META.find(s => s.id === id);
+  const rawText = STORY_TEXTS[id] || '';
+  if(!meta || !rawText) return;
+
+  document.getElementById('reader-title').textContent = meta.title;
+  document.getElementById('reader-subtitle').textContent = meta.subtitle;
+  const pill = document.getElementById('reader-level-pill');
+  pill.textContent = 'Level ' + meta.level;
+  pill.className = 'sc-level sc-level-' + meta.level;
+
+  // highlight vocab words in text
+  const paragraphs = rawText.trim().split(/\n\n+/);
+  let highlighted = paragraphs.map(p => {
+    let t = p.trim();
+    meta.vocabWords.forEach(w => {
+      const re = new RegExp('\\b(' + w + ')\\b', 'gi');
+      t = t.replace(re, '<span class=\"vocab-word\" title=\"$1\">$1</span>');
+    });
+    return '<p>' + t + '</p>';
+  }).join('');
+
+  document.getElementById('reader-text').innerHTML = highlighted;
+
+  // vocab chips
+  document.getElementById('reader-vocab-chips').innerHTML =
+    meta.vocabWords.map(w => `<span class="vocab-chip">${w}</span>`).join('');
+
+  document.getElementById('story-reader').classList.add('open');
+  document.getElementById('story-reader').scrollTop = 0;
+};
+
+window.closeStoryReader = function(){
+  document.getElementById('story-reader').classList.remove('open');
+};
+
 let toastTimer;
 window.toast=function(msg){ const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2400); };
 
