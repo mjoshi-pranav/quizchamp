@@ -593,9 +593,13 @@ window.addEventListener('DOMContentLoaded', function(){
   <div class="story-filter-bar">
     <div class="sf-btn active" onclick="filterStories('all')" id="sf-all">📚 All</div>
     <div class="sf-btn" onclick="filterStories('spy')" id="sf-spy">🕵️ Spy</div>
-    <div class="sf-btn" onclick="filterStories('astronaut')" id="sf-astronaut">🚀 Astronaut</div>
+    <div class="sf-btn" onclick="filterStories('astronaut')" id="sf-astronaut">🚀 Astro</div>
     <div class="sf-btn" onclick="filterStories('adventure')" id="sf-adventure">🗺️ Adventure</div>
     <div class="sf-btn" onclick="filterStories('mystery')" id="sf-mystery">🔍 Mystery</div>
+    <div class="sf-btn" onclick="filterStories('fantasy')" id="sf-fantasy">🧙 Fantasy</div>
+    <div class="sf-btn" onclick="filterStories('historical')" id="sf-historical">⚔️ History</div>
+    <div class="sf-btn" onclick="filterStories('science')" id="sf-science">🔬 Science</div>
+    <div class="sf-btn" onclick="filterStories('sport')" id="sf-sport">⚽ Sport</div>
   </div>
   <div class="story-grid" id="story-grid"></div>
 </div>
@@ -1494,7 +1498,7 @@ window.showParentView=function(){
 // ════════════════════════════════════════════════════════
 // VOCAB DICTIONARY
 // ════════════════════════════════════════════════════════
-const VOCAB_DICT = JSON.parse(`{"abundant": {"def": "Fully sufficient; found in copious supply; in great quantity; overflowing.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/abundant-us.mp3", "phonetic": "/əˈbʌn.dn̩t/"}, "accumulate": {"def": "To heap up in a mass; to pile up; to collect or bring together (either literally or figuratively)", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/accumulate-us.mp3", "phonetic": "/əˈkjuːmjʊˌleɪt/"}, "accumulated": {"def": "To heap up in a mass; to pile up; to collect or bring together (either literally or figuratively)", "audio": "", "phonetic": "/əˈkjuːmjʊleɪtɪd/"}, "adversity": {"def": "The state of adverse conditions; state of misfortune or calamity.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/adversity-au.mp3", "phonetic": "/ædˈvɜː.sɪ.ti/"}, "agile": {"def": "Having the faculty of quick motion in the limbs; apt or ready to move", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/agile-us.mp3", "phonetic": "/ˈæd͡ʒ.aɪl/"}, "ambiguous": {"def": "Open to multiple interpretations.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/ambiguous-us.mp3", "phonetic": "/æmˈbɪɡjuəs/"}, "ancient": {"def": "A person who is very old.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/ancient-us.mp3", "phonetic": "/ˈeɪn.ʃənt/"}, "apprehensive": {"def": "Anticipating something with anxiety or fear.", "audio": "", "phonetic": ""}, "astonished": {"def": "To surprise greatly.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/astonished-us.mp3", "phonetic": ""}, "benevolent": {"def": "Having a disposition to do good.", "audio": "", "phonetic": "/bəˈnɛvələnt/"}, "bleak": {"def": "Without color; pale; pallid.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/bleak-us.mp3", "phonetic": "/bliːk/"}, "cautious": {"def": "Careful; using or exercising caution; tentative", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/cautious-us.mp3", "phonetic": "/ˈkɔːʃəs/"}, "coerce": {"def": "To restrain by force, especially by law or authority; to repress; to curb.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/coerce-us.mp3", "phonetic": "/kəʊˈɜːs/"}, "coerced": {"def": "To restrain by force, especially by law or authority; to repress; to curb.", "audio": "", "phonetic": ""}, "coercing": {"def": "To restrain by force, especially by law or authority; to repress; to curb.", "audio": "", "phonetic": ""}, "colossal": {"def": "Extremely large or on a great scale.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/colossal-us.mp3", "phonetic": "/kəˈlɒsəl/"}, "concealed": {"def": "To hide something from view or from public knowledge, to try to keep something secret.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/concealed-us.mp3", "phonetic": "/kənˈsiːld/"}, "condescending": {"def": "To come down from one's superior position; to deign (to do something).", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/condescending-us.mp3", "phonetic": "/ˈkɔn.dɪ.sɛnd.ɪŋ/"}, "consecutive": {"def": "A sequence of notes or chords that results from repeated shifts in pitch of the same interval.", "audio": "", "phonetic": "/kɒnsɛkjʊtɪv/"}, "cryptic": {"def": "A cryptic crossword.", "audio": "", "phonetic": "/ˈkɹɪptɪk/"}, "cunning": {"def": "Sly; crafty; clever in surreptitious behaviour.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/cunning-us.mp3", "phonetic": "/ˈkʌnɪŋ/"}, "daunting": {"def": "To discourage, intimidate.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/daunting-uk.mp3", "phonetic": "/ˈdɔːntɪŋ/"}, "dazzling": {"def": "To confuse the sight of by means of excessive brightness.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/dazzling-us.mp3", "phonetic": "/ˈdæz.lɪŋ/"}, "decipher": {"def": "A decipherment; a decoding.", "audio": "", "phonetic": "/dɪˈsaɪfə(ɹ)/"}, "defiant": {"def": "One who defies opposition.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/defiant-us.mp3", "phonetic": "/dɪˈfaɪ(j)ənt/"}, "desolate": {"def": "To deprive of inhabitants.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/desolate-us.mp3", "phonetic": ""}, "deteriorate": {"def": "To make worse; to make inferior in quality or value; to impair.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/deteriorate-uk.mp3", "phonetic": "/dɪˈtɪəɹɪəɹeɪt/"}, "diligent": {"def": "Performing with industrious concentration; hard-working and focused.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/diligent-us.mp3", "phonetic": "/ˈdɪlɪdʒənt/"}, "diminishing": {"def": "To make smaller.", "audio": "", "phonetic": ""}, "dormant": {"def": "A crossbeam or joist.", "audio": "", "phonetic": "/ˈdɔːmənt/"}, "eerie": {"def": "Strange, weird, fear-inspiring.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/eerie-us.mp3", "phonetic": "/ˈɪəɹi/"}, "elaborate": {"def": "To develop in detail or complexity", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/elaborate-us.mp3", "phonetic": "/ɪˈlæbəɹeɪt/"}, "eloquent": {"def": "Fluently persuasive and articulate", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/eloquent-uk.mp3", "phonetic": "/ˈɛl.əˌkwənt/"}, "empathy": {"def": "Identification with or understanding of the thoughts, feelings, or emotional state of another person.", "audio": "", "phonetic": "/ˈɛmpəθi/"}, "enigmatic": {"def": "Pertaining to an enigma.", "audio": "", "phonetic": "/ˌɛnɪɡˈmætɪk/"}, "enormous": {"def": "Deviating from the norm; unusual, extraordinary.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/enormous-us.mp3", "phonetic": "/ɪˈnɔː(ɹ)məs/"}, "erratic": {"def": "A rock moved from one location to another, usually by a glacier.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/erratic-au.mp3", "phonetic": "/ɪˈɹætɪk/"}, "evasive": {"def": "Tending to avoid speaking openly or making revelations about oneself.", "audio": "", "phonetic": "/ɪˈveɪsɪv/"}, "exhausted": {"def": "To draw or let out wholly; to drain off completely", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/exhausted-us.mp3", "phonetic": "/ɪɡˈzɑstɪd/"}, "exquisite": {"def": "Fop, dandy.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/exquisite-us.mp3", "phonetic": "/ɪkˈskwɪzɪt/"}, "extraordinary": {"def": "Anything that goes beyond what is ordinary.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/extraordinary-us.mp3", "phonetic": "/ɪksˈtɹɔː(ɹ)dɪnəɹi/"}, "feign": {"def": "To make a false show or pretence of; to counterfeit or simulate.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/feign-us.mp3", "phonetic": "/feɪn/"}, "ferocious": {"def": "Marked by extreme and violent energy.", "audio": "", "phonetic": "/fəˈɹəʊʃəs/"}, "fervent": {"def": "Exhibiting particular enthusiasm, zeal, conviction, persistence, or belief.", "audio": "", "phonetic": "/ˈfɜː.vənt/"}, "fierce": {"def": "Exceedingly violent, severe, ferocious, cruel or savage.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/fierce-us.mp3", "phonetic": "/fɪəs/"}, "formidable": {"def": "Difficult to defeat or overcome.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/formidable-us.mp3", "phonetic": "/fɔːˈmɪdəbəl/"}, "fragile": {"def": "Easily broken or destroyed, and thus often of subtle or intricate structure.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/fragile-us.mp3", "phonetic": "/ˈfɹædʒaɪl/"}, "frail": {"def": "A basket made of rushes, used chiefly to hold figs and raisins.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/frail-au.mp3", "phonetic": "/fɹeɪl/"}, "frantic": {"def": "A person who is insane or mentally unstable, madman.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/frantic-us.mp3", "phonetic": "/ˈfɹæntɪk/"}, "furtive": {"def": "Stealthy.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/furtive-us.mp3", "phonetic": "[ˈfɜːɾɪv]"}, "gleaming": {"def": "To shine; to glitter; to glisten.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/gleaming-us.mp3", "phonetic": "/ˈɡliːmɪŋ/"}, "gloomy": {"def": "Not very illuminated; dim because of darkness, especially when appearing depressing or frightening.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/gloomy-us.mp3", "phonetic": "/ˈɡlumi/"}, "glorious": {"def": "Exhibiting attributes, qualities, or acts that are worthy of or receive glory.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/glorious-us.mp3", "phonetic": "/ˈɡlɔː.ɹi.əs/"}, "gracious": {"def": "Kind and warmly courteous", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/gracious-us.mp3", "phonetic": "/ˈɡɹeɪʃəs/"}, "hesitant": {"def": "Tending to hesitate, wait, or proceed with caution or reservation.", "audio": "", "phonetic": "/ˈhɛzɪtənt/"}, "hideous": {"def": "Extremely or shockingly ugly.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/hideous-us.mp3", "phonetic": "/ˈhɪd.iː.ʌs/"}, "illuminate": {"def": "Someone thought to have an unusual degree of enlightenment.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/illuminate-us-verb.mp3", "phonetic": "/ɪlˈl(j)uməneɪt/"}, "immense": {"def": "Immense extent or expanse; immensity", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/immense-us.mp3", "phonetic": "/ɪˈmɛns/"}, "incessant": {"def": "Without pause or stop; not ending, especially to the point of annoyance.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/incessant-us.mp3", "phonetic": "/ɪnˈsɛs.ənt/"}, "indignant": {"def": "Showing anger or indignation, especially at something unjust or wrong.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/indignant-us.mp3", "phonetic": "/ɪnˈdɪɡ.nənt/"}, "inevitable": {"def": "Something that is predictable, necessary, or cannot be avoided.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/inevitable-us.mp3", "phonetic": "/ɪnˈɛvɪtəbəl/"}, "infer": {"def": "To introduce (something) as a reasoned conclusion; to conclude by reasoning or deduction, as from premises or evidence.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/infer-us.mp3", "phonetic": "/ɪnˈfɜː/"}, "inquisitive": {"def": "Eager to acquire knowledge.", "audio": "", "phonetic": "/ɪŋˈkwɪzətɪv/"}, "integrity": {"def": "Steadfast adherence to a strict moral or ethical code.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/integrity-us.mp3", "phonetic": "/ɪnˈtɛɡɹəti/"}, "intricate": {"def": "Having a great deal of fine detail or complexity.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/intricate-1-us.mp3", "phonetic": "/ˈɪn.tɹɪ.kət/"}, "jovial": {"def": "Cheerful and good-humoured; jolly, merry.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/jovial-us.mp3", "phonetic": "/ˈdʒəʊ.vɪ.əl/"}, "jubilant": {"def": "In a state of elation.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/jubilant-us.mp3", "phonetic": "/ˈdʒu.bə.lənt/"}, "lucid": {"def": "A lucid dream.", "audio": "", "phonetic": "/ˈl(j)uːsɪd/"}, "luminous": {"def": "Emitting light; glowing brightly.", "audio": "", "phonetic": "/ˈluːmɪnəs/"}, "magnificent": {"def": "Grand, elegant or splendid in appearance.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/magnificent-us.mp3", "phonetic": "/mæɡˈnɪfəsənt/"}, "menacing": {"def": "To make threats against (someone); to intimidate.", "audio": "", "phonetic": ""}, "meticulous": {"def": "Characterized by very precise, conscientious attention to details.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/meticulous-uk.mp3", "phonetic": "/mɨˈtɪkjuləs/"}, "mischievous": {"def": "Causing mischief; injurious.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/mischievous-us.mp3", "phonetic": "/ˈmɪs.t͡ʃə.vəs/"}, "momentous": {"def": "Outstanding in importance, of great consequence.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/momentous-us.mp3", "phonetic": "/məʊˈmɛn.təs/"}, "monotonous": {"def": "Having an unvarying tone or pitch.", "audio": "", "phonetic": "/məˈnɒtənəs/"}, "nonchalant": {"def": "Casually calm and relaxed.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/nonchalant-us.mp3", "phonetic": "/ˈnɒn.ʃəl.ənt/"}, "notorious": {"def": "Widely known, especially for something negative; infamous.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/notorious-us.mp3", "phonetic": "/nəʊˈtɔːɹɪəs/"}, "oblivious": {"def": "(usually followed by to or of) Lacking awareness; unmindful; unaware, unconscious of.", "audio": "", "phonetic": "/əˈblɪ.vi.əs/"}, "obscure": {"def": "To render obscure; to darken; to make dim; to keep in the dark; to hide; to make less visible, intelligible, legible, glorious, beautiful, or illustrious.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/obscure-us.mp3", "phonetic": "/əbˈskjɔː(ɹ)/"}, "ominous": {"def": "Of or pertaining to an omen or to omens; being or exhibiting an omen; significant.", "audio": "", "phonetic": "/ˈɒmɪnəs/"}, "peculiar": {"def": "That which is peculiar; a sole or exclusive property; a prerogative; a characteristic.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/peculiar-us.mp3", "phonetic": "[pʰə̥ˈkʰj̊uːljʊə]"}, "perceive": {"def": "To become aware of, through the physical senses or by thinking; to see; to understand.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/perceive-us.mp3", "phonetic": "/pəˈsiːv/"}, "perilous": {"def": "Dangerous, full of peril.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/perilous-us.mp3", "phonetic": "/pɛɹ.l̩.əs/"}, "persevere": {"def": "To persist steadfastly in pursuit of an undertaking, task, journey, or goal, even if hindered by distraction, difficulty, obstacles, or discouragement.", "audio": "", "phonetic": ""}, "persistent": {"def": "Obstinately refusing to give up or let go.", "audio": "", "phonetic": "/pəˈsɪstənt/"}, "plausible": {"def": "Seemingly or apparently valid, likely, or acceptable; conceivably true or likely", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/plausible-us.mp3", "phonetic": "/ˈplɔːz.ə.bəl/"}, "ponder": {"def": "A period of deep thought.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/ponder-us.mp3", "phonetic": "/ˈpɒn.də(ɹ)/"}, "precarious": {"def": "Dangerously insecure or unstable; perilous.", "audio": "", "phonetic": "/pɹəˈkɛəɹi.əs/"}, "predicted": {"def": "(of theories, laws, etc.) To imply.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/predicted-us.mp3", "phonetic": "/pɹɪˈdɪktɪd/"}, "profound": {"def": "The deep; the sea; the ocean.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/profound-us.mp3", "phonetic": "/pɹəˈfaʊnd/"}, "prominent": {"def": "Standing out, or projecting; jutting; protuberant", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/prominent-us.mp3", "phonetic": "/ˈpɹɒmɪnənt/"}, "rapid": {"def": "(often in the plural) a rough section of a river or stream which is difficult to navigate due to the swift and turbulent motion of the water.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/rapid-us.mp3", "phonetic": "/ˈɹæpɪd/"}, "reluctant": {"def": "Opposing; offering resistance (to).", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/reluctant-us.mp3", "phonetic": "/ɹɪˈlʌktənt/"}, "remorse": {"def": "A feeling of regret or sadness for doing wrong or sinning.", "audio": "", "phonetic": "/ɹɪˈmɔː(ɹ)s/"}, "resilient": {"def": "(of objects or substances) Returning quickly to original shape after force is applied; elastic.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/resilient-us.mp3", "phonetic": ""}, "ruthless": {"def": "Without pity or compassion; cruel, pitiless.", "audio": "", "phonetic": "/ˈɹuːθləs/"}, "serene": {"def": "Serenity; clearness; calmness.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/serene-us.mp3", "phonetic": "/səˈɹiːn/"}, "sinister": {"def": "Inauspicious, ominous, unlucky, illegitimate (as in bar sinister).", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/sinister-us.mp3", "phonetic": "/ˈsɪnɪstə/"}, "solemn": {"def": "Deeply serious and somber.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/solemn-us.mp3", "phonetic": "/ˈsɒləm/"}, "spontaneous": {"def": "Self-generated; happening without any apparent external cause.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/spontaneous-us.mp3", "phonetic": "/spɒnˈteɪ.ni.əs/"}, "steadfast": {"def": "Fixed or unchanging; steady.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/steadfast-us.mp3", "phonetic": "/ˈstɛdfæst/"}, "stealthy": {"def": "Characterized by or resembling stealth or secrecy.", "audio": "", "phonetic": "/ˈstɛlθi/"}, "sturdy": {"def": "A disease in sheep and cattle, caused by a tapeworm and marked by great nervousness or by dullness and stupor.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/sturdy-us.mp3", "phonetic": "/ˈstɜːdi/"}, "summit": {"def": "A peak; the topmost point or surface, as of a mountain.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/summit-1-us.mp3", "phonetic": "/ˈsʌmɪt/"}, "swift": {"def": "Moving or happening very quickly; fast.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/swift-us.mp3", "phonetic": "/swɪft/"}, "tenacious": {"def": "Not giving up easily; determined and persistent.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/tenacious-us.mp3", "phonetic": "/təˈneɪʃəs/"}, "transparent": {"def": "Easy to see through; also means honest and open.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/transparent-us.mp3", "phonetic": "/tɹæn(t)sˈpæɹənt/"}, "treacherous": {"def": "Not loyal or reliable; likely to betray trust; dangerously unstable.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/treacherous-us.mp3", "phonetic": "/ˈtɹɛtʃəɹəs/"}, "turbulent": {"def": "Violently disturbed or agitated; tempestuous, tumultuous", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/turbulent-us.mp3", "phonetic": "/ˈtɜːbjələnt/"}, "valiant": {"def": "Showing courage and determination, especially in difficult situations.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/valiant-us.mp3", "phonetic": "/ˈvæljənt/"}, "verify": {"def": "To substantiate or prove the truth of something", "audio": "", "phonetic": ""}, "vivid": {"def": "Producing strong, clear images in the mind; bright and striking.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/vivid-us.mp3", "phonetic": "/ˈvɪvɪd/"}, "voyage": {"def": "A long journey, especially by ship.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/voyage-us.mp3", "phonetic": "/ˈvɔɪ.ɪdʒ/"}, "wary": {"def": "Cautious of danger; carefully watching and guarding against deception, trickery, and dangers; suspiciously prudent", "audio": "", "phonetic": "/ˈwɛəɹ.i/"}, "weary": {"def": "Very tired, especially after working hard for a long time.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/weary-us.mp3", "phonetic": "/ˈwiːɹi/"}, "zealous": {"def": "Very enthusiastic and eager about something you care about.", "audio": "https://api.dictionaryapi.dev/media/pronunciations/en/zealous-us.mp3", "phonetic": "/ˈzɛl.əs/"}}`);
+const VOCAB_DICT = JSON.parse(`{"abundant":{"def":"Fully sufficient; found in copious supply; in great quantity; overflowing.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/abundant-us.mp3","phonetic":"/əˈbʌn.dn̩t/"},"accumulate":{"def":"To heap up in a mass; to pile up; to collect or bring together (either literally or figuratively)","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/accumulate-us.mp3","phonetic":"/əˈkjuːmjʊˌleɪt/"},"accumulated":{"def":"To heap up in a mass; to pile up; to collect or bring together (either literally or figuratively)","audio":"","phonetic":"/əˈkjuːmjʊleɪtɪd/"},"adversity":{"def":"The state of adverse conditions; state of misfortune or calamity.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/adversity-au.mp3","phonetic":"/ædˈvɜː.sɪ.ti/"},"agile":{"def":"Having the faculty of quick motion in the limbs; apt or ready to move","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/agile-us.mp3","phonetic":"/ˈæd͡ʒ.aɪl/"},"ambiguous":{"def":"Open to multiple interpretations.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/ambiguous-us.mp3","phonetic":"/æmˈbɪɡjuəs/"},"ancient":{"def":"A person who is very old.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/ancient-us.mp3","phonetic":"/ˈeɪn.ʃənt/"},"apprehensive":{"def":"Anticipating something with anxiety or fear.","audio":"","phonetic":""},"astonished":{"def":"To surprise greatly.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/astonished-us.mp3","phonetic":""},"benevolent":{"def":"Having a disposition to do good.","audio":"","phonetic":"/bəˈnɛvələnt/"},"bleak":{"def":"Without color; pale; pallid.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/bleak-us.mp3","phonetic":"/bliːk/"},"cautious":{"def":"Careful; using or exercising caution; tentative","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/cautious-us.mp3","phonetic":"/ˈkɔːʃəs/"},"coerce":{"def":"To restrain by force, especially by law or authority; to repress; to curb.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/coerce-us.mp3","phonetic":"/kəʊˈɜːs/"},"coerced":{"def":"To restrain by force, especially by law or authority; to repress; to curb.","audio":"","phonetic":""},"coercing":{"def":"To restrain by force, especially by law or authority; to repress; to curb.","audio":"","phonetic":""},"colossal":{"def":"Extremely large or on a great scale.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/colossal-us.mp3","phonetic":"/kəˈlɒsəl/"},"concealed":{"def":"To hide something from view or from public knowledge, to try to keep something secret.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/concealed-us.mp3","phonetic":"/kənˈsiːld/"},"condescending":{"def":"To come down from one's superior position; to deign (to do something).","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/condescending-us.mp3","phonetic":"/ˈkɔn.dɪ.sɛnd.ɪŋ/"},"consecutive":{"def":"A sequence of notes or chords that results from repeated shifts in pitch of the same interval.","audio":"","phonetic":"/kɒnsɛkjʊtɪv/"},"cryptic":{"def":"A cryptic crossword.","audio":"","phonetic":"/ˈkɹɪptɪk/"},"cunning":{"def":"Sly; crafty; clever in surreptitious behaviour.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/cunning-us.mp3","phonetic":"/ˈkʌnɪŋ/"},"daunting":{"def":"To discourage, intimidate.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/daunting-uk.mp3","phonetic":"/ˈdɔːntɪŋ/"},"dazzling":{"def":"To confuse the sight of by means of excessive brightness.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/dazzling-us.mp3","phonetic":"/ˈdæz.lɪŋ/"},"decipher":{"def":"A decipherment; a decoding.","audio":"","phonetic":"/dɪˈsaɪfə(ɹ)/"},"defiant":{"def":"One who defies opposition.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/defiant-us.mp3","phonetic":"/dɪˈfaɪ(j)ənt/"},"desolate":{"def":"To deprive of inhabitants.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/desolate-us.mp3","phonetic":""},"deteriorate":{"def":"To make worse; to make inferior in quality or value; to impair.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/deteriorate-uk.mp3","phonetic":"/dɪˈtɪəɹɪəɹeɪt/"},"diligent":{"def":"Performing with industrious concentration; hard-working and focused.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/diligent-us.mp3","phonetic":"/ˈdɪlɪdʒənt/"},"diminishing":{"def":"To make smaller.","audio":"","phonetic":""},"dormant":{"def":"A crossbeam or joist.","audio":"","phonetic":"/ˈdɔːmənt/"},"eerie":{"def":"Strange, weird, fear-inspiring.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/eerie-us.mp3","phonetic":"/ˈɪəɹi/"},"elaborate":{"def":"To develop in detail or complexity","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/elaborate-us.mp3","phonetic":"/ɪˈlæbəɹeɪt/"},"eloquent":{"def":"Fluently persuasive and articulate","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/eloquent-uk.mp3","phonetic":"/ˈɛl.əˌkwənt/"},"empathy":{"def":"Identification with or understanding of the thoughts, feelings, or emotional state of another person.","audio":"","phonetic":"/ˈɛmpəθi/"},"enigmatic":{"def":"Pertaining to an enigma.","audio":"","phonetic":"/ˌɛnɪɡˈmætɪk/"},"enormous":{"def":"Deviating from the norm; unusual, extraordinary.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/enormous-us.mp3","phonetic":"/ɪˈnɔː(ɹ)məs/"},"erratic":{"def":"A rock moved from one location to another, usually by a glacier.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/erratic-au.mp3","phonetic":"/ɪˈɹætɪk/"},"evasive":{"def":"Tending to avoid speaking openly or making revelations about oneself.","audio":"","phonetic":"/ɪˈveɪsɪv/"},"exhausted":{"def":"To draw or let out wholly; to drain off completely","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/exhausted-us.mp3","phonetic":"/ɪɡˈzɑstɪd/"},"exquisite":{"def":"Fop, dandy.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/exquisite-us.mp3","phonetic":"/ɪkˈskwɪzɪt/"},"extraordinary":{"def":"Anything that goes beyond what is ordinary.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/extraordinary-us.mp3","phonetic":"/ɪksˈtɹɔː(ɹ)dɪnəɹi/"},"feign":{"def":"To make a false show or pretence of; to counterfeit or simulate.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/feign-us.mp3","phonetic":"/feɪn/"},"ferocious":{"def":"Marked by extreme and violent energy.","audio":"","phonetic":"/fəˈɹəʊʃəs/"},"fervent":{"def":"Exhibiting particular enthusiasm, zeal, conviction, persistence, or belief.","audio":"","phonetic":"/ˈfɜː.vənt/"},"fierce":{"def":"Exceedingly violent, severe, ferocious, cruel or savage.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/fierce-us.mp3","phonetic":"/fɪəs/"},"formidable":{"def":"Difficult to defeat or overcome.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/formidable-us.mp3","phonetic":"/fɔːˈmɪdəbəl/"},"fragile":{"def":"Easily broken or destroyed, and thus often of subtle or intricate structure.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/fragile-us.mp3","phonetic":"/ˈfɹædʒaɪl/"},"frail":{"def":"A basket made of rushes, used chiefly to hold figs and raisins.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/frail-au.mp3","phonetic":"/fɹeɪl/"},"frantic":{"def":"A person who is insane or mentally unstable, madman.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/frantic-us.mp3","phonetic":"/ˈfɹæntɪk/"},"furtive":{"def":"Stealthy.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/furtive-us.mp3","phonetic":"[ˈfɜːɾɪv]"},"gleaming":{"def":"To shine; to glitter; to glisten.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/gleaming-us.mp3","phonetic":"/ˈɡliːmɪŋ/"},"gloomy":{"def":"Not very illuminated; dim because of darkness, especially when appearing depressing or frightening.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/gloomy-us.mp3","phonetic":"/ˈɡlumi/"},"glorious":{"def":"Exhibiting attributes, qualities, or acts that are worthy of or receive glory.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/glorious-us.mp3","phonetic":"/ˈɡlɔː.ɹi.əs/"},"gracious":{"def":"Kind and warmly courteous","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/gracious-us.mp3","phonetic":"/ˈɡɹeɪʃəs/"},"hesitant":{"def":"Tending to hesitate, wait, or proceed with caution or reservation.","audio":"","phonetic":"/ˈhɛzɪtənt/"},"hideous":{"def":"Extremely or shockingly ugly.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/hideous-us.mp3","phonetic":"/ˈhɪd.iː.ʌs/"},"illuminate":{"def":"Someone thought to have an unusual degree of enlightenment.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/illuminate-us-verb.mp3","phonetic":"/ɪlˈl(j)uməneɪt/"},"immense":{"def":"Immense extent or expanse; immensity","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/immense-us.mp3","phonetic":"/ɪˈmɛns/"},"incessant":{"def":"Without pause or stop; not ending, especially to the point of annoyance.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/incessant-us.mp3","phonetic":"/ɪnˈsɛs.ənt/"},"indignant":{"def":"Showing anger or indignation, especially at something unjust or wrong.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/indignant-us.mp3","phonetic":"/ɪnˈdɪɡ.nənt/"},"inevitable":{"def":"Something that is predictable, necessary, or cannot be avoided.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/inevitable-us.mp3","phonetic":"/ɪnˈɛvɪtəbəl/"},"infer":{"def":"To introduce (something) as a reasoned conclusion; to conclude by reasoning or deduction, as from premises or evidence.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/infer-us.mp3","phonetic":"/ɪnˈfɜː/"},"inquisitive":{"def":"Eager to acquire knowledge.","audio":"","phonetic":"/ɪŋˈkwɪzətɪv/"},"integrity":{"def":"Steadfast adherence to a strict moral or ethical code.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/integrity-us.mp3","phonetic":"/ɪnˈtɛɡɹəti/"},"intricate":{"def":"Having a great deal of fine detail or complexity.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/intricate-1-us.mp3","phonetic":"/ˈɪn.tɹɪ.kət/"},"jovial":{"def":"Cheerful and good-humoured; jolly, merry.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/jovial-us.mp3","phonetic":"/ˈdʒəʊ.vɪ.əl/"},"jubilant":{"def":"In a state of elation.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/jubilant-us.mp3","phonetic":"/ˈdʒu.bə.lənt/"},"lucid":{"def":"A lucid dream.","audio":"","phonetic":"/ˈl(j)uːsɪd/"},"luminous":{"def":"Emitting light; glowing brightly.","audio":"","phonetic":"/ˈluːmɪnəs/"},"magnificent":{"def":"Grand, elegant or splendid in appearance.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/magnificent-us.mp3","phonetic":"/mæɡˈnɪfəsənt/"},"menacing":{"def":"To make threats against (someone); to intimidate.","audio":"","phonetic":""},"meticulous":{"def":"Characterized by very precise, conscientious attention to details.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/meticulous-uk.mp3","phonetic":"/mɨˈtɪkjuləs/"},"mischievous":{"def":"Causing mischief; injurious.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/mischievous-us.mp3","phonetic":"/ˈmɪs.t͡ʃə.vəs/"},"momentous":{"def":"Outstanding in importance, of great consequence.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/momentous-us.mp3","phonetic":"/məʊˈmɛn.təs/"},"monotonous":{"def":"Having an unvarying tone or pitch.","audio":"","phonetic":"/məˈnɒtənəs/"},"nonchalant":{"def":"Casually calm and relaxed.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/nonchalant-us.mp3","phonetic":"/ˈnɒn.ʃəl.ənt/"},"notorious":{"def":"Widely known, especially for something negative; infamous.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/notorious-us.mp3","phonetic":"/nəʊˈtɔːɹɪəs/"},"oblivious":{"def":"(usually followed by to or of) Lacking awareness; unmindful; unaware, unconscious of.","audio":"","phonetic":"/əˈblɪ.vi.əs/"},"obscure":{"def":"To render obscure; to darken; to make dim; to keep in the dark; to hide; to make less visible, intelligible, legible, glorious, beautiful, or illustrious.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/obscure-us.mp3","phonetic":"/əbˈskjɔː(ɹ)/"},"ominous":{"def":"Of or pertaining to an omen or to omens; being or exhibiting an omen; significant.","audio":"","phonetic":"/ˈɒmɪnəs/"},"peculiar":{"def":"That which is peculiar; a sole or exclusive property; a prerogative; a characteristic.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/peculiar-us.mp3","phonetic":"[pʰə̥ˈkʰj̊uːljʊə]"},"perceive":{"def":"To become aware of, through the physical senses or by thinking; to see; to understand.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/perceive-us.mp3","phonetic":"/pəˈsiːv/"},"perilous":{"def":"Dangerous, full of peril.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/perilous-us.mp3","phonetic":"/pɛɹ.l̩.əs/"},"persevere":{"def":"To persist steadfastly in pursuit of an undertaking, task, journey, or goal, even if hindered by distraction, difficulty, obstacles, or discouragement.","audio":"","phonetic":""},"persistent":{"def":"Obstinately refusing to give up or let go.","audio":"","phonetic":"/pəˈsɪstənt/"},"plausible":{"def":"Seemingly or apparently valid, likely, or acceptable; conceivably true or likely","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/plausible-us.mp3","phonetic":"/ˈplɔːz.ə.bəl/"},"ponder":{"def":"A period of deep thought.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/ponder-us.mp3","phonetic":"/ˈpɒn.də(ɹ)/"},"precarious":{"def":"Dangerously insecure or unstable; perilous.","audio":"","phonetic":"/pɹəˈkɛəɹi.əs/"},"predicted":{"def":"(of theories, laws, etc.) To imply.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/predicted-us.mp3","phonetic":"/pɹɪˈdɪktɪd/"},"profound":{"def":"The deep; the sea; the ocean.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/profound-us.mp3","phonetic":"/pɹəˈfaʊnd/"},"prominent":{"def":"Standing out, or projecting; jutting; protuberant","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/prominent-us.mp3","phonetic":"/ˈpɹɒmɪnənt/"},"rapid":{"def":"(often in the plural) a rough section of a river or stream which is difficult to navigate due to the swift and turbulent motion of the water.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/rapid-us.mp3","phonetic":"/ˈɹæpɪd/"},"reluctant":{"def":"Opposing; offering resistance (to).","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/reluctant-us.mp3","phonetic":"/ɹɪˈlʌktənt/"},"remorse":{"def":"A feeling of regret or sadness for doing wrong or sinning.","audio":"","phonetic":"/ɹɪˈmɔː(ɹ)s/"},"resilient":{"def":"(of objects or substances) Returning quickly to original shape after force is applied; elastic.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/resilient-us.mp3","phonetic":""},"ruthless":{"def":"Without pity or compassion; cruel, pitiless.","audio":"","phonetic":"/ˈɹuːθləs/"},"serene":{"def":"Serenity; clearness; calmness.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/serene-us.mp3","phonetic":"/səˈɹiːn/"},"sinister":{"def":"Inauspicious, ominous, unlucky, illegitimate (as in bar sinister).","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/sinister-us.mp3","phonetic":"/ˈsɪnɪstə/"},"solemn":{"def":"Deeply serious and somber.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/solemn-us.mp3","phonetic":"/ˈsɒləm/"},"spontaneous":{"def":"Self-generated; happening without any apparent external cause.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/spontaneous-us.mp3","phonetic":"/spɒnˈteɪ.ni.əs/"},"steadfast":{"def":"Fixed or unchanging; steady.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/steadfast-us.mp3","phonetic":"/ˈstɛdfæst/"},"stealthy":{"def":"Characterized by or resembling stealth or secrecy.","audio":"","phonetic":"/ˈstɛlθi/"},"sturdy":{"def":"A disease in sheep and cattle, caused by a tapeworm and marked by great nervousness or by dullness and stupor.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/sturdy-us.mp3","phonetic":"/ˈstɜːdi/"},"summit":{"def":"A peak; the topmost point or surface, as of a mountain.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/summit-1-us.mp3","phonetic":"/ˈsʌmɪt/"},"swift":{"def":"Moving or happening very quickly; fast.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/swift-us.mp3","phonetic":"/swɪft/"},"tenacious":{"def":"Not giving up easily; determined and persistent.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/tenacious-us.mp3","phonetic":"/təˈneɪʃəs/"},"transparent":{"def":"Easy to see through; also means honest and open.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/transparent-us.mp3","phonetic":"/tɹæn(t)sˈpæɹənt/"},"treacherous":{"def":"Not loyal or reliable; likely to betray trust; dangerously unstable.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/treacherous-us.mp3","phonetic":"/ˈtɹɛtʃəɹəs/"},"turbulent":{"def":"Violently disturbed or agitated; tempestuous, tumultuous","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/turbulent-us.mp3","phonetic":"/ˈtɜːbjələnt/"},"valiant":{"def":"Showing courage and determination, especially in difficult situations.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/valiant-us.mp3","phonetic":"/ˈvæljənt/"},"verify":{"def":"To substantiate or prove the truth of something","audio":"","phonetic":""},"vivid":{"def":"Producing strong, clear images in the mind; bright and striking.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/vivid-us.mp3","phonetic":"/ˈvɪvɪd/"},"voyage":{"def":"A long journey, especially by ship.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/voyage-us.mp3","phonetic":"/ˈvɔɪ.ɪdʒ/"},"wary":{"def":"Cautious of danger; carefully watching and guarding against deception, trickery, and dangers; suspiciously prudent","audio":"","phonetic":"/ˈwɛəɹ.i/"},"weary":{"def":"Very tired, especially after working hard for a long time.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/weary-us.mp3","phonetic":"/ˈwiːɹi/"},"zealous":{"def":"Very enthusiastic and eager about something you care about.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/zealous-us.mp3","phonetic":"/ˈzɛl.əs/"},"astute":{"def":"Quickly and critically discerning.","audio":null,"phonetic":"/əsˈtjuːt/"},"audacious":{"def":"Showing willingness to take bold risks; recklessly daring.","audio":null,"phonetic":"/ɔːˈdeɪʃəs/"},"baffled":{"def":"To publicly disgrace, especially of a recreant knight.","audio":null,"phonetic":"/ˈbæfl̩d/"},"bewildered":{"def":"To confuse, disorientate, or puzzle someone, especially with many different choices.","audio":null,"phonetic":"/bəˈwɪldəd/"},"bravado":{"def":"A swaggering show of defiance or courage.","audio":null,"phonetic":"/brəˈvɑːdoʊ/"},"calculated":{"def":"To determine the value of something or the solution to something by a mathematical process.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/calculated-us.mp3","phonetic":"/ˈkælkjəleɪtɪd/"},"cavernous":{"def":"Resembling a cavern; vast","audio":null,"phonetic":""},"clandestine":{"def":"Done or kept in secret, sometimes to conceal an illicit or improper purpose.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/clandestine-au.mp3","phonetic":"/klænˈdɛstɪn/"},"contemplate":{"def":"To look at on all sides or in all its aspects; to view or consider with continued attention; to regard with deliberate care; to meditate on; to study, ponder, or consider.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/contemplate-us.mp3","phonetic":"/ˈkɒn.təmˌpleɪt/"},"debris":{"def":"Rubble, wreckage, scattered remains of something destroyed.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/debris-us.mp3","phonetic":"/ˈdeɪbɹiː/"},"determined":{"def":"To set the boundaries or limits of.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/determined-ca.mp3","phonetic":""},"discern":{"def":"To detect with the senses, especially with the eyes.","audio":null,"phonetic":""},"disguise":{"def":"Material (such as clothing, makeup, a wig) used to alter one’s visual appearance in order to hide one's identity or assume another.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/disguise-us.mp3","phonetic":"/dɪsˈɡaɪz/"},"dismay":{"def":"A sudden or complete loss of courage and firmness in the face of trouble or danger; overwhelming and disabling terror; a sinking of the spirits","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/dismay-us.mp3","phonetic":"/dɪsˈmeɪ/"},"embark":{"def":"To get on a boat or ship or (outside the USA) an aeroplane.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/embark-uk.mp3","phonetic":"/ɛmˈbɑːk/"},"encounter":{"def":"A meeting, especially one that is unplanned or unexpected.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/encounter-us.mp3","phonetic":"/ɪnˈkaʊntə/"},"endure":{"def":"To continue or carry on, despite obstacles or hardships; to persist.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/endure-us.ogg","phonetic":"/ɪnˈdjɔː(ɹ)/"},"exhilarating":{"def":"To cheer, to cheer up, to gladden, to make happy.","audio":null,"phonetic":""},"expedition":{"def":"The act of expediting something; prompt execution.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/expedition-us.mp3","phonetic":"/ɛkspəˈdɪʃən/"},"facade":{"def":"The face of a building, especially the front view or elevation.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/facade-us.mp3","phonetic":"/fəˈsaːd/"},"flicker":{"def":"An unsteady flash of light.","audio":null,"phonetic":"/ˈflɪkə/"},"foreboding":{"def":"To predict a future event; to hint at something that will happen (especially as a literary device).","audio":null,"phonetic":""},"frenzied":{"def":"In a state of hurry, panic or wild activity.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/frenzied-us.mp3","phonetic":""},"imminent":{"def":"About to happen, occur, or take place very soon, especially of something which won't last long.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/imminent-uk.mp3","phonetic":"/ˈɪmɪnənt/"},"impeccable":{"def":"Perfect, without faults, flaws or errors","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/impeccable-us.mp3","phonetic":"/ɪmˈpɛkəbəl/"},"imposing":{"def":"To establish or apply by authority.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/imposing-us.mp3","phonetic":"/ɪmˈpəʊzɪŋ/"},"intrepid":{"def":"Fearless; bold; brave.","audio":null,"phonetic":"/ɪnˈtɹɛpɪd/"},"investigate":{"def":"To inquire into or study in order to ascertain facts or information.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/investigate-us.mp3","phonetic":"[ɪn.ˈves.tɪ.ɡeɪ̯t]"},"labyrinth":{"def":"A maze-like structure built by Daedalus in Knossos, containing the Minotaur.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/labyrinth-us.mp3","phonetic":"/ˈlab.(ə)ɹ.ɪnθ/"},"methodical":{"def":"In an organized manner; proceeding with regard to method; systematic.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/methodical-us.mp3","phonetic":""},"monumental":{"def":"In the manner of a monument.","audio":null,"phonetic":"/ˌmɒnjʊˈmɛntəl/"},"muster":{"def":"Gathering.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/muster-1-au.mp3","phonetic":""},"navigate":{"def":"To plan, control and record the position and course of a vehicle, ship, aircraft, etc., on a journey; to follow a planned course.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/navigate-us.mp3","phonetic":"/ˈnæv.ɪ.ɡeɪt/"},"nimble":{"def":"Adept at taking or grasping","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/nimble-uk.mp3","phonetic":"/ˈnɪmbl̩/"},"obstinate":{"def":"Stubbornly adhering to an opinion, purpose, or course, usually with implied unreasonableness; persistent.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/obstinate-us.mp3","phonetic":"/ˈɒb.stɪ.nət/"},"orbit":{"def":"A circular or elliptical path of one object around another object, particularly in astronomy and space travel.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/orbit-us.mp3","phonetic":"/ˈɔː(ɹ)bɪt/"},"perpetual":{"def":"Lasting forever, or for an indefinitely long time","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/perpetual-us.mp3","phonetic":"/pəˈpɛtjʊəl/"},"phenomenon":{"def":"A thing or being, event or process, perceptible through senses; or a fact or occurrence thereof.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/phenomenon-uk.mp3","phonetic":"/fɪˈnɒmənɒn/"},"precaution":{"def":"Previous caution or care; caution previously employed to prevent misfortune or to secure good","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/precaution-us.mp3","phonetic":"/pɹiːˈkɔːʃən/"},"probe":{"def":"Any of various medical instruments used to explore wounds, organs, etc.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/probe-uk.mp3","phonetic":"/pɹəʊb/"},"relentless":{"def":"Unrelenting or unyielding in severity.","audio":null,"phonetic":"/ɹɪˈlɛntləs/"},"remnant":{"def":"A small remaining quantity of something.","audio":null,"phonetic":""},"resolute":{"def":"Admirably purposeful, determined, and unwavering.","audio":null,"phonetic":""},"revelation":{"def":"A surprising and previously unknown fact that has been disclosed.","audio":null,"phonetic":""},"scrutinize":{"def":"Examine or inspect closely and thoroughly.","audio":null,"phonetic":""},"shrouded":{"def":"Envelop, as if with a shroud; cover and hide.","audio":null,"phonetic":""},"skeptical":{"def":"Not easily convinced; having doubts or reservations.","audio":null,"phonetic":""},"soaring":{"def":"Flying or rising high in the air.","audio":null,"phonetic":""},"speculate":{"def":"Form a theory or conjecture about a subject without firm evidence.","audio":null,"phonetic":""},"strategic":{"def":"Relating to the identification of long-term aims and the means of achieving them.","audio":null,"phonetic":""},"submerge":{"def":"Cause to be under water; sink below the surface.","audio":null,"phonetic":""},"subtle":{"def":"So delicate or precise as to be difficult to analyse or describe.","audio":null,"phonetic":""},"surveillance":{"def":"Close observation, especially of a suspected spy or criminal.","audio":null,"phonetic":""},"unravel":{"def":"Investigate and solve or explain something complicated.","audio":null,"phonetic":""},"urgent":{"def":"Requiring immediate action or attention.","audio":null,"phonetic":""},"venture":{"def":"A risky or daring journey or undertaking.","audio":null,"phonetic":""},"vigilant":{"def":"Keeping careful watch for possible danger or difficulties.","audio":null,"phonetic":""},"volatile":{"def":"Liable to change rapidly and unpredictably, especially for the worse.","audio":null,"phonetic":""},"vulnerable":{"def":"Exposed to the possibility of being attacked or harmed.","audio":null,"phonetic":""},"paramount":{"def":"More important than anything else; supreme.","audio":null,"phonetic":""},"covert":{"def":"Not openly acknowledged or displayed; secret.","audio":null,"phonetic":""},"conspicuous":{"def":"Attracting notice or attention; clearly visible.","audio":null,"phonetic":""},"catastrophic":{"def":"Involving or causing sudden great damage or suffering.","audio":null,"phonetic":""},"ambush":{"def":"A surprise attack by people lying in wait in a concealed position.","audio":null,"phonetic":""},"ascend":{"def":"Go up or climb; rise to a higher level.","audio":null,"phonetic":""},"agility":{"def":"Ability to move quickly and easily.","audio":null,"phonetic":""},"evolve":{"def":"Develop gradually, especially from a simple to a more complex form.","audio":null,"phonetic":""},"evolving":{"def":"Developing gradually into something different.","audio":null,"phonetic":""},"plummet":{"def":"A piece of lead attached to a line, used in sounding the depth of water, a plumb bob or a plumb line","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/plummet-us.mp3","phonetic":"/ˈplʌm.ət/"},"trajectory":{"def":"The path an object takes as it moves.","audio":"https://api.dictionaryapi.dev/media/pronunciations/en/trajectory-us.mp3","phonetic":"/tɹəˈdʒɛktəɹɪ/"}}`);
 
 let _vocabAudioUrl = '';
 window.openVocabPopup = function(word) {
@@ -1533,6 +1537,17 @@ const STORIES_META = [
   {id:"mystery_l2",genre:"mystery",level:2,title:"The Missing Trophy",subtitle:"Theo Investigates \u2014 Part 1",emoji:"\ud83d\udd0d",vocabWords:["gleaming", "peculiar", "agile", "hesitant", "hideous", "ferocious", "swift", "vivid", "eerie", "concealed", "tenacious", "persevere", "frantic", "gracious", "solemn", "rapid", "jubilant", "dazzling"]},
   {id:"mystery_l3",genre:"mystery",level:3,title:"The Bigger Picture",subtitle:"Theo Investigates \u2014 Part 2",emoji:"\ud83d\udd0d",vocabWords:["consecutive", "diligent", "accumulated", "sinister", "ominous", "persistent", "jovial", "meticulous", "stealthy", "inevitable", "plausible", "oblivious", "notorious", "benevolent", "formidable", "cunning", "prominent", "resilient"]},
   {id:"mystery_l4",genre:"mystery",level:4,title:"The Final Clue",subtitle:"Theo Investigates \u2014 Part 3",emoji:"\ud83d\udd0d",vocabWords:["fervent", "intricate", "lucid", "momentous", "indignant", "empathy", "menacing", "condescending", "erratic", "remorse", "infer", "verify", "furtive", "steadfast", "defiant"]}
+,
+  {"id": "spy4", "title": "The Shadow Protocol", "subtitle": "Agent Riya vs The Phantom", "genre": "spy", "level": 4, "emoji": "🕵️", "vocabWords": ["surveillance", "clandestine", "covert", "strategic", "calculated", "imminent", "scrutinize", "relentless", "facade", "resolute"]},
+  {"id": "astronaut4", "title": "Beyond the Event Horizon", "subtitle": "Commander Jax and the Anomaly", "genre": "astronaut", "level": 4, "emoji": "🚀", "vocabWords": ["trajectory", "orbit", "phenomenon", "volatile", "probe", "soaring", "perpetual", "paramount", "speculate", "astute"]},
+  {"id": "adventure4", "title": "The Labyrinth of Echoes", "subtitle": "Zara and Uncle Felix in the Depths", "genre": "adventure", "level": 4, "emoji": "🗺️", "vocabWords": ["labyrinth", "cavernous", "nimble", "foreboding", "frenzied", "intrepid", "navigate", "submerge", "resolute", "vigilant"]},
+  {"id": "mystery4", "title": "The Invisible Witness", "subtitle": "Theo and Mia Close the Case", "genre": "mystery", "level": 4, "emoji": "🔍", "vocabWords": ["discern", "methodical", "revelation", "scrutinize", "conspicuous", "ambush", "unravel", "surveillance", "covert", "skeptical"]},
+  {"id": "fantasy4_1", "title": "The Shattered Crystal", "subtitle": "The Kingdom of Aeloria", "genre": "fantasy", "level": 4, "emoji": "🧙", "vocabWords": ["monumental", "paramount", "resolute", "formidable", "tenacious", "luminous", "catastrophic", "shrouded", "remnant", "perilous"]},
+  {"id": "fantasy4_2", "title": "The Dragon's Bargain", "subtitle": "A Quest for the Lost Flame", "genre": "fantasy", "level": 4, "emoji": "🐉", "vocabWords": ["audacious", "bravado", "obstinate", "volatile", "venture", "muster", "ascend", "imposing", "strategic", "encounter"]},
+  {"id": "historical4_1", "title": "The Codebreakers of Bletchley", "subtitle": "Secret War, 1943", "genre": "historical", "level": 4, "emoji": "⚔️", "vocabWords": ["clandestine", "calculated", "methodical", "intricate", "persistent", "relentless", "determined", "impeccable", "decipher", "vigilant"]},
+  {"id": "historical4_2", "title": "The Night Runner", "subtitle": "The Underground Railroad, 1850", "genre": "historical", "level": 4, "emoji": "🏛️", "vocabWords": ["precaution", "evasive", "stealthy", "vigilant", "perilous", "resilient", "steadfast", "embark", "endure", "foreboding"]},
+  {"id": "science4", "title": "Project Prometheus", "subtitle": "The Lab That Changed Everything", "genre": "science", "level": 4, "emoji": "🔬", "vocabWords": ["investigate", "phenomenon", "evolve", "trajectory", "probe", "methodical", "astute", "speculate", "exhilarating", "revelation"]},
+  {"id": "sport4", "title": "The Final Sixty Seconds", "subtitle": "Champions Are Made Here", "genre": "sport", "level": 4, "emoji": "⚽", "vocabWords": ["agility", "relentless", "determined", "muster", "strategic", "imminent", "exhilarating", "resolute", "bravado", "paramount"]}
 ];
 
 const STORY_TEXTS = {
@@ -1887,7 +1902,596 @@ He didn't mind. The solution was the reward. It always was.
 
 "Something will turn up," said Theo. And he smiled — not dazzling or theatrical, but small and genuine.
 
-It always did.`
+It always did.`,
+  spy4: `The encrypted message had been decoded at precisely 3:47 am. Agent Riya stared at the words on her screen, her pulse quickening despite years of training.
+
+OPERATION PHANTOM GATE. TARGET: CENTRAL ARCHIVES. TIME: TONIGHT.
+
+The Phantom was making his move at last. Six months of clandestine surveillance, six months of watching from shadows and waiting — it had all led to this moment. Riya had scrutinized every piece of evidence, every blurred camera image, every coded transmission. She knew his methods better than he knew himself.
+
+Director Chandra appeared behind her, his face unreadable. "Your assessment?"
+
+"The facade he's been building — the identity as a shipping clerk — it's cover for something bigger," Riya said. "He doesn't just want the archives. He wants the encryption keys stored inside them."
+
+"Which would make every covert operation we've run in the last decade visible to our enemies."
+
+"Exactly." Riya began laying out her strategic plan on the digital map. "He'll expect us to protect the front entrance. That's what he wants — a distraction. His real approach will be through the maintenance tunnels beneath the east wing."
+
+Chandra studied the map. "You're certain?"
+
+"The Phantom is brilliant, but he's predictable in one way. He always chooses the route that makes him feel invincible." She pointed to the tunnel access. "He thinks we don't know about these passages. But I've been watching the heat signatures in that corridor for three weeks."
+
+The operation launched at nightfall. Riya's team was methodical and resolute, moving through the building with the precision of a well-rehearsed performance. She positioned herself at the junction where the maintenance tunnel connected to the archive vault.
+
+She waited in darkness so complete she could hear her own breathing.
+
+At 11:14 pm, a calculated sound reached her — the soft click of a magnetic lock being overridden. Then footsteps, careful and practised but not careful enough. Riya had been trained by the best, and she could discern the weight and rhythm of those steps from forty metres away.
+
+The Phantom emerged from the tunnel, his silhouette barely visible. He moved towards the vault with absolute confidence.
+
+He was six steps away when Riya stepped forward and switched on the lights.
+
+"Good evening," she said calmly. "I've been relentless in finding you. I hope you appreciate that."
+
+The Phantom froze. For a moment, Riya saw genuine surprise cross his face — an expression she doubted many people had ever seen there.
+
+"Agent Riya." His voice was controlled, almost admiring. "You worked out the tunnels."
+
+"Three weeks ago. I've been watching the heat signatures in the walls."
+
+He smiled thinly. "Imminent defeat is uncomfortable, I'll admit."
+
+"The archives are secure. Your network's encryption keys won't be going anywhere tonight."
+
+Behind him, the corridor filled with Riya's team. The Phantom assessed his options with the calm of someone running rapid calculations. Then, slowly, he raised his hands.
+
+"You've won this round," he said quietly.
+
+Riya stepped forward. "You've always underestimated how long I'm willing to wait. Surveillance isn't glamorous work. But tonight it was worth every hour."
+
+As she led him out of the building, Director Chandra's voice crackled in her earpiece. "Outstanding work, Agent. He's been evading us for four years."
+
+"He made one mistake," Riya replied. "He thought being brilliant was enough. It isn't. You have to be relentless too."
+
+The night air was cold and clean as they emerged from the building. The Phantom walked quietly beside her, already calculating his next move from whatever cell he'd be taken to. She knew he'd be thinking several steps ahead.
+
+So would she.
+
+The work of an intelligence officer was never truly finished. There would always be another threat, another encrypted message, another race against time. But for tonight, the archives were safe, the mission was complete, and Agent Riya allowed herself precisely ten seconds of satisfaction before her mind turned to the next case.
+
+In her world, ten seconds was a luxury.`,
+
+  astronaut4: `The anomaly appeared on NOVA's sensors at 04:31, station time.
+
+Commander Jax was already awake — sleep had become elusive at this depth of space — when the alert chimed softly through the observation deck. He floated to the main display and studied the readout with the careful, astute eyes of someone who had spent twenty years in deep space.
+
+"NOVA," he said quietly, "what am I looking at?"
+
+"A phenomenon I cannot fully classify, Commander," the AI responded. Her voice carried the particular measured tone she reserved for things outside her vast database. "The readings suggest a localised distortion in the gravitational field, approximately 340 kilometres off the starboard bow. Its trajectory does not match any known asteroid, comet, or stellar object."
+
+Dr. Priya pushed herself through the hatchway, her dark hair floating loosely around her face. She had been running calculations in the lab module for sixteen hours. "I heard the alert. What is it?"
+
+"We're not sure," Jax said. "NOVA, speculate."
+
+"Based on available data, the distortion could represent a micro-singularity — a theoretical phenomenon that has never been directly observed. Alternatively, it could be a volatile pocket of exotic matter. Both possibilities carry significant risk to the station."
+
+Dr. Priya moved to her console, her fingers working rapidly. "If it's a micro-singularity, its orbit could become erratic. If it's exotic matter, proximity could disrupt our propulsion systems." She looked up. "Paramount concern: we don't have enough data."
+
+"Then we gather more." Jax checked the probe inventory. Three autonomous units, fully charged. "We send in a probe and get direct readings before we make any decisions."
+
+"The probe could be destroyed," NOVA said, not as a warning but as a statement of fact.
+
+"Probes can be replaced. The information they gather cannot." Jax programmed the trajectory and launched the first unit. They watched it soar away from the station on its long arc towards the anomaly, a tiny point of light against the absolute darkness of deep space.
+
+For forty minutes, they waited. The perpetual hum of the station filled the silence — life support, navigation, temperature regulation, all the invisible systems that stood between three humans and the void.
+
+Then NOVA spoke. "Probe One has made contact. Transmitting data."
+
+The readings were extraordinary. Dr. Priya's eyes widened as she processed the numbers. "Jax. This is not a singularity. It's not exotic matter either." She turned, and Jax saw something he rarely witnessed on her face: wonder. "It's a stable gravitational fold. Space is folded back on itself at this point, like a page in a book. The mathematics are… they're perfect."
+
+"What does that mean?"
+
+"It means this is not a natural phenomenon." She paused to let that settle. "The probability of a stable fold occurring spontaneously, with these precise measurements, is so vanishingly small it's effectively zero."
+
+The observation deck fell completely silent.
+
+"Someone built this," Jax said.
+
+"Or something." Dr. Priya was already sending a second probe. "The fold is stable. It appears to be a controlled structure. A gateway, perhaps. Something designed to allow passage between two points in space without crossing the distance between them."
+
+NOVA interjected. "I am detecting a signal within the fold. It is not on any frequency in my database, but its structure is regular and repeating. It is not random noise."
+
+Jax floated to the viewport and stared into the dark. Out there, 340 kilometres away, something impossible was happening. Something that suggested humanity was not the first species to have looked up at the stars and decided to reach for them.
+
+"We document everything," he said. "Every reading, every transmission, every calculation. And we do not attempt to enter the fold without a full understanding of what we're dealing with."
+
+"Agreed," said Dr. Priya. "But Jax — this changes everything. Every model we have of the universe, every assumption about what exists beyond our own solar system —"
+
+"I know." He turned from the viewport. "Send the report to Central Command. And NOVA — keep the probes running. I want continuous data."
+
+"Understood, Commander."
+
+Outside, the anomaly pulsed once — a single, brief brightening — as if acknowledging that it had been found.
+
+Jax watched it for a long moment.
+
+Then he got to work.`,
+
+  adventure4: `The entrance to the cave was barely wide enough to squeeze through sideways, and Zara almost missed it entirely.
+
+"There." Uncle Felix pressed his hand against the dark crack in the cliff face. The rock was cool and damp beneath his fingers, covered in a thin film of moisture that caught what little remained of the afternoon light. "This is it. The Labyrinth of Echoes."
+
+Zara pressed her ear to the opening. From somewhere deep within came a sound — not quite wind, not quite water, but something between the two. A whispering, restless noise that seemed to carry words she couldn't quite make out.
+
+"Foreboding," she said quietly.
+
+"What?"
+
+"That's what this feels like. Like something is warning us."
+
+Felix smiled, though it didn't quite reach his eyes. "Warnings make the best stories, don't they? Come on."
+
+They had been searching for the Labyrinth for three weeks. According to the ancient cartographer's journal — the one they had spent two years tracking down, which had led them through six countries and across two mountain ranges — the cave system contained the remains of a civilisation so old that no written record described it. Only this journal. Only this map.
+
+Inside, the cave was cavernous beyond all expectation. Their headlamps carved pale beams into a darkness so absolute it felt solid. The ceiling soared somewhere above them, invisible. The floor beneath their boots was smooth and curved, as if shaped by long-ago water.
+
+"Stay close," Felix said. "The journal mentioned that the passages branch constantly. Without the map, disorientation is almost immediate."
+
+Zara was nimble and sure-footed, moving through the narrow corridors with an ease that Felix could no longer match with his injured knee. She navigated by feel as much as sight — trailing her fingers along the walls, reading the subtle changes in temperature, listening to the way their footsteps echoed.
+
+After forty minutes, they found the first chamber.
+
+It was circular, perhaps thirty metres across, and its walls were covered in carvings so intricate they seemed almost to move in the flickering light. Animals, stars, patterns that might have been writing, figures in various postures of worship or ceremony or grief — Zara couldn't tell which.
+
+"These are thousands of years old," Felix breathed. He was photographing everything, his hands trembling slightly with the excitement he worked hard to contain. "Look at the precision. Every line is perfect."
+
+Zara was examining the floor. "There's water here." She crouched down. A thin sheet of liquid covered the lowest part of the chamber, completely still. She leaned forward, and her reflection looked back at her from a surface as smooth as a mirror.
+
+Then it moved.
+
+Not the reflection — something beneath the water. A shape, dark and slow, moving in a gentle arc beneath the surface.
+
+"Felix." She kept her voice steady with the kind of effort that required all her concentration. "There's something in here with us."
+
+He was at her side in three strides. They stared at the water. The shape was large — perhaps two metres long — and it was circling the outer edge of the chamber in a slow, perpetual loop, apparently unconcerned by their presence.
+
+"Blind cave fish," Felix said after a long moment. "Giant ones. There must be an underground water system far below us." His voice was full of awe. "Zara, this chamber may be connected to a subterranean river. These creatures have been living in complete isolation for potentially thousands of years. Evolving without any contact with the surface world."
+
+The creature passed beneath them again, close enough that Zara could see the ghostly translucence of its body.
+
+They pressed on for another two hours, through passages that twisted and doubled back on themselves, across narrow bridges of natural stone above drops they couldn't see the bottom of, through chambers where the temperature dropped so sharply their breath came in clouds.
+
+When they finally found it — the central chamber, the one the journal had called the Heart of the Labyrinth — Zara stopped breathing for a full five seconds.
+
+The chamber was vast. And in its centre, rising from the floor like something that had grown there rather than been built, was a structure of carved stone columns arranged in a perfect circle, each one connected to the next by a carved lintel. At the centre of the circle, a single flat stone.
+
+An altar, or a throne, or something for which no modern word existed.
+
+"We found it," Felix whispered.
+
+Zara nodded. Her heart was hammering with something that was equal parts fear and joy and the overwhelming sense of standing somewhere that no living person had stood for a very, very long time.
+
+"We found it," she agreed.
+
+From somewhere deep in the cave system, the whispering continued.`,
+
+  mystery4: `The painting disappeared on a Tuesday, which Theo found significant.
+
+"Tuesdays are quiet days," he explained to Mia as they stood in the empty gallery room, staring at the rectangular patch of lighter paint where the canvas had hung for forty years. "Fewer visitors. Smaller staff. If you were planning a theft, you would choose Tuesday."
+
+Mia was examining the security camera with a small torch. "The camera was disabled between 2:14 and 2:31 am. Seventeen minutes. Enough time to remove the painting and exit through the fire escape."
+
+"And the alarm?"
+
+"Triggered at 2:12. But it reset itself automatically at 2:14 — two minutes after activation." She turned to look at him. "Theo, alarms don't reset themselves."
+
+"Someone with access to the security panel reset it manually. Which means —"
+
+"— someone who works here. Or worked here." Mia's methodical mind was already running through possibilities. "The security code was changed six weeks ago. Only four people have the new code."
+
+They had been working this case for Inspector Wells for eighteen hours without sleep, and Theo was beginning to feel the tiredness behind his eyes. But fatigue also had a way of making things clearer, stripping away the unnecessary thoughts and leaving only what mattered.
+
+He walked slowly around the room, scrutinizing each detail. The floor was polished hardwood, unmarked. The window was sealed from the inside. The single door had a keypad lock, its entry log showing no activity between midnight and 9 am — the time the theft was discovered.
+
+"The log is empty," he said. "But the painting is gone. The thief didn't come through the door."
+
+"Or the log was falsified." Mia crouched near the base of the wall. "Theo. Look at this."
+
+He moved to her side. On the floor, barely visible against the dark wood, was a single small smear of something pale. She photographed it and sent the image to Inspector Wells's forensic team.
+
+"The painting wasn't taken through the fire escape," Theo said slowly. His mind was working the problem from a different angle now, unravelling the scenario he had built and replacing it with a new one. "There were no marks on the escape ladder. No fingerprints on the push-bar of the fire door. The thief never left the building."
+
+Mia stood up. "The painting is still here."
+
+It wasn't a question.
+
+"The whole operation was a misdirection. Disable the camera, reset the alarm, leave a seventeen-minute window that looks like the theft window. But the painting is hidden somewhere in this building." He began moving towards the door. "We need to think about which spaces in this building a four-foot canvas could be concealed in, and which of those spaces could be accessed without appearing on any security log."
+
+They spent the next three hours conducting a room-by-room investigation. Inspector Wells joined them at noon, skeptical but willing to follow their lead. Mia maintained a methodical checklist of every space searched. Theo moved ahead, his instincts guiding him towards areas that felt overlooked.
+
+It was in the restoration workshop on the third floor that they found it.
+
+The painting was concealed behind a false panel in the storage rack — a panel that, when Theo pressed it at precisely the right angle, swung open on hidden hinges to reveal a narrow space packed with rolled canvases and two flat wooden boards. And between the boards, wrapped in acid-free tissue paper, was The Harbour at Dusk by Cornelius Brandt, valued at four million pounds.
+
+"Well," said Inspector Wells, staring at it. "I'll be — how did you know it was here?"
+
+"The restoration workshop is the only room in the building where the security cameras have a blind spot," Theo said. "And it's the only room where someone could legitimately spend hours alone without raising suspicion. But the revelation was the residue Mia found on the gallery floor — preservation wax. The kind used only in this workshop."
+
+Mia was already photographing the panel and the hidden space. "The thief planned to wait until the investigation cooled down, then remove the painting and sell it through a private channel. They just hadn't counted on us working through the night."
+
+The next morning, when the workshop's senior conservator arrived at 8 am, Inspector Wells and two officers were waiting for her.
+
+She looked at the Inspector. Then at Theo and Mia.
+
+"You're very young to be this good," she said.
+
+Theo allowed himself a small, satisfied smile.
+
+"We've had practice," he said.`,
+
+  fantasy4_1: `The Crystal of Aeloria had protected the kingdom for five hundred years. When Mira woke to find it shattered on the tower floor, she knew the catastrophic consequences would reach further than anyone could imagine.
+
+She was twelve years old and the youngest apprentice the Keeper had ever accepted. She was also, at this particular moment, the only person who knew what had happened.
+
+The crystal lay in seven pieces across the cold stone floor of the inner sanctum, each fragment still faintly luminous but dimming by the second. The protective field that the crystal generated — that invisible, paramount barrier which had kept the shadow beasts of the Mirewood at bay since before her grandmother's grandmother was born — was failing.
+
+Mira did not scream, though part of her very much wanted to. Instead she crouched beside the largest piece and examined it carefully. The break was clean. Not accidental. Someone had struck the crystal with deliberate force, and the impact point was at the precise angle that would cause maximum fracture.
+
+Monumental carelessness could not explain this. This was sabotage.
+
+She gathered the fragments into her satchel — all seven — and ran.
+
+The Keeper was in the lower library when Mira found him, hunched over an ancient text with a magnifying glass. He looked up as she burst through the door, took one look at her face, and put down the glass.
+
+"Tell me," he said.
+
+She told him. He listened without interrupting, which was one of the things she had come to respect about him. When she finished, he was silent for a long moment.
+
+"The shadow beasts will sense the failing field within hours," he said. "Once they realise the barrier is down, they will move. We have perhaps until nightfall."
+
+"Then we mend it before nightfall."
+
+He looked at her steadily. "The Crystal of Aeloria cannot simply be glued back together, child. It takes a master artificer to —"
+
+"The Keeper of Stonehaven is a master artificer. She lives three valleys away."
+
+"A three-day journey."
+
+"On a horse, yes. Through the Thornwood on foot, six hours." She pulled the first map from the library shelf. The Thornwood was perilous — tangled and disorienting, full of the kind of plants that caught at clothing and roots that tripped the unwary — but it was direct.
+
+The Keeper studied her for a long moment. His expression shifted through several things she couldn't entirely read: concern, calculation, and something she slowly recognised as respect.
+
+"You have thought this through," he said.
+
+"I've been thinking since I found the pieces." She was already marking the route. "The saboteur knew what they were doing. They knew when the inner sanctum would be empty and they knew exactly where to strike. That means they've been inside the tower before. We need to think about who had access."
+
+"Agreed. But first —"
+
+"First, we save the kingdom." She shouldered her satchel. "I'll think about who broke it on the way."
+
+The Thornwood was everything the stories said — dark and dense and full of sounds that didn't quite make sense, noises that seemed to come from behind you even when you stopped and turned around. Mira moved with tenacious focus, following the compass bearing she had memorised, counting her steps. She did not let herself be distracted by the shadows between the trees or the soft, shrouded whispers that seemed to float just below the level of hearing.
+
+She reached Stonehaven in five hours and forty minutes.
+
+The Keeper of Stonehaven was a small, ancient woman with hands like oak bark and eyes that suggested she had seen several centuries worth of trouble and was not impressed by any of it.
+
+She examined the crystal fragments without touching them. She circled them twice. Then she looked at Mira.
+
+"Who sent you?"
+
+"I sent myself. The crystal needs mending by nightfall or the Mirewood barriers fail."
+
+"I'm aware of what the crystal does." The old woman picked up the largest fragment and held it to the light. "And I'm aware that this wasn't an accident." A pause. "You're a remnant of a line I recognised. Your grandmother was one of mine."
+
+Mira blinked. "My grandmother was a —"
+
+"Apprentice. Yes. Come inside."
+
+The mending took four hours. When it was complete, the crystal sat whole on the workbench, luminous and steady and giving off a warmth that Mira could feel across the room.
+
+She rode back through the valley as fast as the borrowed horse would carry her. She arrived at the tower as the first shadow creatures began to gather at the treeline, their forms dark and uncertain in the failing light.
+
+The Keeper placed the crystal in its cradle.
+
+The barrier rose.
+
+The shadow beasts retreated.
+
+In the morning, Mira would begin thinking carefully about who had broken the crystal, and why. But for now, she allowed herself to sit on the tower steps and breathe the clean night air, watching the stars appear one by one above the kingdom of Aeloria.
+
+She had saved it.
+
+And she had only just begun.`,
+
+  fantasy4_2: `Everyone said that making a bargain with a dragon was the worst idea in a long and distinguished history of terrible ideas.
+
+Ren had considered this advice carefully and decided to try it anyway.
+
+The dragon's name was Sarax, and she lived at the summit of the Cinder Peak, which was the third-tallest mountain in the known world and also the most aggressively unpleasant to climb. Ren had been ascending for three days. His legs ached, his supplies were running low, and the air at this altitude was so thin he had to stop every hundred steps to catch his breath.
+
+But the village of Thorndale had been without fire for six weeks. Without fire, there was no warmth, no cooked food, no light in the long winter nights. Three of the eldest villagers had already become ill. More would follow.
+
+The ancient flame — the one that had burned continuously in Thorndale's great hearth for four hundred years — had gone out when the stone that housed it cracked in the autumn earthquake. Without the stone, the flame could not be relit. And without the flame, the village could not survive the winter.
+
+Sarax was the only source of dragonfire within a thousand miles.
+
+Ren reached the summit as the sun was setting. The crater at the top of Cinder Peak was imposing even by volcanic standards — vast and deep and radiating heat that hit him like a wall. And in the centre of the crater, curled on a ledge of black rock in a posture of supreme indifference, was the dragon.
+
+She was enormous. She was bronze-scaled and terrible and beautiful in the way that only genuinely dangerous things manage to be. One enormous eye opened as Ren approached.
+
+"A human," Sarax said. Her voice was like boulders shifting. "How audacious."
+
+"I need dragonfire," Ren said. He had practised this speech for the entire three-day climb. He had planned every word. Now, standing in front of an actual dragon, he found that his prepared words had entirely abandoned him. "The village of Thorndale. We need fire."
+
+Sarax regarded him with ancient, volatile amusement. "And you decided to climb to the top of a volcano and ask a dragon for some."
+
+"Yes."
+
+"Most humans who come here want treasure."
+
+"I want fire." He reached into his pack and produced the iron lamp he had carried from Thorndale. "Just enough to light this. If I can get it home before it goes out —"
+
+"It would go out," she said. "Dragonfire without a dragonfire stone burns for approximately eight minutes in open air. Your village is three days away."
+
+Ren had not known this. He felt the bravado draining out of him. "Then... I don't know what to do."
+
+The dragon uncoiled herself with the slow, monumental movement of something that was in absolutely no hurry. She padded towards him, each footstep a small seismic event, until her enormous head was level with his, close enough that he could see his own reflection in her eye.
+
+"What do you have to offer?" she asked.
+
+He thought. "I can read and write. I know mathematics and cartography and three languages."
+
+"I have all the knowledge I need."
+
+"I can — I don't know. I can muster courage when I'm terrified, apparently, because I'm here."
+
+The dragon made a sound that was either a laugh or a volcanic rumble. It was difficult to tell.
+
+"There is something I want," she said. "There is a map. A strategic document, locked in the vaults of the Merchant Council of Aldenmoor. It shows the location of the last true dragonfire stone in existence. For centuries, the Council has kept this information from dragonkind, fearing what we might do with such a stone."
+
+Ren stared at her. "You want me to steal a map from the most powerful merchant council in the kingdom."
+
+"I want you to retrieve what rightfully belongs to us." A pause. "In exchange, I will give you a fragment of the dragonfire stone I currently possess. Small enough to fit in your lamp. More than enough to sustain a flame for a thousand years."
+
+He thought about this. He thought about the risk, and the distance, and the almost certain impossibility of breaking into a merchant council vault. He thought about the elderly villagers ill in their cold houses and the children going to sleep in darkness.
+
+"Agreed," he said.
+
+Sarax smiled. Or at least she did something with her mouth that a dragon's equivalent of a smile might look like.
+
+"You are either very brave or very foolish," she said.
+
+"Probably both," Ren admitted. He held out his hand.
+
+She reached out one vast claw and placed a fragment of warm, glowing stone into his palm.
+
+The bargain was struck.`,
+
+  historical4_1: `The message took four hours to decode. When Eleanor finally broke it, she sat very still for a long moment and stared at the translated words on her notepad.
+
+It was September 1943, and the war was at its most brutal and uncertain. Outside the windows of Hut 7, the Bletchley estate was quiet under a grey English sky. Eleanor was nineteen years old and had been working here for eight months, recruited directly from her mathematics degree — the degree she had been told women did not need.
+
+She had thought about telling them several things in response to that. She had not, because she needed the work, and the work mattered enormously.
+
+"Turner." She kept her voice low, though there was no one near enough to hear. "Look at this."
+
+Her colleague James Turner materialised from the corner where he had been running calculations for the past six hours. He was methodical to a degree that occasionally irritated Eleanor and frequently saved their work from error. He read her notepad twice, which was his habit.
+
+"The convoy route," he said.
+
+"They've changed it again. Third time this month." Eleanor pulled her codebook and began cross-referencing. "But look at this sequence here." She pointed to a cluster of digits in the middle of the transmission. "This pattern appeared in the transmission we decoded on the 12th. And again on the 19th."
+
+"They're using a sub-code within the primary encryption."
+
+"A fallback. If the main cipher is compromised, the sub-code carries the genuine tactical information." She was already working backwards through the pattern, her intricate knowledge of the German cipher systems letting her navigate the mathematics with the ease of someone reading a familiar map. "Which means every transmission we've decoded this month — the ones we've acted on —"
+
+"May have been deliberate misinformation." James sat down heavily. "While the real orders were embedded in a secondary layer we weren't reading."
+
+Eleanor felt the weight of it. The implications were vast. If naval command had been making decisions based on false information —
+
+"We need to be certain before we say anything," she said, and her voice was steady despite what she was feeling. "Absolutely impeccable certainty. We cannot go to the Admiral with a theory."
+
+"How long?"
+
+"Give me tonight."
+
+She worked without sleeping. James brought her tea at intervals and checked her calculations with the determined, relentless concentration that was his greatest quality. By 4 am, they had decoded seventeen messages using both layers. By 5 am, the pattern was clear, clandestine, and devastating.
+
+The German naval command had been running a calculated intelligence operation. For three weeks, they had been feeding the Allies' codebreakers a plausible set of decoded messages — true enough to seem genuine, false enough to misdirect British naval operations. The real convoy routes were in the sub-code.
+
+At 6 am, Eleanor and James went to see Commander Hartwell.
+
+He was a precise, watchful man who had worked in intelligence for twenty years. He read their report without speaking. He read it again.
+
+"You're certain," he said. It was not a question.
+
+"Yes," Eleanor said. "We've verified every calculation. The sub-code exists. The misinformation campaign has been running for twenty-two days."
+
+Hartwell looked at her steadily. "How did you find it?"
+
+"A repeated pattern in a position that shouldn't have repeated." She paused. "I noticed it because I was vigilant. Because I never assume a problem is fully solved just because it appears to be."
+
+He nodded once. "I'll need your complete analysis for the naval staff meeting at 0800." He began to rise, then stopped. "Miss Eleanor. Outstanding work."
+
+She was already turning back to her notepad.
+
+Outstanding work was not the end point. It was the beginning of the next problem.
+
+There were seventeen other sub-code patterns to investigate, and she had already spotted two of them.
+
+She got back to work.`,
+
+  historical4_2: `The night Clara ran was the kind that felt too dark even for darkness — a sky without stars, a wind that swallowed every sound.
+
+She had been planning her escape for four months. Every precaution had been considered, every route memorised, every contingency prepared for. She knew which creeks could be forded and which were too deep. She knew which farms belonged to those who would help and which to avoid at all costs. She knew the sound of approaching horses from half a mile away.
+
+She did not know if she was brave enough.
+
+At midnight, when the house was long silent, she moved. Stealthy in a way that had taken weeks to learn — her body had to be trained to avoid every board that creaked, every door that stuck. She had practised this exact path for months, evasive and silent, until it was as familiar as breathing.
+
+Outside, the air was cold and sharp. She paused at the edge of the tree line and listened for thirty seconds — a precaution she would take at every stopping point between here and the Ohio River, one hundred and twenty miles north.
+
+Nothing. She moved.
+
+The first safe house was twelve miles away, concealed in the barn of a farmstead that showed a lantern in its left window when it was safe to approach. Clara had been told to wait at the creek fork for the signal. She waited there for an hour, shivering, before the distant light appeared.
+
+The farmer and his wife were quiet people with tired eyes and immediate practical kindness. They asked no questions and provided everything needed — food, dry clothes, a corner of the hayloft with clean straw.
+
+"You'll rest here today," the woman said. "Move again at nightfall. There are two men who will take you to the next point."
+
+Clara endured the long, perilous hours of daylight hidden in the hayloft, listening to the ordinary sounds of the farm going on below — animals, tools, voices, the daily rhythm of a life being lived in the open. She thought about what it would mean to have that. To simply exist in the world without concealment, without the foreboding weight of what happened to people who were caught.
+
+She thought about her family still behind. About the promises she had made to return for them once she reached the north.
+
+At nightfall, she moved again.
+
+The journey took eleven days. Eleven days of moving only in darkness, of trusting strangers whose faces she never fully saw, of crossing rivers in flat-bottomed boats, of hiding in spaces so small her breath came in short, conscious pulls. Eleven days of steadfast progress, of refusing to let fear make her decisions.
+
+On the eleventh night, her guides stopped at the top of a ridge.
+
+"Ohio River," one of them said quietly, pointing into the darkness below. "You cross there. Ferryman knows you're coming."
+
+Clara looked down. In the faint moonlight, she could see the dark shimmer of moving water.
+
+She had spent four months imagining this moment, rehearsing it, building it up in her mind as a destination that would make the preceding terror worthwhile. Now that it was here, she felt something unexpected: not triumph, but a profound and quiet grief for everyone she had left behind.
+
+She resolved, in that moment, to be back for them. Whatever it took.
+
+She began to descend towards the water.
+
+The crossing was cold and the current was strong and the ferryman was a white-bearded man who poled in silence and did not look at her. She sat in the bow of the boat and watched the southern bank recede and the northern bank grow closer.
+
+When the boat touched the far bank, Clara stepped out onto Ohio soil.
+
+She stood still for a moment, water dripping from her clothing, breath misting in the cold air.
+
+She was free.
+
+And freedom, she understood now, was not an ending. It was the beginning of the work she had promised herself she would do.
+
+She walked north, towards the lights of a town, towards a life she would build from nothing, towards the long road back to the people who still waited.`,
+
+  science4: `No one at school believed that twelve-year-old Amara had discovered a new enzyme. Including her teacher.
+
+"Protein structures don't spontaneously change in a home laboratory," Dr. Osei had said, with the particular tone of someone who was trying to be kind and not quite managing it. "The equipment required to verify that kind of observation is highly specialised."
+
+Amara had gone home, thought about this carefully, and begun a methodical investigation of every possible objection. Then she wrote to Professor Nakamura at the University of Bristol.
+
+She had not expected a reply.
+
+Professor Nakamura's response arrived three weeks later. It was brief and astute: he had read her observation notes, he found them intriguing, and he wanted to see her results.
+
+Two weeks after that, Amara was sitting in a university laboratory surrounded by equipment that cost more than her family's house, being introduced to a research team of seven, as their youngest collaborator by approximately fifteen years.
+
+"Walk me through your original observation," Professor Nakamura said. He was a small, precise man with the habit of absolute focus — when he looked at you, it felt like being scrutinised by someone who retained everything.
+
+Amara explained. She had been investigating enzyme activity in a sample of soil taken from the garden — a project for a national science competition, nothing extraordinary. But when she ran the standard reaction tests, the results were anomalous. The enzyme she had isolated appeared to catalyse a reaction that, according to her textbooks, required temperatures thirty degrees higher than the temperature she was working at.
+
+"So either my equipment was wrong," she said, "or the enzyme is different from anything previously catalogued."
+
+"And you tested for equipment error how?"
+
+She described her verification process. It took eight minutes to explain. When she finished, there was a brief silence in the laboratory.
+
+"You ran the same test sixty times," Professor Nakamura said.
+
+"Sixty-three. I wanted to speculate from data, not from a single observation."
+
+A few of the researchers exchanged glances. One of them smiled.
+
+"Your equipment wasn't wrong," the professor said. "We ran your samples last week, before you arrived, without telling you our results. The enzyme is real." He paused, and she could see him deciding how much to say. "What you've found is extraordinary. This enzyme is active at temperatures that nothing in our current database can function at. The implications for industrial processes, for medicine, for understanding how life can exist in extreme environments — they are very significant."
+
+Amara sat with this for a moment. She was exhilarated and frightened and deeply aware that she was sitting in a room full of people who had spent their entire careers preparing for exactly this kind of discovery.
+
+"What happens now?" she asked.
+
+"Now we verify completely. We probe every aspect of this enzyme's structure. We understand exactly how and why it does what it does." He leaned forward. "And then — if everything holds up — you'll be named as co-discoverer of something that will appear in biology textbooks for the next fifty years."
+
+The investigation took four months. Amara visited the lab every Saturday and participated in the research via email for the rest of the week. She learned more in those four months than in the previous three years of school. The researchers were generous with their knowledge — perhaps because she was twelve, perhaps because she had already demonstrated that she would not misuse what she was given, but mostly, she suspected, because she simply could not stop asking questions.
+
+The enzyme was catalogued and named in January. The paper was accepted by a leading journal in February.
+
+When Dr. Osei asked her what she had been working on, she explained.
+
+He was very quiet for a moment.
+
+"Amara," he said finally. "I owe you an apology."
+
+"You were being scientifically rigorous," she said generously, though she privately thought he could have been more encouraging. "You had no evidence I was right."
+
+"You had evidence. I didn't look at it carefully enough." He paused. "I'll look more carefully in future."
+
+It was, Amara thought, the most important lesson the whole experience had produced: the revelation wasn't the enzyme itself. It was what she had done with the doubt. She had taken every sceptical voice — her teacher's, her own — and used it to make her evidence stronger.
+
+Science, she had learned, was not about being right.
+
+It was about being relentless about finding out.`,
+
+  sport4: `Sixty seconds on the clock. One goal down. The entire season coming down to this.
+
+Priya had been in tight situations before, but nothing quite like this — the stadium noise was a wall of sound that she could feel in her ribcage, her legs were burning from ninety minutes of play, and her team, the Riverside FC under-13s, were losing by a single goal in the regional final.
+
+She was their captain. That meant something specific right now: it meant the other players were looking at her face to decide how they felt.
+
+She made her face resolute.
+
+"We have time," she said, pulling her team into a tight group. She had to shout to be heard over the crowd. "One goal. We've scored from worse positions. We know what we need to do."
+
+"The defence hasn't given us a clear run all half," said Jade, their striker, breathing hard.
+
+"Then we create one." Priya looked at each of them in turn. "Jade, you take the centre. I'll come from the right. They'll be expecting us to hold the ball and look for a gap. We're not going to do that." She outlined the plan in fifteen seconds — the kind of strategic clarity that was only possible because she had been studying the opposition's defensive shape for the entire second half. "The paramount thing is to keep moving. Don't slow down. Make them react."
+
+The referee blew for a corner.
+
+Priya jogged into position, and the crowd noise, which had been overwhelming a moment before, seemed to settle into something she could move through rather than be stopped by. This was what she had worked for — not the easy games, not the comfortable leads, but moments like this where everything that had been practised and trained and built over three years was distilled into a single clear opportunity.
+
+She had agility and pace and the kind of determination that had seen her through two knee injuries, a broken collarbone, and three years of being told she wasn't quite big enough to play at this level. She had never accepted that. She had worked instead.
+
+The corner came in.
+
+Jade rose for it in the centre — the decoy, planned — and drew three defenders with her. This was the moment Priya had calculated. The space appeared on the right side of the box, exactly where she had predicted it would.
+
+She moved.
+
+It was one of those moments in sport that happen too fast for conscious thought — where months of training simply express themselves. She met the ball as it was deflected by Jade's run, controlled it for a single touch, set, and drove it towards the far post.
+
+The goalkeeper dove.
+
+The ball hit the back of the net.
+
+The sound that followed was unlike anything Priya had ever experienced — a wave of noise so complete and imminent that it seemed to replace everything else. Her teammates were running at her from all directions, and she let herself be caught up in the exhilarating, overwhelming chaos of it before she pulled herself back.
+
+"There's thirty seconds," she shouted. "We're level. We play to win."
+
+They played to win.
+
+When the final whistle blew — drawing the match and sending it to penalties — Priya walked to the penalty spot with the bravado of someone who was not going to show, in any measure, how much her legs were shaking.
+
+She had always been reliable from the spot. She knew why: she had practised it two hundred times in training, in all conditions, until the mechanics were so embedded that nerves couldn't interfere.
+
+She placed the ball.
+
+She stepped back.
+
+She thought of all the hours and all the work and all the moments of doubt she had converted into practice.
+
+She ran up and struck the ball with the controlled precision that every one of those hours had built.
+
+Bottom corner. The goalkeeper went the other way.
+
+Riverside FC won the regional final on penalties, three-two.
+
+Later, when the trophy had been lifted and the celebrations had settled into the comfortable warmth of a successful day, a parent came over to Priya and said: "You looked so calm out there. Weren't you nervous?"
+
+Priya thought about this honestly.
+
+"I was," she said. "But I've been practising for moments like this for three years. The nerves don't change what you've built."
+
+She looked at the trophy.
+
+"They just test it."
+`,
+
 };
 
 function storyUnlockedForLevel(lvl){
