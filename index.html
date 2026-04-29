@@ -190,8 +190,8 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 @media (min-width: 480px) { .question-text { font-size: 1.25rem; } .screen { padding: 20px; } }
 
 /* ── VOCAB POPUP ── */
-#vocab-popup { position:fixed; bottom:0; left:0; right:0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -4px 30px rgba(0,0,0,0.18); padding:20px 20px 36px; z-index:600; transform:translateY(100%); transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1); max-width:600px; margin:0 auto; }
-#vocab-popup.show { transform:translateY(0); }
+#vocab-popup { position:fixed; bottom:0; left:0; right:0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -4px 30px rgba(0,0,0,0.18); padding:20px 20px 36px; z-index:600; transform:translateY(100%); transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1); max-width:600px; margin:0 auto; pointer-events:none; }
+#vocab-popup.show { transform:translateY(0); pointer-events:auto; }
 #vocab-popup-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:599; display:none; }
 #vocab-popup-overlay.show { display:block; }
 .vp-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
@@ -406,7 +406,6 @@ window.addEventListener('DOMContentLoaded', function(){
   <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">🚀 Start Session</button>
   <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">📊 My Dashboard</button>
     <button class="btn btn-outline" onclick="showStories()" style="margin-bottom:12px">📚 Story Library</button>
-  <button class="btn btn-ghost btn-sm" onclick="showParentView()" style="display:block;width:100%;margin-bottom:8px;background:rgba(108,99,255,0.07);border-color:rgba(108,99,255,0.2);color:var(--primary)">👨‍👩‍👧‍👦 Parent View</button>
   <button class="btn btn-ghost btn-sm" onclick="showLogin()" style="display:block;width:100%;margin-bottom:8px">Switch Player</button>
 </div>
 
@@ -677,7 +676,7 @@ const TOPICS = {
 // ════════════════════════════════════════════════════════
 let PLAYER_ID = null;
 let state = {
-  subject:'maths', pickMode:'auto', manualTopic:null,
+  subject:'maths', pickMode:'auto', manualTopics:[],
   session:null,
   profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{}},
   dashFilter:'maths', dashTab:'progress'
@@ -865,9 +864,8 @@ function pickWeakestTopics(subj, count=5){
   const pool=subj==='mix'?[...TOPICS.maths,...TOPICS.english]:TOPICS[subj];
   const scored=pool.map(t=>{
     const p=getTopicProgress(t);
-    if(!p.sessions) return {t,score:200};
-    const days=p.lastSession?Math.min(30,(Date.now()-new Date(p.lastSession))/86400000):30;
-    return {t,score:days*2+(100-(p.lastAccuracy||0))};
+    if(!p.sessions) return {t,score:150+Math.random()*50};
+    return {t,score:100-(p.lastAccuracy||0)};
   });
   scored.sort((a,b)=>b.score-a.score);
   return scored.slice(0,count).map(x=>x.t);
@@ -901,13 +899,13 @@ function buildTopicPool(topic,count){
 // SUBJECT & PICK MODE
 // ════════════════════════════════════════════════════════
 window.setSubject=function(s){
-  state.subject=s; state.manualTopic=null;
+  state.subject=s; state.manualTopics=[];
   ['maths','mix','english'].forEach(id=>document.getElementById('subj-'+id).classList.toggle('active',id===s));
   if(state.pickMode==='manual') renderTopicList();
 };
 
 window.setPickMode=function(mode){
-  state.pickMode=mode; state.manualTopic=null;
+  state.pickMode=mode; state.manualTopics=[];
   document.getElementById('pick-auto').classList.toggle('active',mode==='auto');
   document.getElementById('pick-manual').classList.toggle('active',mode==='manual');
   const panel=document.getElementById('topic-list-panel');
@@ -927,29 +925,37 @@ function renderTopicList(){
   }).join('');
 }
 
-window.selectManualTopic=function(t){
-  state.manualTopic=t;
-  document.querySelectorAll('.topic-list-item').forEach(el=>{
-    el.classList.toggle('selected', el.textContent.trim()===t);
-  });
+window.toggleManualTopic=function(t){
+  const idx=state.manualTopics.indexOf(t);
+  if(idx===-1) state.manualTopics.push(t); else state.manualTopics.splice(idx,1);
+  renderTopicList();
 };
 
 // ════════════════════════════════════════════════════════
 // START SESSION
 // ════════════════════════════════════════════════════════
 window.startAutoSession=function(){
-  let questions=[];
-  if(state.pickMode==='manual'&&state.manualTopic){
-    questions=buildTopicPool(state.manualTopic,20);
-    if(questions.length===0){ toast('Not enough questions for this topic yet!'); return; }
-  } else {
-    const topics=pickWeakestTopics(state.subject,5);
-    topics.forEach(t=>questions.push(...buildTopicPool(t,4)));
-    if(questions.length===0){ toast('No questions available!'); return; }
-    questions=shuffle(questions);
+  try {
+    let questions=[];
+    if(state.pickMode==='manual'){
+      if(state.manualTopics.length===0){ toast('Tap at least one topic first ☝️'); return; }
+      const perTopic=Math.max(4,Math.ceil(20/state.manualTopics.length));
+      state.manualTopics.forEach(t=>questions.push(...buildTopicPool(t,perTopic)));
+      questions=shuffle(questions).slice(0,20);
+      if(questions.length===0){ toast('No questions found for selected topics'); return; }
+    } else {
+      const topics=pickWeakestTopics(state.subject,5);
+      topics.forEach(t=>questions.push(...buildTopicPool(t,4)));
+      if(questions.length===0){ toast('No questions available — check connection'); return; }
+      questions=shuffle(questions);
+    }
+    state.session={questions,count:questions.length,current:0,correct:0,wrong:[],skipped:[],startTime:Date.now(),answered:false};
+    renderQuestion();
+    showScreen('quiz');
+  } catch(err){
+    console.error('startSession error:',err);
+    toast('Error: '+(err.message||'could not start'));
   }
-  state.session={questions,count:questions.length,current:0,correct:0,wrong:[],skipped:[],startTime:Date.now(),answered:false};
-  renderQuestion(); showScreen('quiz');
 };
 
 function getCurrentQuestion(){ return state.session.questions[state.session.current]; }
