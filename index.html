@@ -286,6 +286,50 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 @keyframes lock-pop{0%{transform:scale(1)}30%{transform:scale(1.4) rotate(-15deg)}60%{transform:scale(.9) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
 .sc-lock-icon.unlocking{animation:lock-pop .55s ease forwards;}
 
+
+/* ── MYSTERY BOX ── */
+#mystery-box-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9998;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
+#mystery-box-overlay.show{display:flex;}
+.mb-card{background:#fff;border-radius:24px;padding:32px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.mb-title{font-size:1.4rem;font-weight:900;color:var(--primary);margin-bottom:6px;}
+.mb-subtitle{font-size:0.82rem;color:var(--text-muted);margin-bottom:20px;}
+.mb-box-icon{font-size:5rem;display:block;margin:0 auto 20px;animation:mb-bounce 0.7s ease-in-out infinite alternate;}
+@keyframes mb-bounce{from{transform:translateY(0) rotate(-6deg);}to{transform:translateY(-14px) rotate(6deg);}}
+.mb-reward-icon{font-size:4.5rem;display:block;margin:0 auto 10px;animation:mb-pop 0.45s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes mb-pop{from{transform:scale(0) rotate(-20deg);}to{transform:scale(1) rotate(0deg);}}
+.mb-rarity{display:inline-block;padding:4px 14px;border-radius:20px;font-size:0.78rem;font-weight:800;margin:8px 0 14px;letter-spacing:.05em;}
+.mb-rarity.Common{background:#E2E8F0;color:#475569;}
+.mb-rarity.Uncommon{background:#D1FAE5;color:#065F46;}
+.mb-rarity.Rare{background:#DBEAFE;color:#1E40AF;}
+.mb-rarity.Legendary{background:linear-gradient(135deg,#FEF3C7,#FDE68A);color:#92400E;border:1px solid #F59E0B;}
+.mb-dup{font-size:0.83rem;color:var(--success);font-weight:700;margin:4px 0 10px;}
+/* ── LEADERBOARD CATEGORIES ── */
+.lb-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;justify-content:center;}
+.lb-tab{padding:6px 10px;border-radius:20px;font-size:0.75rem;font-weight:800;cursor:pointer;border:2px solid var(--border);background:#fff;color:var(--text-muted);transition:all .15s;white-space:nowrap;}
+.lb-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.lb-cat-desc{font-size:0.78rem;color:var(--text-muted);text-align:center;margin-bottom:10px;font-weight:600;}
+/* ── CHEERS ── */
+.cheer-notif{position:absolute;top:6px;right:8px;min-width:10px;height:10px;background:var(--danger);border-radius:50%;display:none;}
+.cheer-notif.visible{display:block;}
+.lb-row-actions{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.cheer-btn{background:linear-gradient(135deg,#FF6B6B,#FF8E53);color:#fff;border:none;border-radius:12px;padding:4px 10px;font-size:0.75rem;font-weight:800;cursor:pointer;}
+.cheer-btn:disabled{background:#E2E8F0;color:#94A3B8;cursor:not-allowed;}
+#cheers-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
+#cheers-overlay.show{display:flex;}
+.cheers-card{background:#fff;border-radius:24px;padding:24px 20px;max-width:360px;width:100%;max-height:85vh;overflow-y:auto;}
+.cheers-title{font-size:1.2rem;font-weight:900;color:var(--primary);margin-bottom:4px;}
+.cheers-sub{font-size:0.8rem;color:var(--text-muted);margin-bottom:16px;}
+.cheer-msg-btn{display:block;width:100%;text-align:left;background:#F8F7FF;border:2px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:8px;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .15s;}
+.cheer-msg-btn:hover{border-color:var(--primary);background:#EEF0FF;}
+.cheer-msg-btn.selected{border-color:var(--primary);background:var(--primary);color:#fff;}
+.cheer-inbox-item{background:#F8F7FF;border-radius:12px;padding:12px 14px;margin-bottom:8px;border-left:4px solid var(--primary);}
+.cheer-inbox-from{font-size:0.75rem;font-weight:800;color:var(--primary);margin-bottom:4px;}
+.cheer-inbox-msg{font-size:0.9rem;font-weight:600;color:var(--text);}
+/* ── EASTER EGG FIREWORKS ── */
+.ee-firework{position:fixed;pointer-events:none;z-index:8000;font-size:2rem;animation:ee-fly 1.2s ease-out forwards;}
+@keyframes ee-fly{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-120px) scale(0.3);}}
+.ee-toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#FF8C00);color:#fff;padding:10px 20px;border-radius:20px;font-weight:900;font-size:1rem;z-index:8001;animation:ee-toast 2s ease forwards;}
+@keyframes ee-toast{0%{opacity:0;transform:translateX(-50%) scale(0.8);}15%{opacity:1;transform:translateX(-50%) scale(1);}80%{opacity:1;}100%{opacity:0;transform:translateX(-50%) scale(0.9);}}
 </style>
 </head>
 <body>
@@ -417,7 +461,7 @@ window.addEventListener('DOMContentLoaded', function(){
   <div class="app-header">
     <div class="app-logo">Quiz<span>Champ</span> 🏆</div>
     <div class="header-stats">
-      <div class="streak-badge">🔥 <span id="home-streak">0</span></div>
+      <div class="streak-badge" onclick="easterEgg_dragonClick()" style="cursor:pointer">🔥 <span id="home-streak">0</span></div>
       <div class="xp-badge">⭐ <span id="home-xp">0</span></div>
     </div>
   </div>
@@ -458,7 +502,10 @@ window.addEventListener('DOMContentLoaded', function(){
   <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">🚀 Start Session</button>
   <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">📊 My Dashboard</button>
   <button class="btn btn-outline" onclick="showStories()" style="margin-bottom:12px">📚 Story Library</button>
-  <button class="btn btn-outline" onclick="showLeaderboard()" style="margin-bottom:12px">🏆 Leaderboard</button>
+  <div style="position:relative;margin-bottom:12px">
+    <button class="btn btn-outline" onclick="showLeaderboard()" style="width:100%">🏆 Leaderboard</button>
+    <span class="cheer-notif" id="home-cheer-dot"></span>
+  </div>
   <button class="btn btn-ghost btn-sm" onclick="showLogin()" style="display:block;width:100%;margin-bottom:8px">Switch Player</button>
 </div>
 
@@ -491,9 +538,20 @@ window.addEventListener('DOMContentLoaded', function(){
   <div class="app-header">
     <button onclick="showHome()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--primary)">‹</button>
     <div class="app-logo">🏆 Leaderboard</div>
-    <div></div>
+    <div style="position:relative">
+      <button onclick="showCheersInbox()" style="background:none;border:none;font-size:1.4rem;cursor:pointer">💌</button>
+      <span class="cheer-notif" id="lb-cheer-dot"></span>
+    </div>
   </div>
-  <p style="font-size:0.8rem;color:var(--text-muted);font-weight:600;margin-bottom:4px;text-align:center">Weekly XP — resets every Monday</p>
+  <div class="lb-tabs">
+    <div class="lb-tab active" id="lbt-sparks" onclick="switchLbTab('sparks')">⚡ SPARKS</div>
+    <div class="lb-tab" id="lbt-consistency" onclick="switchLbTab('consistency')">🔥 Consistency</div>
+    <div class="lb-tab" id="lbt-daily" onclick="switchLbTab('daily')">🎯 Daily King</div>
+    <div class="lb-tab" id="lbt-accuracy" onclick="switchLbTab('accuracy')">🎯 Accuracy</div>
+    <div class="lb-tab" id="lbt-maths" onclick="switchLbTab('maths')">📈 Maths</div>
+    <div class="lb-tab" id="lbt-english" onclick="switchLbTab('english')">📈 English</div>
+  </div>
+  <div class="lb-cat-desc" id="lb-cat-desc">Most SPARKS earned this week</div>
   <div class="lb-rows" id="lb-rows"><div class="lb-empty">Loading…</div></div>
   <div style="margin-top:16px;text-align:center">
     <button class="btn btn-ghost btn-sm" onclick="showAvatarSetup(true)">✏️ Change my nickname/avatar</button>
@@ -773,7 +831,7 @@ let PLAYER_ID = null;
 let state = {
   subject:'maths', pickMode:'auto', manualTopics:[],
   session:null,
-  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[],nickname:'',avatar:'',dailyChallenge:{}},
+  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[],nickname:'',avatar:'',dailyChallenge:{},mysteryBox:{lastDate:null,owned:[]},easterEggs:{},consecutivePerfect:0,cheersSentToday:{date:null,count:0}},
   dashFilter:'maths', dashTab:'progress'
 };
 const XP_PER_CORRECT=15, XP_PER_QUESTION=5, XP_PER_LEVEL=200;
@@ -845,6 +903,14 @@ window._loadAndGo=async function(id){
   await loadProfile();
   document.getElementById('loading-overlay').classList.add('hidden');
   showHome();
+  // Night Owl easter egg: login between midnight and 1am
+  const hr=new Date().getHours();
+  if(hr===0&&!(state.profile.easterEggs||{}).nightOwl){
+    state.profile.easterEggs=state.profile.easterEggs||{};
+    state.profile.easterEggs.nightOwl=true;
+    saveProfile();
+    setTimeout(()=>easterEgg_nightOwl(),1500);
+  }
 };
 
 function shakeInput(id){
@@ -1061,8 +1127,14 @@ window.handleAnswer=function(idx,btn){
   const q=getCurrentQuestion(); const chosen=q.o[idx];
   btn.classList.add('picked');
   document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
-  if(chosen!==q.a) state.session.wrong.push({q,chosen});
-  else state.session.correct++;
+  if(chosen!==q.a){
+    state.session.wrong.push({q,chosen});
+    state.session.correctStreak=0;
+  } else {
+    state.session.correct++;
+    state.session.correctStreak=(state.session.correctStreak||0)+1;
+    if(state.session.correctStreak===5) easterEgg_fiveStreak();
+  }
   setTimeout(()=>{ state.session.current++; state.session.answered=false; if(state.session.current>=state.session.count) finishSession(); else renderQuestion(); },350);
 };
 
@@ -1127,8 +1199,30 @@ async function finishSession(){
   const pb=state.profile.personalBest||{};
   topicSet.forEach(t=>{ const tp=getTopicProgress(t); if(!pb[t]||tp.lastAccuracy>pb[t])pb[t]=tp.lastAccuracy; });
   state.profile.personalBest=pb;
+  // Compute session stats for leaderboard categories
+  const mathsSet=new Set(TOPICS.maths), engSet=new Set(TOPICS.english);
+  const answeredQs=(state.session.questions||[]).slice(0,state.session.current);
+  const wrongIdSet=new Set((state.session.wrong||[]).map(w=>w.q.id));
+  let mCorrect=0,mTotal=0,eCorrect=0,eTotal=0;
+  answeredQs.forEach(q=>{
+    const ok=!wrongIdSet.has(q.id);
+    if(mathsSet.has(q.t)){mTotal++;if(ok)mCorrect++;}
+    else{eTotal++;if(ok)eCorrect++;}
+  });
+  const sessionStats={correct:state.session.correct,total:state.session.current,mathsCorrect:mCorrect,mathsTotal:mTotal,engCorrect:eCorrect,engTotal:eTotal};
+  // Hat trick easter egg (3 perfect sessions in a row)
+  if(accuracy===100&&state.session.current>=10){
+    state.profile.consecutivePerfect=(state.profile.consecutivePerfect||0)+1;
+    if(state.profile.consecutivePerfect>=3&&!(state.profile.easterEggs||{}).hatTrick){
+      state.profile.easterEggs=state.profile.easterEggs||{};
+      state.profile.easterEggs.hatTrick=true;
+      setTimeout(()=>easterEgg_hatTrick(),1200);
+    }
+  } else if(accuracy<100){
+    state.profile.consecutivePerfect=0;
+  }
   await saveProfile();
-  updateLeaderboardDoc(xpEarned);
+  updateLeaderboardDoc(xpEarned, sessionStats);
   checkStoryUnlocks();
   await saveSessionResult({topics:topicSet,correct:s.correct,total:s.count,accuracy,duration,xpEarned});
   // Render end screen
@@ -1163,6 +1257,7 @@ async function finishSession(){
   if(newBadge){ const icons={bronze:'🥉',silver:'🥈',gold:'🏅'}; const b=state.profile.badges[newBadge]; document.getElementById('new-badge-section').style.display='block'; document.getElementById('new-badge-content').textContent=`${icons[b]} ${b.toUpperCase()} badge for ${newBadge}!`; }
   else document.getElementById('new-badge-section').style.display='none';
   document.getElementById('wrong-count').textContent=s.wrong.length;
+  setTimeout(showMysteryBox, 900);
   document.getElementById('review-list').innerHTML=s.wrong.length===0
     ?'<div style="text-align:center;color:#1DB954;font-weight:800;padding:16px">🎉 Perfect score! No wrong answers!</div>'
     :s.wrong.map(w=>`<div class="review-item"><div class="q-text">${w.q.q}</div><div class="your-ans">✗ Your answer: ${w.chosen}</div><div class="correct-ans">✓ Correct: ${w.q.a}</div>${w.q.e?`<div class="explanation">💡 ${w.q.e}</div>`:''}</div>`).join('');
@@ -1204,6 +1299,7 @@ function renderHome(){
     `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`).join('');
   document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).length;
   renderDailyChallengeCard();
+  checkCheersNotification();
 }
 
 // ════════════════════════════════════════════════════════
@@ -1339,57 +1435,146 @@ function getMondayDate(){
   return mon.toDateString();
 }
 
-async function updateLeaderboardDoc(xpEarned){
+async function updateLeaderboardDoc(xpEarned, sessionStats){
   if(!db||!PLAYER_ID) return;
-  // Only appear on leaderboard if student has chosen a nickname
   if(!state.profile.nickname) return;
   try {
     const monday = getMondayDate();
+    const todayStr = new Date().toISOString().split('T')[0];
     const lbRef = doc(db,'leaderboard',PLAYER_ID);
     const snap = await getDoc(lbRef);
     let data = snap.exists() ? snap.data() : {};
-    if(data.weekStart !== monday){ data.weeklyXP=0; data.weekStart=monday; }
+    if(data.weekStart !== monday){
+      // Week reset — archive last week's accuracy for Most Improved
+      data.prevWeekMathsAcc = (data.weeklyMathsTotal||0)>0 ? Math.round((data.weeklyMathsCorrect||0)/(data.weeklyMathsTotal)*100) : null;
+      data.prevWeekEngAcc   = (data.weeklyEngTotal||0)>0   ? Math.round((data.weeklyEngCorrect||0)/(data.weeklyEngTotal)*100)   : null;
+      data.weeklyXP=0; data.weekStart=monday;
+      data.weeklyCorrect=0; data.weeklyTotal=0;
+      data.weeklyMathsCorrect=0; data.weeklyMathsTotal=0;
+      data.weeklyEngCorrect=0; data.weeklyEngTotal=0;
+      data.weeklyDays=[]; data.weeklyDailyChallenges=0;
+    }
     data.weeklyXP = (data.weeklyXP||0) + xpEarned;
-    data.totalXP = state.profile.xp||0;
-    data.nickname = state.profile.nickname; // never fall back to real name
-    data.avatar = state.profile.avatar || (STUDENTS[PLAYER_ID]||{}).avatar || '🏆';
+    data.totalXP  = state.profile.xp||0;
+    data.nickname = state.profile.nickname;
+    data.avatar   = state.profile.avatar || (STUDENTS[PLAYER_ID]||{}).avatar || '🏆';
     data.playerId = PLAYER_ID;
+    if(sessionStats){
+      data.weeklyCorrect=(data.weeklyCorrect||0)+sessionStats.correct;
+      data.weeklyTotal  =(data.weeklyTotal||0)+sessionStats.total;
+      data.weeklyMathsCorrect=(data.weeklyMathsCorrect||0)+(sessionStats.mathsCorrect||0);
+      data.weeklyMathsTotal  =(data.weeklyMathsTotal||0)+(sessionStats.mathsTotal||0);
+      data.weeklyEngCorrect=(data.weeklyEngCorrect||0)+(sessionStats.engCorrect||0);
+      data.weeklyEngTotal  =(data.weeklyEngTotal||0)+(sessionStats.engTotal||0);
+    }
+    if(sessionStats && sessionStats.isDailyChallenge){
+      data.weeklyDailyChallenges=(data.weeklyDailyChallenges||0)+1;
+    }
+    const days=data.weeklyDays||[];
+    if(!days.includes(todayStr)){ days.push(todayStr); }
+    data.weeklyDays=days;
     await setDoc(lbRef, data);
   } catch(e){ console.warn('leaderboard update failed', e); }
+}
+
+let _lbTab = 'sparks';
+let _lbData = [];
+
+const LB_TAB_DESC = {
+  sparks:      'Most SPARKS earned this week',
+  consistency: 'Most days active this week (min 5 questions/day)',
+  daily:       'Most Daily Challenges completed this week',
+  accuracy:    'Highest accuracy this week (min 30 questions)',
+  maths:       'Most improved Maths accuracy vs last week',
+  english:     'Most improved English accuracy vs last week',
+};
+
+window.switchLbTab = function(tab){
+  _lbTab = tab;
+  document.querySelectorAll('.lb-tab').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('lbt-'+tab); if(el)el.classList.add('active');
+  document.getElementById('lb-cat-desc').textContent=LB_TAB_DESC[tab]||'';
+  renderLbTab(tab, _lbData);
+};
+
+function renderLbTab(tab, rows){
+  const monday=getMondayDate();
+  const medals=['🥇','🥈','🥉'];
+  let sorted=[];
+  if(tab==='sparks'){
+    sorted=rows.map(r=>({...r,val:r.weekStart===monday?(r.weeklyXP||0):0})).sort((a,b)=>b.val-a.val);
+    renderLbRows(sorted,'val',' XP',medals);
+  } else if(tab==='consistency'){
+    sorted=rows.map(r=>({...r,val:(r.weeklyDays||[]).length})).sort((a,b)=>b.val-a.val);
+    renderLbRows(sorted,'val',' day(s)',medals);
+  } else if(tab==='daily'){
+    sorted=rows.map(r=>({...r,val:r.weekStart===monday?(r.weeklyDailyChallenges||0):0})).sort((a,b)=>b.val-a.val);
+    renderLbRows(sorted,'val',' challenge(s)',medals);
+  } else if(tab==='accuracy'){
+    sorted=rows.filter(r=>r.weekStart===monday&&(r.weeklyTotal||0)>=30)
+      .map(r=>({...r,val:Math.round((r.weeklyCorrect||0)/(r.weeklyTotal)*100)}))
+      .sort((a,b)=>b.val-a.val);
+    if(sorted.length===0){
+      document.getElementById('lb-rows').innerHTML='<div class="lb-empty">Need 30+ questions answered this week to appear here. Keep practising! 💪</div>';
+      return;
+    }
+    renderLbRows(sorted,'val','%',medals);
+  } else if(tab==='maths'||tab==='english'){
+    const totKey=tab==='maths'?'weeklyMathsTotal':'weeklyEngTotal';
+    const corKey=tab==='maths'?'weeklyMathsCorrect':'weeklyEngCorrect';
+    const prevKey=tab==='maths'?'prevWeekMathsAcc':'prevWeekEngAcc';
+    const qualified=rows.filter(r=>r.weekStart===monday&&(r[totKey]||0)>=20&&r[prevKey]!=null);
+    if(qualified.length===0){
+      document.getElementById('lb-rows').innerHTML='<div class="lb-empty">Not enough data yet — need 20+ '+tab+' questions this week AND last week to appear here 📈</div>';
+      return;
+    }
+    sorted=qualified.map(r=>{
+      const thisAcc=Math.round((r[corKey]||0)/(r[totKey])*100);
+      const improvement=thisAcc-(r[prevKey]||0);
+      return {...r,val:improvement,thisAcc,prevAcc:r[prevKey]};
+    }).sort((a,b)=>b.val-a.val);
+    const el=document.getElementById('lb-rows');
+    el.innerHTML=sorted.map((r,i)=>{
+      const isMe=r.id===PLAYER_ID;
+      const sign=r.val>=0?'+':'';
+      const cheerBtn=(!isMe&&state.profile.nickname)?'<button class="cheer-btn" onclick="openSendCheer(\''+r.id+'\',\''+String(r.nick||'?').replace(/'/g,'')+'\')">🔥</button>':'';
+      return '<div class="lb-row'+(isMe?' me':'')+'"><div class="lb-rank-num">'+(medals[i]||('#'+(i+1)))+'</div><div class="lb-av">'+(r.av||'🏆')+'</div><div class="lb-info"><div class="lb-nick">'+(r.nick||'?')+(isMe?' (you)':'')+'</div><div class="lb-xp-label">'+sign+r.val+'pp improvement · Now '+r.thisAcc+'%</div></div>'+cheerBtn+'</div>';
+    }).join('');
+    return;
+  }
+}
+
+function renderLbRows(sorted, valKey, suffix, medals){
+  const maxVal=sorted[0]?.[valKey]||1;
+  const el=document.getElementById('lb-rows');
+  if(sorted.length===0){ el.innerHTML='<div class="lb-empty">No data yet for this category this week 🚀</div>'; return; }
+  el.innerHTML=sorted.map((r,i)=>{
+    const isMe=r.id===PLAYER_ID;
+    const pct=Math.round((r[valKey]/maxVal)*100);
+    return `<div class="lb-row${isMe?' me':''}">
+      <div class="lb-rank-num">${medals[i]||('#'+(i+1))}</div>
+      <div class="lb-av">${r.av||'🏆'}</div>
+      <div class="lb-info">
+        <div class="lb-nick">${r.nick||'?'}${isMe?' (you)':''}</div>
+        <div class="lb-xp-label">${r[valKey]}${suffix}</div>
+      </div>
+      <div style="flex:1;margin-left:8px">
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      ${!isMe&&state.profile.nickname?`<button class="cheer-btn" onclick="openSendCheer('${r.id}','${(r.nick||'?').replace(/'/g,'')}')">🔥</button>`:''}
+    </div>`;
+  }).join('');
 }
 
 window.showLeaderboard = async function(){
   showScreen('leaderboard');
   document.getElementById('lb-rows').innerHTML = '<div class="lb-empty">Loading…</div>';
+  checkCheersNotification();
   try {
-    const monday = getMondayDate();
     const snap = await getDocs(collection(db,'leaderboard'));
-    let rows = [];
-    snap.forEach(d => {
-      const data = d.data();
-      const wXP = data.weekStart===monday ? (data.weeklyXP||0) : 0;
-      rows.push({id:d.id, nick:data.nickname||'?', av:data.avatar||'🏆', wXP, tXP:data.totalXP||0});
-    });
-    rows.sort((a,b)=>b.wXP-a.wXP);
-    const maxXP = rows[0]?.wXP || 1;
-    const medals = ['🥇','🥈','🥉'];
-    if(rows.length===0){
-      document.getElementById('lb-rows').innerHTML='<div class="lb-empty">No one on the board yet — complete a session to appear! 🚀</div>';
-      return;
-    }
-    document.getElementById('lb-rows').innerHTML = rows.map((r,i)=>{
-      const isMe = r.id===PLAYER_ID;
-      const pct = Math.round((r.wXP/maxXP)*100);
-      return `<div class="lb-row${isMe?' me':''}">
-        <div class="lb-rank-num">${medals[i]||('#'+(i+1))}</div>
-        <div class="lb-av">${r.av}</div>
-        <div class="lb-info">
-          <div class="lb-nick">${r.nick}${isMe?' (you)':''}</div>
-          <div class="lb-xp-label">${r.wXP} XP this week</div>
-        </div>
-        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${pct}%"></div></div>
-      </div>`;
-    }).join('');
+    _lbData = [];
+    snap.forEach(d=>{ const data=d.data(); _lbData.push({id:d.id,...data,av:data.avatar||'🏆',nick:data.nickname||'?'}); });
+    switchLbTab(_lbTab);
   } catch(e){
     document.getElementById('lb-rows').innerHTML='<div class="lb-empty">Leaderboard unavailable right now</div>';
     console.warn(e);
@@ -1456,7 +1641,7 @@ window.handleDailyAnswer = function(chosen, correct, btn){
   state.profile.dailyChallenge = {date:today, completed:true, correct:isCorrect};
   if(isCorrect){
     state.profile.xp = (state.profile.xp||0)+50;
-    updateLeaderboardDoc(50);
+    updateLeaderboardDoc(50, {isDailyChallenge:true,correct:0,total:0,mathsCorrect:0,mathsTotal:0,engCorrect:0,engTotal:0});
     saveProfile();
     document.getElementById('dm-result-icon').textContent='🎉';
     document.getElementById('dm-result-msg').textContent='Correct! +50 XP!';
@@ -2552,6 +2737,15 @@ window.openStory = function(id){
     if(!state.profile.readStories) state.profile.readStories=[];
     state.profile.readStories.push(id);
     saveProfile();
+    // Archivist easter egg: read all stories
+    if(typeof STORIES_META!=='undefined'&&state.profile.readStories.length>=STORIES_META.length){
+      if(!(state.profile.easterEggs||{}).archivist){
+        state.profile.easterEggs=state.profile.easterEggs||{};
+        state.profile.easterEggs.archivist=true;
+        saveProfile();
+        setTimeout(()=>easterEgg_archivist(),800);
+      }
+    }
   }
   const meta = STORIES_META.find(s => s.id === id);
   const rawText = STORY_TEXTS[id] || '';
@@ -2611,6 +2805,293 @@ window.toast=function(msg){ const el=document.getElementById('toast'); el.textCo
     console.log('Firebase ready');
   } catch(e){ console.warn('Firebase unavailable:', e); }
 })();
+
+
+// ════════════════════════════════════════════════════════
+// MYSTERY BOX
+// ════════════════════════════════════════════════════════
+const MYSTERY_BOX_ITEMS = [
+  // Common 60%
+  {id:'fr_blue',   name:'Blue Frame',      emoji:'🔵', rarity:'Common'},
+  {id:'fr_gold',   name:'Gold Frame',      emoji:'🟡', rarity:'Common'},
+  {id:'fr_green',  name:'Green Frame',     emoji:'🟢', rarity:'Common'},
+  {id:'fr_purple', name:'Purple Frame',    emoji:'🟣', rarity:'Common'},
+  {id:'fr_red',    name:'Red Frame',       emoji:'🔴', rarity:'Common'},
+  {id:'fr_orange', name:'Orange Frame',    emoji:'🟠', rarity:'Common'},
+  // Uncommon 25%
+  {id:'ac_guitar', name:'Guitar Badge',    emoji:'🎸', rarity:'Uncommon'},
+  {id:'ac_foot',   name:'Football Badge',  emoji:'⚽', rarity:'Uncommon'},
+  {id:'ac_mic',    name:'Mic Badge',       emoji:'🎤', rarity:'Uncommon'},
+  {id:'ac_rocket', name:'Rocket Badge',    emoji:'🚀', rarity:'Uncommon'},
+  {id:'ac_cricket',name:'Cricket Badge',   emoji:'🏏', rarity:'Uncommon'},
+  {id:'ac_piano',  name:'Piano Badge',     emoji:'🎹', rarity:'Uncommon'},
+  // Rare 12%
+  {id:'fx_sparkle',name:'Sparkle Effect',  emoji:'✨', rarity:'Rare'},
+  {id:'fx_fire',   name:'Fire Effect',     emoji:'🔥', rarity:'Rare'},
+  {id:'fx_bolt',   name:'Lightning Effect',emoji:'⚡', rarity:'Rare'},
+  {id:'fx_rainbow',name:'Rainbow Effect',  emoji:'🌈', rarity:'Rare'},
+  // Legendary 3%
+  {id:'leg_brain', name:'Einstein Frame',  emoji:'🧠', rarity:'Legendary'},
+  {id:'leg_crown', name:'Champion Crown',  emoji:'👑', rarity:'Legendary'},
+  {id:'leg_comet', name:'Shooting Star',   emoji:'🌟', rarity:'Legendary'},
+];
+
+function drawMysteryReward(){
+  const r=Math.random()*100;
+  let pool;
+  if(r<60)      pool=MYSTERY_BOX_ITEMS.filter(i=>i.rarity==='Common');
+  else if(r<85) pool=MYSTERY_BOX_ITEMS.filter(i=>i.rarity==='Uncommon');
+  else if(r<97) pool=MYSTERY_BOX_ITEMS.filter(i=>i.rarity==='Rare');
+  else          pool=MYSTERY_BOX_ITEMS.filter(i=>i.rarity==='Legendary');
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function showMysteryBox(){
+  const today=new Date().toISOString().split('T')[0];
+  const mb=state.profile.mysteryBox||{};
+  if(mb.lastDate===today) return;
+  document.getElementById('mb-box-phase').style.display='';
+  document.getElementById('mb-reward-phase').style.display='none';
+  document.getElementById('mb-subtitle').textContent="You earned it — open to see what's inside!";
+  document.getElementById('mystery-box-overlay').classList.add('show');
+}
+
+window.openMysteryBox=function(){
+  const today=new Date().toISOString().split('T')[0];
+  const reward=drawMysteryReward();
+  const mb=state.profile.mysteryBox||{lastDate:null,owned:[]};
+  const owned=mb.owned||[];
+  let dupMsg='';
+  if(owned.includes(reward.id)){
+    state.profile.xp=(state.profile.xp||0)+20;
+    dupMsg='+20 XP bonus (duplicate item!)';
+  } else {
+    owned.push(reward.id);
+  }
+  mb.owned=owned; mb.lastDate=today;
+  state.profile.mysteryBox=mb;
+  saveProfile();
+  document.getElementById('mb-box-phase').style.display='none';
+  document.getElementById('mb-reward-emoji').textContent=reward.emoji;
+  document.getElementById('mb-reward-name').textContent=reward.name;
+  const rb=document.getElementById('mb-rarity-badge');
+  rb.textContent=reward.rarity; rb.className='mb-rarity '+reward.rarity;
+  const dm=document.getElementById('mb-dup-msg');
+  if(dupMsg){dm.textContent=dupMsg;dm.style.display='';}else{dm.style.display='none';}
+  document.getElementById('mb-reward-phase').style.display='';
+};
+
+window.closeMysteryBox=function(){
+  document.getElementById('mystery-box-overlay').classList.remove('show');
+};
+
+// ════════════════════════════════════════════════════════
+// EASTER EGGS
+// ════════════════════════════════════════════════════════
+let _dragonClicks=0, _dragonTimer=null;
+
+function showEEToast(msg){
+  const existing=document.querySelector('.ee-toast');
+  if(existing)existing.remove();
+  const el=document.createElement('div');
+  el.className='ee-toast'; el.textContent=msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),2500);
+}
+
+function spawnFirework(x,y){
+  const emojis=['🎆','🎇','✨','🌟','⚡','🔥'];
+  for(let i=0;i<6;i++){
+    const el=document.createElement('div');
+    el.className='ee-firework';
+    el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    el.style.left=(x + (Math.random()-0.5)*120)+'px';
+    el.style.top=(y + (Math.random()-0.5)*60)+'px';
+    el.style.animationDelay=(i*0.07)+'s';
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1500);
+  }
+}
+
+function easterEgg_fiveStreak(){
+  const el=document.querySelector('.options-grid')||document.body;
+  const rect=el.getBoundingClientRect();
+  spawnFirework(rect.left+rect.width/2, rect.top+rect.height/2);
+  showEEToast('🔥 5 in a row! On fire!');
+  if(!(state.profile.easterEggs||{}).fiveStreak){
+    state.profile.easterEggs=state.profile.easterEggs||{};
+    state.profile.easterEggs.fiveStreak=true;
+    saveProfile();
+  }
+}
+
+function easterEgg_hatTrick(){
+  showEEToast('🎩 HAT TRICK! 3 perfect scores in a row — you legend!');
+  spawnFirework(window.innerWidth/2, window.innerHeight/3);
+  setTimeout(()=>spawnFirework(window.innerWidth/3, window.innerHeight/2),300);
+  setTimeout(()=>spawnFirework(window.innerWidth*2/3, window.innerHeight/2),600);
+}
+
+window.easterEgg_dragonClick=function(){
+  _dragonClicks++;
+  clearTimeout(_dragonTimer);
+  _dragonTimer=setTimeout(()=>{ _dragonClicks=0; },2000);
+  if(_dragonClicks>=5){
+    _dragonClicks=0;
+    const el=document.createElement('div');
+    el.style.cssText='position:fixed;font-size:3rem;z-index:9000;top:50%;left:-10%;animation:ee-dragon 2s ease-in-out forwards;pointer-events:none';
+    el.textContent='🐉';
+    el.style.animation='none';
+    el.style.transition='all 2s ease-in-out';
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>{
+      el.style.transform='translateX(120vw)';
+    });
+    setTimeout(()=>el.remove(),2200);
+    showEEToast('🐉 You found the dragon! Secret unlocked!');
+    if(!(state.profile.easterEggs||{}).dragon){
+      state.profile.easterEggs=state.profile.easterEggs||{};
+      state.profile.easterEggs.dragon=true;
+      saveProfile();
+    }
+  }
+};
+
+function easterEgg_nightOwl(){
+  showEEToast('🦉 Night Owl! Studying after midnight — respect!');
+  spawnFirework(window.innerWidth/2, 200);
+}
+
+function easterEgg_archivist(){
+  showEEToast('📚 ARCHIVIST! You read every single story. Incredible!');
+  spawnFirework(window.innerWidth/2, window.innerHeight/3);
+  setTimeout(()=>spawnFirework(window.innerWidth/3, window.innerHeight/2),300);
+}
+
+// ════════════════════════════════════════════════════════
+// STUDENT CHEERS
+// ════════════════════════════════════════════════════════
+const CHEER_MESSAGES = [
+  "You're on fire this week! 🔥",
+  "Keep going — you've got this! 💪",
+  "Amazing streak! I see you! 👀",
+  "You're inspiring me to practise more! ⭐",
+  "Top of the leaderboard soon — watch out! 🏆",
+  "Genius energy today! 🧠",
+  "You are unstoppable! 🚀",
+  "Level 4 incoming! ⚡",
+];
+
+let _cheerTarget = null;
+let _selectedCheer = null;
+
+window.openSendCheer=function(targetId, targetNick){
+  if(!state.profile.nickname){ toast("Set your nickname first to send cheers!"); return; }
+  // Check daily limit
+  const today=new Date().toISOString().split('T')[0];
+  const cs=state.profile.cheersSentToday||{};
+  if(cs.date===today&&(cs.count||0)>=2){ toast("Max 2 cheers per day — come back tomorrow! 💌"); return; }
+  if((state.profile.xp||0)<50){ toast("Need 50 XP to send a cheer!"); return; }
+  _cheerTarget={id:targetId,nick:targetNick};
+  _selectedCheer=null;
+  document.getElementById('cheers-modal-title').textContent='💌 Cheer for '+targetNick;
+  document.getElementById('cheers-modal-sub').textContent='Pick a message · Costs 50 XP · Max 2/day';
+  document.getElementById('cheers-send-panel').style.display='';
+  document.getElementById('cheers-inbox-panel').style.display='none';
+  const sendBtn=document.getElementById('cheers-send-btn');
+  sendBtn.disabled=true;
+  document.getElementById('cheers-msg-list').innerHTML=CHEER_MESSAGES.map((m,i)=>
+    `<button class="cheer-msg-btn" onclick="selectCheerMsg(${i})" id="cmsg-${i}">${m}</button>`
+  ).join('');
+  document.getElementById('cheers-overlay').classList.add('show');
+};
+
+window.selectCheerMsg=function(i){
+  _selectedCheer=CHEER_MESSAGES[i];
+  document.querySelectorAll('.cheer-msg-btn').forEach((b,j)=>b.classList.toggle('selected',j===i));
+  document.getElementById('cheers-send-btn').disabled=false;
+};
+
+window.confirmSendCheer=async function(){
+  if(!_cheerTarget||!_selectedCheer) return;
+  if(!db){ toast('Cheers unavailable offline'); return; }
+  const today=new Date().toISOString().split('T')[0];
+  const cs=state.profile.cheersSentToday||{};
+  if(cs.date===today&&(cs.count||0)>=2){ toast("Max 2 cheers per day!"); return; }
+  if((state.profile.xp||0)<50){ toast("Need 50 XP to send a cheer!"); return; }
+  try {
+    await addDoc(collection(db,'leaderboard',_cheerTarget.id,'cheers'),{
+      from:state.profile.nickname,
+      message:_selectedCheer,
+      timestamp:serverTimestamp(),
+      read:false
+    });
+    state.profile.xp=Math.max(0,(state.profile.xp||0)-50);
+    const newCount=(cs.date===today?(cs.count||0):0)+1;
+    state.profile.cheersSentToday={date:today,count:newCount};
+    saveProfile();
+    closeCheers();
+    toast('Cheer sent to '+_cheerTarget.nick+'! 🔥');
+  } catch(e){
+    console.warn('cheer send failed',e);
+    toast('Could not send cheer — try again');
+  }
+};
+
+window.showCheersInbox=async function(){
+  if(!db||!PLAYER_ID){ toast('Cheers unavailable'); return; }
+  document.getElementById('cheers-modal-title').textContent='💌 My Cheers';
+  document.getElementById('cheers-modal-sub').textContent='Messages from fellow Quizzers';
+  document.getElementById('cheers-send-panel').style.display='none';
+  document.getElementById('cheers-inbox-panel').style.display='';
+  document.getElementById('cheers-inbox-list').innerHTML='<div style="text-align:center;color:var(--text-muted)">Loading…</div>';
+  document.getElementById('cheers-overlay').classList.add('show');
+  try {
+    const snap=await getDocs(collection(db,'leaderboard',PLAYER_ID,'cheers'));
+    const cheers=[];
+    snap.forEach(d=>{ cheers.push({id:d.id,...d.data()}); });
+    cheers.sort((a,b)=>(b.timestamp?.seconds||0)-(a.timestamp?.seconds||0));
+    if(cheers.length===0){
+      document.getElementById('cheers-inbox-list').innerHTML='<div style="text-align:center;color:var(--text-muted);padding:20px">No cheers yet — keep practising and someone will notice! 🌟</div>';
+    } else {
+      document.getElementById('cheers-inbox-list').innerHTML=cheers.map(c=>
+        `<div class="cheer-inbox-item">
+          <div class="cheer-inbox-from">From: ${c.from||'A fellow Quizzer'}</div>
+          <div class="cheer-inbox-msg">${c.message||''}</div>
+        </div>`
+      ).join('');
+      // Mark all as read
+      cheers.filter(c=>!c.read).forEach(c=>{
+        setDoc(doc(db,'leaderboard',PLAYER_ID,'cheers',c.id),{read:true},{merge:true}).catch(()=>{});
+      });
+      updateCheersNotification(false);
+    }
+  } catch(e){
+    document.getElementById('cheers-inbox-list').innerHTML='<div style="text-align:center;color:var(--text-muted)">Could not load cheers</div>';
+    console.warn(e);
+  }
+};
+
+window.closeCheers=function(){
+  document.getElementById('cheers-overlay').classList.remove('show');
+};
+
+async function checkCheersNotification(){
+  if(!db||!PLAYER_ID||!state.profile.nickname) return;
+  try {
+    const snap=await getDocs(collection(db,'leaderboard',PLAYER_ID,'cheers'));
+    let hasUnread=false;
+    snap.forEach(d=>{ if(!d.data().read) hasUnread=true; });
+    updateCheersNotification(hasUnread);
+  } catch(e){}
+}
+
+function updateCheersNotification(hasUnread){
+  ['home-cheer-dot','lb-cheer-dot'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('visible', hasUnread);
+  });
+}
 </script>
 
 <!-- VOCAB POPUP -->
@@ -2642,6 +3123,45 @@ window.toast=function(msg){ const el=document.getElementById('toast'); el.textCo
       <div class="dm-result-msg" id="dm-result-msg"></div>
       <div class="dm-result-sub" id="dm-result-sub"></div>
       <button class="btn btn-primary" onclick="closeDailyChallenge()" style="margin-top:16px">Back to Home</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ MYSTERY BOX OVERLAY ═══ -->
+<div id="mystery-box-overlay">
+  <div class="mb-card">
+    <div class="mb-title">🎁 Daily Mystery Box</div>
+    <div class="mb-subtitle" id="mb-subtitle">You earned it — open to see what's inside!</div>
+    <div id="mb-box-phase">
+      <span class="mb-box-icon">🎁</span>
+      <button class="btn btn-primary" onclick="openMysteryBox()" style="margin-top:4px">Open Box! 🎉</button>
+    </div>
+    <div id="mb-reward-phase" style="display:none">
+      <span class="mb-reward-icon" id="mb-reward-emoji">⭐</span>
+      <div style="font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:2px" id="mb-reward-name">Item</div>
+      <div class="mb-rarity Common" id="mb-rarity-badge">Common</div>
+      <div class="mb-dup" id="mb-dup-msg" style="display:none"></div>
+      <button class="btn btn-primary" onclick="closeMysteryBox()">Sweet! Let's go 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHEERS OVERLAY ═══ -->
+<div id="cheers-overlay">
+  <div class="cheers-card">
+    <div class="cheers-title" id="cheers-modal-title">💌 Send a Cheer</div>
+    <div class="cheers-sub" id="cheers-modal-sub">Pick a message to send</div>
+    <div id="cheers-send-panel">
+      <div id="cheers-msg-list"></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-outline btn-sm" onclick="closeCheers()" style="flex:1">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="cheers-send-btn" onclick="confirmSendCheer()" style="flex:1" disabled>Send 🔥 (50 XP)</button>
+      </div>
+    </div>
+    <div id="cheers-inbox-panel" style="display:none">
+      <div id="cheers-inbox-list"></div>
+      <button class="btn btn-outline btn-sm" onclick="closeCheers()" style="margin-top:12px;width:100%">Close</button>
     </div>
   </div>
 </div>
