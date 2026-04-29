@@ -89,6 +89,11 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .topic-list-item:hover, .topic-list-item.selected { background: #EEF0FF; color: var(--primary); }
 .topic-list-item .tli-icon { font-size: 1.2rem; }
 
+/* ── FLAG BUTTON ── */
+.flag-btn { background:none; border:2px solid var(--border); border-radius:20px; padding:6px 14px; font-size:0.82rem; font-weight:700; color:var(--text-muted); cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; gap:6px; }
+.flag-btn:active { transform:scale(0.96); }
+.flag-btn.flagged { border-color:var(--danger); color:var(--danger); background:#FFF5F5; }
+
 /* ── QUIZ SCREEN ── */
 .quiz-header { margin-bottom: 16px; }
 .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -299,6 +304,10 @@ window.addEventListener('DOMContentLoaded', function(){
   <div id="parent-students-list">
     <div style="text-align:center;color:var(--text-muted);padding:32px">Loading student data…</div>
   </div>
+  <div id="flagged-section" style="margin-top:16px;display:none">
+    <div style="font-size:0.8rem;font-weight:800;color:var(--danger);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">🚩 Flagged Questions — need review</div>
+    <div id="flagged-list"></div>
+  </div>
   <div style="margin-top:16px">
     <button class="btn btn-primary" onclick="showStudentLogin()" style="margin-bottom:10px">👦 Hand to Student →</button>
     <button class="btn btn-ghost" onclick="parentSignOut()" style="font-size:0.85rem">🔒 Sign Out (Lock App)</button>
@@ -365,6 +374,9 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="question-card"><div class="question-text" id="question-text">Loading…</div></div>
   <div class="options-grid" id="options-grid"></div>
+  <div style="text-align:center;margin:12px 0 4px">
+    <button class="flag-btn" id="flag-btn" onclick="flagQuestion()">🚩 Flag — something wrong here</button>
+  </div>
   <button class="skip-btn" onclick="skipQuestion()">Skip this question →</button>
 </div>
 
@@ -618,6 +630,31 @@ async function saveSessionResult(r){
 // ════════════════════════════════════════════════════════
 // LOGIN — STUDENT (validation in instant script, Firebase here)
 // ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════
+// QUESTION FLAGGING
+// ════════════════════════════════════════════════════════
+window.flagQuestion=function(){
+  const btn=document.getElementById('flag-btn');
+  if(!btn || btn.classList.contains('flagged')) return;
+  const q=getCurrentQuestion();
+  if(!q) return;
+  // Mark UI immediately
+  btn.classList.add('flagged');
+  btn.textContent='🚩 Flagged';
+  btn.disabled=true;
+  // Save to Firestore if available
+  if(db && collection && addDoc && serverTimestamp){
+    addDoc(collection(db,'flags'),{
+      qId:q.id, question:q.q, topic:q.t, level:q.l,
+      options:q.o, correctAnswer:q.a,
+      flaggedBy:PLAYER_ID, timestamp:serverTimestamp()
+    }).then(()=>toast('Question flagged — we'll review it 👍'))
+      .catch(()=>toast('Flagged (saved locally)'));
+  } else {
+    toast('Question flagged — we'll review it 👍');
+  }
+};
+
 window._loadAndGo=async function(id){
   PLAYER_ID=id;
   await loadProfile();
@@ -666,6 +703,24 @@ window.parentSignOut=function(){
 async function loadParentDashboard(){
   const container=document.getElementById('parent-students-list');
   container.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:24px">Loading…</div>';
+  // Load flagged questions
+  try {
+    const { getDocs, query, orderBy, limit:fsLimit, collection:col } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+    const flagSnap = await getDocs(query(col(db,'flags'), orderBy('timestamp','desc'), fsLimit(30)));
+    const flags=[];
+    flagSnap.forEach(d=>flags.push({id:d.id,...d.data()}));
+    const sec=document.getElementById('flagged-section');
+    const lst=document.getElementById('flagged-list');
+    if(flags.length>0 && sec && lst){
+      sec.style.display='block';
+      lst.innerHTML=flags.map(f=>`
+        <div style="background:#FFF5F5;border:1px solid #FFD0D0;border-radius:12px;padding:12px 14px;margin-bottom:8px;border-left:4px solid var(--danger)">
+          <div style="font-size:0.7rem;font-weight:800;color:var(--danger);margin-bottom:4px">${f.topic||''} · L${f.level||'?'} · by ${f.flaggedBy||'?'}</div>
+          <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">${f.question||''}</div>
+          <div style="font-size:0.78rem;color:var(--text-muted)">Options: ${(f.options||[]).join(' / ')} · Correct: ${f.correctAnswer||'?'}</div>
+        </div>`).join('');
+    }
+  } catch(e){ console.warn('Could not load flags:', e); }
   const results=[];
   for(const [id,student] of Object.entries(STUDENTS)){
     if(id==='trial') continue;
@@ -908,6 +963,9 @@ function renderQuestion(){
   document.getElementById('quiz-progress').style.width=(s.current/s.count*100)+'%';
   document.getElementById('q-number').textContent=`Q${s.current+1} of ${s.count}`;
   document.getElementById('question-text').textContent=q.q;
+  // Reset flag button for each new question
+  const fb=document.getElementById('flag-btn');
+  if(fb){ fb.classList.remove('flagged'); fb.textContent='🚩 Flag — something wrong here'; fb.disabled=false; }
   document.getElementById('options-grid').innerHTML=q.o.map((opt,i)=>
     `<button class="option-btn" onclick="handleAnswer(${i},this)">${opt}</button>`).join('');
 }
