@@ -189,6 +189,19 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 
 @media (min-width: 480px) { .question-text { font-size: 1.25rem; } .screen { padding: 20px; } }
 
+/* ── VOCAB POPUP ── */
+#vocab-popup { position:fixed; bottom:0; left:0; right:0; background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -4px 30px rgba(0,0,0,0.18); padding:20px 20px 36px; z-index:600; transform:translateY(100%); transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1); max-width:600px; margin:0 auto; }
+#vocab-popup.show { transform:translateY(0); }
+#vocab-popup-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index:599; display:none; }
+#vocab-popup-overlay.show { display:block; }
+.vp-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.vp-word { font-size:1.4rem; font-weight:900; color:var(--primary); }
+.vp-phonetic { font-size:0.85rem; color:var(--text-muted); font-weight:600; }
+.vp-audio-btn { background:var(--primary); color:#fff; border:none; border-radius:50%; width:36px; height:36px; font-size:1rem; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:transform 0.15s; flex-shrink:0; }
+.vp-audio-btn:active { transform:scale(0.88); }
+.vp-def { font-size:0.95rem; color:#333; line-height:1.55; font-weight:500; }
+.vocab-word { cursor:pointer; }
+
 /* ── STORY LIBRARY ── */
 #screen-stories { padding-bottom: 24px; }
 .story-filter-bar { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px; -webkit-overflow-scrolling: touch; }
@@ -1162,6 +1175,146 @@ window.showParentView=function(){
   showScreen('parent');
 };
 
+const VOCAB_DICT={
+  'abundant':{def:'Fully sufficient; found in copious supply; in great quantity; overflowing.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/abundant-us.mp3',phonetic:'/əˈbʌn.dn̩t/'},
+  'accumulate':{def:'To heap up in a mass; to pile up; to collect or bring together (either literally or figuratively)',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/accumulate-us.mp3',phonetic:'/əˈkjuːmjʊˌleɪt/'},
+  'accumulated':{def:'To heap up in a mass; to pile up; to collect or bring together (either literally or figuratively)',audio:'',phonetic:'/əˈkjuːmjʊleɪtɪd/'},
+  'adversity':{def:'The state of adverse conditions; state of misfortune or calamity.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/adversity-au.mp3',phonetic:'/ædˈvɜː.sɪ.ti/'},
+  'agile':{def:'Having the faculty of quick motion in the limbs; apt or ready to move',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/agile-us.mp3',phonetic:'/ˈæd͡ʒ.aɪl/'},
+  'ambiguous':{def:'Open to multiple interpretations.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/ambiguous-us.mp3',phonetic:'/æmˈbɪɡjuəs/'},
+  'ancient':{def:'A person who is very old.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/ancient-us.mp3',phonetic:'/ˈeɪn.ʃənt/'},
+  'apprehensive':{def:'Anticipating something with anxiety or fear.',audio:'',phonetic:''},
+  'astonished':{def:'To surprise greatly.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/astonished-us.mp3',phonetic:''},
+  'benevolent':{def:'Having a disposition to do good.',audio:'',phonetic:'/bəˈnɛvələnt/'},
+  'bleak':{def:'Without color; pale; pallid.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/bleak-us.mp3',phonetic:'/bliːk/'},
+  'cautious':{def:'Careful; using or exercising caution; tentative',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/cautious-us.mp3',phonetic:'/ˈkɔːʃəs/'},
+  'coerce':{def:'To restrain by force, especially by law or authority; to repress; to curb.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/coerce-us.mp3',phonetic:'/kəʊˈɜːs/'},
+  'coerced':{def:'To restrain by force, especially by law or authority; to repress; to curb.',audio:'',phonetic:''},
+  'coercing':{def:'To restrain by force, especially by law or authority; to repress; to curb.',audio:'',phonetic:''},
+  'colossal':{def:'Extremely large or on a great scale.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/colossal-us.mp3',phonetic:'/kəˈlɒsəl/'},
+  'concealed':{def:'To hide something from view or from public knowledge, to try to keep something secret.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/concealed-us.mp3',phonetic:'/kənˈsiːld/'},
+  'condescending':{def:'To come down from one\'s superior position; to deign (to do something).',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/condescending-us.mp3',phonetic:'/ˈkɔn.dɪ.sɛnd.ɪŋ/'},
+  'consecutive':{def:'A sequence of notes or chords that results from repeated shifts in pitch of the same interval.',audio:'',phonetic:'/kɒnsɛkjʊtɪv/'},
+  'cryptic':{def:'A cryptic crossword.',audio:'',phonetic:'/ˈkɹɪptɪk/'},
+  'cunning':{def:'Sly; crafty; clever in surreptitious behaviour.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/cunning-us.mp3',phonetic:'/ˈkʌnɪŋ/'},
+  'daunting':{def:'To discourage, intimidate.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/daunting-uk.mp3',phonetic:'/ˈdɔːntɪŋ/'},
+  'dazzling':{def:'To confuse the sight of by means of excessive brightness.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/dazzling-us.mp3',phonetic:'/ˈdæz.lɪŋ/'},
+  'decipher':{def:'A decipherment; a decoding.',audio:'',phonetic:'/dɪˈsaɪfə(ɹ)/'},
+  'defiant':{def:'One who defies opposition.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/defiant-us.mp3',phonetic:'/dɪˈfaɪ(j)ənt/'},
+  'desolate':{def:'To deprive of inhabitants.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/desolate-us.mp3',phonetic:''},
+  'deteriorate':{def:'To make worse; to make inferior in quality or value; to impair.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/deteriorate-uk.mp3',phonetic:'/dɪˈtɪəɹɪəɹeɪt/'},
+  'diligent':{def:'Performing with industrious concentration; hard-working and focused.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/diligent-us.mp3',phonetic:'/ˈdɪlɪdʒənt/'},
+  'diminishing':{def:'To make smaller.',audio:'',phonetic:''},
+  'dormant':{def:'A crossbeam or joist.',audio:'',phonetic:'/ˈdɔːmənt/'},
+  'eerie':{def:'Strange, weird, fear-inspiring.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/eerie-us.mp3',phonetic:'/ˈɪəɹi/'},
+  'elaborate':{def:'To develop in detail or complexity',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/elaborate-us.mp3',phonetic:'/ɪˈlæbəɹeɪt/'},
+  'eloquent':{def:'Fluently persuasive and articulate',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/eloquent-uk.mp3',phonetic:'/ˈɛl.əˌkwənt/'},
+  'empathy':{def:'Identification with or understanding of the thoughts, feelings, or emotional state of another person.',audio:'',phonetic:'/ˈɛmpəθi/'},
+  'enigmatic':{def:'Pertaining to an enigma.',audio:'',phonetic:'/ˌɛnɪɡˈmætɪk/'},
+  'enormous':{def:'Deviating from the norm; unusual, extraordinary.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/enormous-us.mp3',phonetic:'/ɪˈnɔː(ɹ)məs/'},
+  'erratic':{def:'A rock moved from one location to another, usually by a glacier.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/erratic-au.mp3',phonetic:'/ɪˈɹætɪk/'},
+  'evasive':{def:'Tending to avoid speaking openly or making revelations about oneself.',audio:'',phonetic:'/ɪˈveɪsɪv/'},
+  'exhausted':{def:'To draw or let out wholly; to drain off completely',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/exhausted-us.mp3',phonetic:'/ɪɡˈzɑstɪd/'},
+  'exquisite':{def:'Fop, dandy.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/exquisite-us.mp3',phonetic:'/ɪkˈskwɪzɪt/'},
+  'extraordinary':{def:'Anything that goes beyond what is ordinary.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/extraordinary-us.mp3',phonetic:'/ɪksˈtɹɔː(ɹ)dɪnəɹi/'},
+  'feign':{def:'To make a false show or pretence of; to counterfeit or simulate.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/feign-us.mp3',phonetic:'/feɪn/'},
+  'ferocious':{def:'Marked by extreme and violent energy.',audio:'',phonetic:'/fəˈɹəʊʃəs/'},
+  'fervent':{def:'Exhibiting particular enthusiasm, zeal, conviction, persistence, or belief.',audio:'',phonetic:'/ˈfɜː.vənt/'},
+  'fierce':{def:'Exceedingly violent, severe, ferocious, cruel or savage.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/fierce-us.mp3',phonetic:'/fɪəs/'},
+  'formidable':{def:'Difficult to defeat or overcome.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/formidable-us.mp3',phonetic:'/fɔːˈmɪdəbəl/'},
+  'fragile':{def:'Easily broken or destroyed, and thus often of subtle or intricate structure.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/fragile-us.mp3',phonetic:'/ˈfɹædʒaɪl/'},
+  'frail':{def:'A basket made of rushes, used chiefly to hold figs and raisins.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/frail-au.mp3',phonetic:'/fɹeɪl/'},
+  'frantic':{def:'A person who is insane or mentally unstable, madman.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/frantic-us.mp3',phonetic:'/ˈfɹæntɪk/'},
+  'furtive':{def:'Stealthy.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/furtive-us.mp3',phonetic:'[ˈfɜːɾɪv]'},
+  'gleaming':{def:'To shine; to glitter; to glisten.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/gleaming-us.mp3',phonetic:'/ˈɡliːmɪŋ/'},
+  'gloomy':{def:'Not very illuminated; dim because of darkness, especially when appearing depressing or frightening.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/gloomy-us.mp3',phonetic:'/ˈɡlumi/'},
+  'glorious':{def:'Exhibiting attributes, qualities, or acts that are worthy of or receive glory.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/glorious-us.mp3',phonetic:'/ˈɡlɔː.ɹi.əs/'},
+  'gracious':{def:'Kind and warmly courteous',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/gracious-us.mp3',phonetic:'/ˈɡɹeɪʃəs/'},
+  'hesitant':{def:'Tending to hesitate, wait, or proceed with caution or reservation.',audio:'',phonetic:'/ˈhɛzɪtənt/'},
+  'hideous':{def:'Extremely or shockingly ugly.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/hideous-us.mp3',phonetic:'/ˈhɪd.iː.ʌs/'},
+  'illuminate':{def:'Someone thought to have an unusual degree of enlightenment.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/illuminate-us-verb.mp3',phonetic:'/ɪlˈl(j)uməneɪt/'},
+  'immense':{def:'Immense extent or expanse; immensity',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/immense-us.mp3',phonetic:'/ɪˈmɛns/'},
+  'incessant':{def:'Without pause or stop; not ending, especially to the point of annoyance.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/incessant-us.mp3',phonetic:'/ɪnˈsɛs.ənt/'},
+  'indignant':{def:'Showing anger or indignation, especially at something unjust or wrong.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/indignant-us.mp3',phonetic:'/ɪnˈdɪɡ.nənt/'},
+  'inevitable':{def:'Something that is predictable, necessary, or cannot be avoided.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/inevitable-us.mp3',phonetic:'/ɪnˈɛvɪtəbəl/'},
+  'infer':{def:'To introduce (something) as a reasoned conclusion; to conclude by reasoning or deduction, as from premises or evidence.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/infer-us.mp3',phonetic:'/ɪnˈfɜː/'},
+  'inquisitive':{def:'Eager to acquire knowledge.',audio:'',phonetic:'/ɪŋˈkwɪzətɪv/'},
+  'integrity':{def:'Steadfast adherence to a strict moral or ethical code.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/integrity-us.mp3',phonetic:'/ɪnˈtɛɡɹəti/'},
+  'intricate':{def:'Having a great deal of fine detail or complexity.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/intricate-1-us.mp3',phonetic:'/ˈɪn.tɹɪ.kət/'},
+  'jovial':{def:'Cheerful and good-humoured; jolly, merry.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/jovial-us.mp3',phonetic:'/ˈdʒəʊ.vɪ.əl/'},
+  'jubilant':{def:'In a state of elation.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/jubilant-us.mp3',phonetic:'/ˈdʒu.bə.lənt/'},
+  'lucid':{def:'A lucid dream.',audio:'',phonetic:'/ˈl(j)uːsɪd/'},
+  'luminous':{def:'Emitting light; glowing brightly.',audio:'',phonetic:'/ˈluːmɪnəs/'},
+  'magnificent':{def:'Grand, elegant or splendid in appearance.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/magnificent-us.mp3',phonetic:'/mæɡˈnɪfəsənt/'},
+  'menacing':{def:'To make threats against (someone); to intimidate.',audio:'',phonetic:''},
+  'meticulous':{def:'Characterized by very precise, conscientious attention to details.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/meticulous-uk.mp3',phonetic:'/mɨˈtɪkjuləs/'},
+  'mischievous':{def:'Causing mischief; injurious.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/mischievous-us.mp3',phonetic:'/ˈmɪs.t͡ʃə.vəs/'},
+  'momentous':{def:'Outstanding in importance, of great consequence.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/momentous-us.mp3',phonetic:'/məʊˈmɛn.təs/'},
+  'monotonous':{def:'Having an unvarying tone or pitch.',audio:'',phonetic:'/məˈnɒtənəs/'},
+  'nonchalant':{def:'Casually calm and relaxed.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/nonchalant-us.mp3',phonetic:'/ˈnɒn.ʃəl.ənt/'},
+  'notorious':{def:'Widely known, especially for something negative; infamous.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/notorious-us.mp3',phonetic:'/nəʊˈtɔːɹɪəs/'},
+  'oblivious':{def:'(usually followed by to or of) Lacking awareness; unmindful; unaware, unconscious of.',audio:'',phonetic:'/əˈblɪ.vi.əs/'},
+  'obscure':{def:'To render obscure; to darken; to make dim; to keep in the dark; to hide; to make less visible, intelligible, legible, glorious, beautiful, or illustrious.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/obscure-us.mp3',phonetic:'/əbˈskjɔː(ɹ)/'},
+  'ominous':{def:'Of or pertaining to an omen or to omens; being or exhibiting an omen; significant.',audio:'',phonetic:'/ˈɒmɪnəs/'},
+  'peculiar':{def:'That which is peculiar; a sole or exclusive property; a prerogative; a characteristic.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/peculiar-us.mp3',phonetic:'[pʰə̥ˈkʰj̊uːljʊə]'},
+  'perceive':{def:'To become aware of, through the physical senses or by thinking; to see; to understand.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/perceive-us.mp3',phonetic:'/pəˈsiːv/'},
+  'perilous':{def:'Dangerous, full of peril.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/perilous-us.mp3',phonetic:'/pɛɹ.l̩.əs/'},
+  'persevere':{def:'To persist steadfastly in pursuit of an undertaking, task, journey, or goal, even if hindered by distraction, difficulty, obstacles, or discouragement.',audio:'',phonetic:''},
+  'persistent':{def:'Obstinately refusing to give up or let go.',audio:'',phonetic:'/pəˈsɪstənt/'},
+  'plausible':{def:'Seemingly or apparently valid, likely, or acceptable; conceivably true or likely',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/plausible-us.mp3',phonetic:'/ˈplɔːz.ə.bəl/'},
+  'ponder':{def:'A period of deep thought.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/ponder-us.mp3',phonetic:'/ˈpɒn.də(ɹ)/'},
+  'precarious':{def:'Dangerously insecure or unstable; perilous.',audio:'',phonetic:'/pɹəˈkɛəɹi.əs/'},
+  'predicted':{def:'(of theories, laws, etc.) To imply.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/predicted-us.mp3',phonetic:'/pɹɪˈdɪktɪd/'},
+  'profound':{def:'The deep; the sea; the ocean.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/profound-us.mp3',phonetic:'/pɹəˈfaʊnd/'},
+  'prominent':{def:'Standing out, or projecting; jutting; protuberant',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/prominent-us.mp3',phonetic:'/ˈpɹɒmɪnənt/'},
+  'rapid':{def:'(often in the plural) a rough section of a river or stream which is difficult to navigate due to the swift and turbulent motion of the water.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/rapid-us.mp3',phonetic:'/ˈɹæpɪd/'},
+  'reluctant':{def:'Opposing; offering resistance (to).',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/reluctant-us.mp3',phonetic:'/ɹɪˈlʌktənt/'},
+  'remorse':{def:'A feeling of regret or sadness for doing wrong or sinning.',audio:'',phonetic:'/ɹɪˈmɔː(ɹ)s/'},
+  'resilient':{def:'(of objects or substances) Returning quickly to original shape after force is applied; elastic.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/resilient-us.mp3',phonetic:''},
+  'ruthless':{def:'Without pity or compassion; cruel, pitiless.',audio:'',phonetic:'/ˈɹuːθləs/'},
+  'serene':{def:'Serenity; clearness; calmness.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/serene-us.mp3',phonetic:'/səˈɹiːn/'},
+  'sinister':{def:'Inauspicious, ominous, unlucky, illegitimate (as in bar sinister).',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/sinister-us.mp3',phonetic:'/ˈsɪnɪstə/'},
+  'solemn':{def:'Deeply serious and somber.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/solemn-us.mp3',phonetic:'/ˈsɒləm/'},
+  'spontaneous':{def:'Self-generated; happening without any apparent external cause.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/spontaneous-us.mp3',phonetic:'/spɒnˈteɪ.ni.əs/'},
+  'steadfast':{def:'Fixed or unchanging; steady.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/steadfast-us.mp3',phonetic:'/ˈstɛdfæst/'},
+  'stealthy':{def:'Characterized by or resembling stealth or secrecy.',audio:'',phonetic:'/ˈstɛlθi/'},
+  'sturdy':{def:'A disease in sheep and cattle, caused by a tapeworm and marked by great nervousness or by dullness and stupor.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/sturdy-us.mp3',phonetic:'/ˈstɜːdi/'},
+  'summit':{def:'A peak; the topmost point or surface, as of a mountain.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/summit-1-us.mp3',phonetic:'/ˈsʌmɪt/'},
+  'swift':{def:'Moving or happening very quickly; fast.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/swift-us.mp3',phonetic:'/swɪft/'},
+  'tenacious':{def:'Not giving up easily; determined and persistent.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/tenacious-us.mp3',phonetic:'/təˈneɪʃəs/'},
+  'transparent':{def:'Easy to see through; also means honest and open.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/transparent-us.mp3',phonetic:'/tɹæn(t)sˈpæɹənt/'},
+  'treacherous':{def:'Not loyal or reliable; likely to betray trust; dangerously unstable.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/treacherous-us.mp3',phonetic:'/ˈtɹɛtʃəɹəs/'},
+  'turbulent':{def:'Violently disturbed or agitated; tempestuous, tumultuous',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/turbulent-us.mp3',phonetic:'/ˈtɜːbjələnt/'},
+  'valiant':{def:'Showing courage and determination, especially in difficult situations.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/valiant-us.mp3',phonetic:'/ˈvæljənt/'},
+  'verify':{def:'To substantiate or prove the truth of something',audio:'',phonetic:''},
+  'vivid':{def:'Producing strong, clear images in the mind; bright and striking.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/vivid-us.mp3',phonetic:'/ˈvɪvɪd/'},
+  'voyage':{def:'A long journey, especially by ship.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/voyage-us.mp3',phonetic:'/ˈvɔɪ.ɪdʒ/'},
+  'wary':{def:'Cautious of danger; carefully watching and guarding against deception, trickery, and dangers; suspiciously prudent',audio:'',phonetic:'/ˈwɛəɹ.i/'},
+  'weary':{def:'Very tired, especially after working hard for a long time.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/weary-us.mp3',phonetic:'/ˈwiːɹi/'},
+  'zealous':{def:'Very enthusiastic and eager about something you care about.',audio:'https://api.dictionaryapi.dev/media/pronunciations/en/zealous-us.mp3',phonetic:'/ˈzɛl.əs/'}
+};
+
+let _vocabAudioUrl='';
+window.openVocabPopup=function(word){
+  const w=word.toLowerCase().replace(/[^a-z]/g,'');
+  const e=VOCAB_DICT[w]||{};
+  document.getElementById('vp-word').textContent=word;
+  document.getElementById('vp-phonetic').textContent=e.phonetic||'';
+  document.getElementById('vp-def').textContent=e.def||'A great word to keep!';
+  const btn=document.getElementById('vp-audio-btn');
+  _vocabAudioUrl=e.audio||'';
+  btn.style.display=_vocabAudioUrl?'inline-flex':'none';
+  document.getElementById('vocab-popup').classList.add('show');
+  document.getElementById('vocab-popup-overlay').classList.add('show');
+};
+window.closeVocabPopup=function(){
+  document.getElementById('vocab-popup').classList.remove('show');
+  document.getElementById('vocab-popup-overlay').classList.remove('show');
+};
+window.playVocabAudio=function(){
+  if(_vocabAudioUrl){ try{new Audio(_vocabAudioUrl).play();}catch(e){} }
+};
+
 // ════════════════════════════════════════════════════════
 // STORY LIBRARY
 // ════════════════════════════════════════════════════════
@@ -1594,7 +1747,7 @@ window.openStory = function(id){
     let t = p.trim();
     meta.vocabWords.forEach(w => {
       const re = new RegExp('\\b(' + w + ')\\b', 'gi');
-      t = t.replace(re, '<span class=\"vocab-word\" title=\"$1\">$1</span>');
+      t = t.replace(re, '<span class=\"vocab-word\" onclick=\"openVocabPopup(this.textContent)\" title=\"Tap for meaning\">$1</span>');
     });
     return '<p>' + t + '</p>';
   }).join('');
@@ -1637,5 +1790,16 @@ window.toast=function(msg){ const el=document.getElementById('toast'); el.textCo
   } catch(e){ console.warn('Firebase unavailable:', e); }
 })();
 </script>
+
+<!-- VOCAB POPUP -->
+<div id="vocab-popup-overlay" onclick="closeVocabPopup()"></div>
+<div id="vocab-popup">
+  <div class="vp-row">
+    <span class="vp-word" id="vp-word"></span>
+    <span class="vp-phonetic" id="vp-phonetic"></span>
+    <button class="vp-audio-btn" id="vp-audio-btn" onclick="playVocabAudio()" style="display:none">🔊</button>
+  </div>
+  <div class="vp-def" id="vp-def"></div>
+</div>
 </body>
 </html>
