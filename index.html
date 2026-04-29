@@ -220,6 +220,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .sc-level-3 { background: #E6F1FB; color: #0C447C; }
 .sc-level-4 { background: #FAEEDA; color: #633806; }
 .sc-lock-icon { position: absolute; top: 10px; right: 10px; font-size: 1rem; }
+.sc-read-badge { position:absolute; top:8px; right:8px; background:#E53935; color:#fff; font-size:0.6rem; font-weight:900; padding:2px 7px; border-radius:10px; letter-spacing:0.05em; }
 /* story reader */
 #story-reader { position: fixed; inset: 0; background: #fff; z-index: 500; overflow-y: auto; display: none; padding: 0; }
 #story-reader.open { display: block; }
@@ -678,7 +679,7 @@ let PLAYER_ID = null;
 let state = {
   subject:'maths', pickMode:'auto', manualTopics:[],
   session:null,
-  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{}},
+  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[]},
   dashFilter:'maths', dashTab:'progress'
 };
 const XP_PER_CORRECT=15, XP_PER_QUESTION=5, XP_PER_LEVEL=200;
@@ -1612,8 +1613,9 @@ function renderStoryGrid(){
   grid.innerHTML = filtered.map(s => {
     const unlocked = storyUnlockedForLevel(s.level);
     const lockMsg = s.level === 3 ? 'Earn 50 XP to unlock' : 'Earn 200 XP to unlock';
+    const isRead = (state.profile.readStories||[]).includes(s.id);
     return `<div class="story-card${unlocked ? '' : ' locked'}" onclick="${unlocked ? 'openStory(\'' + s.id + '\')' : 'window.toast(\'' + lockMsg + '\')' }">
-      ${unlocked ? '' : '<span class=\"sc-lock-icon\">🔒</span>'}
+      ${!unlocked ? '<span class=\"sc-lock-icon\">🔒</span>' : isRead ? '<span class=\"sc-read-badge\">READ</span>' : ''}
       <span class="sc-emoji">${s.emoji}</span>
       <div class="sc-title">${s.title}</div>
       <div class="sc-sub">${s.subtitle}</div>
@@ -1623,6 +1625,11 @@ function renderStoryGrid(){
 }
 
 window.openStory = function(id){
+  if(!(state.profile.readStories||[]).includes(id)){
+    if(!state.profile.readStories) state.profile.readStories=[];
+    state.profile.readStories.push(id);
+    saveProfile();
+  }
   const meta = STORIES_META.find(s => s.id === id);
   const rawText = STORY_TEXTS[id] || '';
   if(!meta || !rawText) return;
