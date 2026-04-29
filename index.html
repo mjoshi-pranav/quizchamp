@@ -236,6 +236,56 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .reader-vocab h3 { font-size: 0.85rem; font-weight: 800; color: var(--primary); margin: 0 0 10px; }
 .vocab-chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .vocab-chip { background: #fff; border: 2px solid rgba(108,99,255,0.2); border-radius: 20px; padding: 4px 12px; font-size: 0.75rem; font-weight: 700; color: var(--navy); }
+
+/* ── AVATAR SETUP ── */
+.avatar-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}
+.avatar-opt{font-size:2.2rem;text-align:center;padding:12px;border-radius:16px;cursor:pointer;background:var(--surface);border:3px solid transparent;transition:all .2s;}
+.avatar-opt.selected{border-color:var(--primary);background:#EEF0FF;transform:scale(1.1);}
+.nickname-input{width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--border);font-size:1rem;font-weight:700;margin-bottom:4px;box-sizing:border-box;}
+.nickname-input:focus{outline:none;border-color:var(--primary);}
+
+/* ── LEADERBOARD ── */
+.lb-rows{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.lb-row{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:14px;padding:12px 14px;}
+.lb-row.me{background:linear-gradient(135deg,#EEF0FF,#E8F4FF);border:2px solid var(--primary);}
+.lb-rank-num{font-size:1.1rem;font-weight:900;width:28px;text-align:center;}
+.lb-av{font-size:1.7rem;}
+.lb-info{flex:1;}
+.lb-nick{font-weight:800;font-size:0.95rem;}
+.lb-xp-label{font-size:0.75rem;color:var(--text-muted);font-weight:600;}
+.lb-bar-wrap{width:70px;height:8px;background:#eee;border-radius:4px;overflow:hidden;}
+.lb-bar-fill{height:100%;background:var(--primary);border-radius:4px;transition:width .4s;}
+.lb-empty{text-align:center;padding:40px 20px;color:var(--text-muted);font-weight:700;}
+
+/* ── DAILY CHALLENGE ── */
+.daily-card{background:linear-gradient(135deg,#FF6B6B,#FF8E53);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;color:#fff;cursor:pointer;position:relative;overflow:hidden;}
+.daily-card.done{background:linear-gradient(135deg,#2ECC71,#27AE60);cursor:default;}
+.daily-card-tag{font-size:0.7rem;font-weight:800;letter-spacing:.08em;opacity:.85;text-transform:uppercase;}
+.daily-card-title{font-size:1.05rem;font-weight:900;margin:4px 0 2px;}
+.daily-card-sub{font-size:0.78rem;opacity:.85;}
+.daily-xp-pill{position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.3);border-radius:20px;padding:3px 10px;font-size:0.82rem;font-weight:900;}
+#daily-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:900;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
+#daily-overlay.show{display:flex;}
+#daily-modal{background:#fff;border-radius:24px;padding:24px;width:100%;max-width:420px;}
+.dm-head{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.dm-head-icon{font-size:1.6rem;}
+.dm-head-text{font-weight:900;font-size:1rem;}
+.dm-head-xp{font-size:0.78rem;color:var(--primary);font-weight:800;margin-top:2px;}
+.dm-question{font-size:1rem;font-weight:700;margin-bottom:16px;line-height:1.5;}
+.dm-opts{display:flex;flex-direction:column;gap:8px;}
+.dm-opt{background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:12px 14px;cursor:pointer;font-weight:600;text-align:left;transition:all .15s;font-family:inherit;font-size:0.95rem;width:100%;}
+.dm-opt:disabled{cursor:default;}
+.dm-opt.correct{background:#EDFAF3;border-color:#1DB954;color:#085041;}
+.dm-opt.wrong{background:#FFF0F0;border-color:var(--danger);color:#791F1F;}
+.dm-result{text-align:center;padding:16px 0 8px;}
+.dm-result-icon{font-size:2.8rem;}
+.dm-result-msg{font-weight:900;font-size:1.1rem;margin:8px 0 4px;}
+.dm-result-sub{font-size:0.82rem;color:var(--text-muted);}
+
+/* ── STORY UNLOCK ANIMATION ── */
+@keyframes lock-pop{0%{transform:scale(1)}30%{transform:scale(1.4) rotate(-15deg)}60%{transform:scale(.9) rotate(8deg)}100%{transform:scale(1) rotate(0)}}
+.sc-lock-icon.unlocking{animation:lock-pop .55s ease forwards;}
+
 </style>
 </head>
 <body>
@@ -404,10 +454,50 @@ window.addEventListener('DOMContentLoaded', function(){
     <div class="topic-list-panel" id="topic-list-panel"></div>
   </div>
 
+  <div id="daily-challenge-card"></div>
   <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">🚀 Start Session</button>
   <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">📊 My Dashboard</button>
-    <button class="btn btn-outline" onclick="showStories()" style="margin-bottom:12px">📚 Story Library</button>
+  <button class="btn btn-outline" onclick="showStories()" style="margin-bottom:12px">📚 Story Library</button>
+  <button class="btn btn-outline" onclick="showLeaderboard()" style="margin-bottom:12px">🏆 Leaderboard</button>
   <button class="btn btn-ghost btn-sm" onclick="showLogin()" style="display:block;width:100%;margin-bottom:8px">Switch Player</button>
+</div>
+
+<!-- ═══ AVATAR SETUP SCREEN ═══ -->
+<div id="screen-avatar" class="screen">
+  <div class="app-header">
+    <div class="app-logo">Quiz<span>Champ</span> 🏆</div>
+    <div></div>
+  </div>
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:2.5rem" id="avatar-preview">🏆</div>
+    <h2 style="font-weight:900;margin:8px 0 4px">Choose your identity</h2>
+    <p style="color:var(--text-muted);font-size:0.85rem;font-weight:600">This is what friends see on the Leaderboard — not your real name!</p>
+  </div>
+  <div class="card">
+    <div class="card-title">Pick a Nickname</div>
+    <input class="nickname-input" id="nickname-input" maxlength="12" placeholder="e.g. ThunderKid, Ninja99…" oninput="document.getElementById('nickname-char').textContent=12-this.value.length">
+    <div style="font-size:0.72rem;color:var(--text-muted);text-align:right" id="nickname-char">12</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Pick an Avatar</div>
+    <div class="avatar-grid" id="avatar-grid"></div>
+  </div>
+  <button class="btn btn-primary" onclick="saveAvatarSetup()">Save &amp; Continue 🚀</button>
+  <button class="btn btn-ghost btn-sm" onclick="skipAvatarSetup()" style="display:block;width:100%;margin-top:8px">Skip for now</button>
+</div>
+
+<!-- ═══ LEADERBOARD SCREEN ═══ -->
+<div id="screen-leaderboard" class="screen">
+  <div class="app-header">
+    <button onclick="showHome()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--primary)">‹</button>
+    <div class="app-logo">🏆 Leaderboard</div>
+    <div></div>
+  </div>
+  <p style="font-size:0.8rem;color:var(--text-muted);font-weight:600;margin-bottom:4px;text-align:center">Weekly XP — resets every Monday</p>
+  <div class="lb-rows" id="lb-rows"><div class="lb-empty">Loading…</div></div>
+  <div style="margin-top:16px;text-align:center">
+    <button class="btn btn-ghost btn-sm" onclick="showAvatarSetup(true)">✏️ Change my nickname/avatar</button>
+  </div>
 </div>
 
 <!-- ═══ QUIZ SCREEN ═══ -->
@@ -637,7 +727,7 @@ window.submitLogin = function() {
 <script src="questions.js"></script>
 <script>
 // Firebase functions — set after async load below
-var db=null, doc, getDoc, setDoc, collection, addDoc, serverTimestamp;
+var db=null, doc, getDoc, getDocs, setDoc, collection, addDoc, serverTimestamp;
 // STUDENTS & PARENT_PASSWORD already defined in instant script above
 
 // ════════════════════════════════════════════════════════
@@ -679,7 +769,7 @@ let PLAYER_ID = null;
 let state = {
   subject:'maths', pickMode:'auto', manualTopics:[],
   session:null,
-  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[]},
+  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[],nickname:'',avatar:'',dailyChallenge:{}},
   dashFilter:'maths', dashTab:'progress'
 };
 const XP_PER_CORRECT=15, XP_PER_QUESTION=5, XP_PER_LEVEL=200;
@@ -1033,6 +1123,8 @@ async function finishSession(){
   topicSet.forEach(t=>{ const tp=getTopicProgress(t); if(!pb[t]||tp.lastAccuracy>pb[t])pb[t]=tp.lastAccuracy; });
   state.profile.personalBest=pb;
   await saveProfile();
+  updateLeaderboardDoc(xpEarned);
+  checkStoryUnlocks();
   await saveSessionResult({topics:topicSet,correct:s.correct,total:s.count,accuracy,duration,xpEarned});
   // Render end screen
   document.getElementById('end-score').textContent=`${s.correct}/${s.count}`;
@@ -1106,6 +1198,7 @@ function renderHome(){
   document.getElementById('weekly-dots').innerHTML=week.map((d,i)=>
     `<div class="day-dot${done.includes(d)?' done':''}${d===today?' today':''}">${days[i]}</div>`).join('');
   document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).length;
+  renderDailyChallengeCard();
 }
 
 // ════════════════════════════════════════════════════════
@@ -1174,7 +1267,223 @@ function renderRecs(){
 }
 
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); window.scrollTo(0,0); }
-window.showHome=function(){ renderHome(); showScreen('home'); };
+
+// ════════════════════════════════════════════════════════
+// GAMIFICATION — AVATAR SETUP, LEADERBOARD, DAILY CHALLENGE
+// ════════════════════════════════════════════════════════
+
+const AVATARS = ['🦁','🐯','🦊','🐺','🦅','🐬','🦋','🐉','🌟','🚀','⚡','🎯','🔥','🎪','🦄','🏹'];
+let _selectedAvatar = '🏆';
+let _showingAvatarFromLeaderboard = false;
+
+function showAvatarSetup(fromLeaderboard=false){
+  _showingAvatarFromLeaderboard = fromLeaderboard;
+  const nick = state.profile.nickname || '';
+  const av = state.profile.avatar || (STUDENTS[PLAYER_ID]||{}).avatar || '🏆';
+  _selectedAvatar = av;
+  document.getElementById('nickname-input').value = nick;
+  document.getElementById('nickname-char').textContent = 12 - nick.length;
+  document.getElementById('avatar-preview').textContent = av;
+  document.getElementById('avatar-grid').innerHTML = AVATARS.map(a =>
+    `<div class="avatar-opt${a===av?' selected':''}" onclick="selectAvatar('${a}')">${a}</div>`
+  ).join('');
+  showScreen('avatar');
+}
+
+window.selectAvatar = function(a){
+  _selectedAvatar = a;
+  document.getElementById('avatar-preview').textContent = a;
+  document.querySelectorAll('.avatar-opt').forEach(el => el.classList.toggle('selected', el.textContent.trim()===a));
+};
+
+window.saveAvatarSetup = function(){
+  const nick = document.getElementById('nickname-input').value.trim();
+  if(!nick){ toast('Pick a nickname first!'); return; }
+  state.profile.nickname = nick;
+  state.profile.avatar = _selectedAvatar;
+  saveProfile();
+  updateLeaderboardDoc(0);
+  toast('Identity saved! 🎉');
+  if(_showingAvatarFromLeaderboard){ showLeaderboard(); }
+  else { showHome(); }
+};
+
+window.skipAvatarSetup = function(){
+  if(!state.profile.nickname){
+    state.profile.nickname = (STUDENTS[PLAYER_ID]||{}).name || 'Champion';
+    state.profile.avatar = (STUDENTS[PLAYER_ID]||{}).avatar || '🏆';
+    saveProfile();
+    updateLeaderboardDoc(0);
+  }
+  showHome();
+};
+
+// ── LEADERBOARD ──
+function getMondayDate(){
+  const d = new Date();
+  const day = d.getDay(); // 0=Sun
+  const diff = (day===0)?-6:1-day;
+  const mon = new Date(d); mon.setDate(d.getDate()+diff);
+  return mon.toDateString();
+}
+
+async function updateLeaderboardDoc(xpEarned){
+  if(!db||!PLAYER_ID) return;
+  try {
+    const monday = getMondayDate();
+    const lbRef = doc(db,'leaderboard',PLAYER_ID);
+    const snap = await getDoc(lbRef);
+    let data = snap.exists() ? snap.data() : {};
+    if(data.weekStart !== monday){ data.weeklyXP=0; data.weekStart=monday; }
+    data.weeklyXP = (data.weeklyXP||0) + xpEarned;
+    data.totalXP = state.profile.xp||0;
+    data.nickname = state.profile.nickname || (STUDENTS[PLAYER_ID]||{}).name || PLAYER_ID;
+    data.avatar = state.profile.avatar || (STUDENTS[PLAYER_ID]||{}).avatar || '🏆';
+    data.playerId = PLAYER_ID;
+    await setDoc(lbRef, data);
+  } catch(e){ console.warn('leaderboard update failed', e); }
+}
+
+window.showLeaderboard = async function(){
+  showScreen('leaderboard');
+  document.getElementById('lb-rows').innerHTML = '<div class="lb-empty">Loading…</div>';
+  try {
+    const monday = getMondayDate();
+    const snap = await getDocs(collection(db,'leaderboard'));
+    let rows = [];
+    snap.forEach(d => {
+      const data = d.data();
+      const wXP = data.weekStart===monday ? (data.weeklyXP||0) : 0;
+      rows.push({id:d.id, nick:data.nickname||'?', av:data.avatar||'🏆', wXP, tXP:data.totalXP||0});
+    });
+    rows.sort((a,b)=>b.wXP-a.wXP);
+    const maxXP = rows[0]?.wXP || 1;
+    const medals = ['🥇','🥈','🥉'];
+    if(rows.length===0){
+      document.getElementById('lb-rows').innerHTML='<div class="lb-empty">No one on the board yet — complete a session to appear! 🚀</div>';
+      return;
+    }
+    document.getElementById('lb-rows').innerHTML = rows.map((r,i)=>{
+      const isMe = r.id===PLAYER_ID;
+      const pct = Math.round((r.wXP/maxXP)*100);
+      return `<div class="lb-row${isMe?' me':''}">
+        <div class="lb-rank-num">${medals[i]||('#'+(i+1))}</div>
+        <div class="lb-av">${r.av}</div>
+        <div class="lb-info">
+          <div class="lb-nick">${r.nick}${isMe?' (you)':''}</div>
+          <div class="lb-xp-label">${r.wXP} XP this week</div>
+        </div>
+        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    }).join('');
+  } catch(e){
+    document.getElementById('lb-rows').innerHTML='<div class="lb-empty">Leaderboard unavailable right now</div>';
+    console.warn(e);
+  }
+};
+
+// ── DAILY CHALLENGE ──
+function getDailyChallengeQ(){
+  const dateStr = new Date().toDateString();
+  let hash = 0;
+  for(let c of dateStr) hash = ((hash<<5)-hash)+c.charCodeAt(0);
+  hash = Math.abs(hash);
+  const pool = (typeof QUESTIONS!=='undefined') ? QUESTIONS.filter(q=>q.l===4) : [];
+  if(!pool.length) return null;
+  return pool[hash % pool.length];
+}
+
+function renderDailyChallengeCard(){
+  const el = document.getElementById('daily-challenge-card');
+  if(!el) return;
+  const today = new Date().toDateString();
+  const dc = state.profile.dailyChallenge||{};
+  const done = dc.date===today && dc.completed;
+  const q = getDailyChallengeQ();
+  if(!q){ el.innerHTML=''; return; }
+  if(done){
+    el.innerHTML=`<div class="daily-card done">
+      <div class="daily-xp-pill">✓ +50 XP</div>
+      <div class="daily-card-tag">🎯 Daily Challenge</div>
+      <div class="daily-card-title">Challenge Complete!</div>
+      <div class="daily-card-sub">Come back tomorrow for a new one</div>
+    </div>`;
+  } else {
+    el.innerHTML=`<div class="daily-card" onclick="openDailyChallenge()">
+      <div class="daily-xp-pill">+50 XP</div>
+      <div class="daily-card-tag">🎯 Daily Challenge</div>
+      <div class="daily-card-title">Tap to take today's challenge!</div>
+      <div class="daily-card-sub">One harder question · Bonus XP if correct</div>
+    </div>`;
+  }
+}
+
+window.openDailyChallenge = function(){
+  const today = new Date().toDateString();
+  const dc = state.profile.dailyChallenge||{};
+  if(dc.date===today && dc.completed){ toast('Already done today! Come back tomorrow 😊'); return; }
+  const q = getDailyChallengeQ();
+  if(!q){ toast('No challenge available today'); return; }
+  document.getElementById('dm-question').textContent = q.q;
+  document.getElementById('dm-result').style.display='none';
+  const opts = [q.a, ...(q.o||[]).filter(o=>o!==q.a)].sort(()=>Math.random()-0.5);
+  document.getElementById('dm-opts').innerHTML = opts.map(o=>
+    `<button class="dm-opt" onclick="handleDailyAnswer('${o.replace(/'/g,"\'")}','${q.a.replace(/'/g,"\'")}',this)">${o}</button>`
+  ).join('');
+  document.getElementById('daily-overlay').classList.add('show');
+};
+
+window.handleDailyAnswer = function(chosen, correct, btn){
+  document.querySelectorAll('.dm-opt').forEach(b=>b.disabled=true);
+  const isCorrect = chosen===correct;
+  btn.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect) document.querySelectorAll('.dm-opt').forEach(b=>{ if(b.textContent.trim()===correct) b.classList.add('correct'); });
+  const today = new Date().toDateString();
+  state.profile.dailyChallenge = {date:today, completed:true, correct:isCorrect};
+  if(isCorrect){
+    state.profile.xp = (state.profile.xp||0)+50;
+    updateLeaderboardDoc(50);
+    saveProfile();
+    document.getElementById('dm-result-icon').textContent='🎉';
+    document.getElementById('dm-result-msg').textContent='Correct! +50 XP!';
+    document.getElementById('dm-result-sub').textContent=q&&q.e?'💡 '+q.e:'';
+  } else {
+    saveProfile();
+    document.getElementById('dm-result-icon').textContent='😅';
+    document.getElementById('dm-result-msg').textContent='Not quite!';
+    document.getElementById('dm-result-sub').textContent='Correct answer: '+correct;
+  }
+  setTimeout(()=>{ document.getElementById('dm-result').style.display='block'; }, 600);
+  renderDailyChallengeCard();
+  const q2 = getDailyChallengeQ();
+  if(q2) document.getElementById('dm-result-sub').textContent = isCorrect&&q2.e ? '💡 '+q2.e : (isCorrect?'':'Correct: '+correct);
+};
+
+window.closeDailyChallenge = function(){
+  document.getElementById('daily-overlay').classList.remove('show');
+  renderHome();
+};
+
+// ── STORY UNLOCK ANIMATION ──
+let _prevUnlockState = {};
+function checkStoryUnlocks(){
+  const xp = state.profile.xp||0;
+  const lvl3Now = xp>=50, lvl4Now = xp>=200;
+  if(_prevUnlockState.lvl3===false && lvl3Now){
+    toast('🔓 Level 3 Stories unlocked! Keep going!');
+  }
+  if(_prevUnlockState.lvl4===false && lvl4Now){
+    toast('🔓 Level 4 Stories unlocked! 🔥');
+  }
+  _prevUnlockState = {lvl3:lvl3Now, lvl4:lvl4Now};
+}
+
+window.showHome=function(){
+  renderHome();
+  _prevUnlockState={lvl3:(state.profile.xp||0)>=50,lvl4:(state.profile.xp||0)>=200};
+  if(!state.profile.nickname && PLAYER_ID){ showAvatarSetup(false); return; }
+  showScreen('home');
+};
 window.showLogin=function(){ document.getElementById('login-name').value=''; document.getElementById('login-password').value=''; showScreen('login'); };
 window.showDashboard=function(){ renderDashboard(); showScreen('dashboard'); };
 window.showParentView=function(){
@@ -1683,7 +1992,7 @@ window.toast=function(msg){ const el=document.getElementById('toast'); el.textCo
     });
     db=fsMod.getFirestore(fbApp); doc=fsMod.doc; getDoc=fsMod.getDoc;
     setDoc=fsMod.setDoc; collection=fsMod.collection;
-    addDoc=fsMod.addDoc; serverTimestamp=fsMod.serverTimestamp;
+    addDoc=fsMod.addDoc; serverTimestamp=fsMod.serverTimestamp; getDocs=fsMod.getDocs;
     window.db=db;
     console.log('Firebase ready');
   } catch(e){ console.warn('Firebase unavailable:', e); }
@@ -1700,5 +2009,28 @@ window.toast=function(msg){ const el=document.getElementById('toast'); el.textCo
   </div>
   <div class="vp-def" id="vp-def"></div>
 </div>
+
+<!-- DAILY CHALLENGE OVERLAY -->
+<div id="daily-overlay">
+  <div id="daily-modal">
+    <div class="dm-head">
+      <div class="dm-head-icon">🎯</div>
+      <div>
+        <div class="dm-head-text">Daily Challenge</div>
+        <div class="dm-head-xp">+50 XP for correct answer</div>
+      </div>
+      <button onclick="closeDailyChallenge()" style="margin-left:auto;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted)">✕</button>
+    </div>
+    <div class="dm-question" id="dm-question">Loading…</div>
+    <div class="dm-opts" id="dm-opts"></div>
+    <div class="dm-result" id="dm-result" style="display:none">
+      <div class="dm-result-icon" id="dm-result-icon"></div>
+      <div class="dm-result-msg" id="dm-result-msg"></div>
+      <div class="dm-result-sub" id="dm-result-sub"></div>
+      <button class="btn btn-primary" onclick="closeDailyChallenge()" style="margin-top:16px">Back to Home</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
