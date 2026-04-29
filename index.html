@@ -1303,8 +1303,14 @@ window.selectAvatar = function(a){
 window.saveAvatarSetup = function(){
   const nick = document.getElementById('nickname-input').value.trim();
   if(!nick){ toast('Pick a nickname first!'); return; }
+  // Block real student names for privacy
+  const realNames = Object.values(STUDENTS).map(s=>s.name.toLowerCase());
+  if(realNames.includes(nick.toLowerCase())){
+    toast('Please choose a nickname — not your real name 🔒'); return;
+  }
   state.profile.nickname = nick;
   state.profile.avatar = _selectedAvatar;
+  state.profile.avatarSetupSeen = true;
   saveProfile();
   updateLeaderboardDoc(0);
   toast('Identity saved! 🎉');
@@ -1313,12 +1319,13 @@ window.saveAvatarSetup = function(){
 };
 
 window.skipAvatarSetup = function(){
-  if(!state.profile.nickname){
-    state.profile.nickname = (STUDENTS[PLAYER_ID]||{}).name || 'Champion';
+  // Mark setup as seen — but never write real name to leaderboard
+  state.profile.avatarSetupSeen = true;
+  if(!state.profile.avatar){
     state.profile.avatar = (STUDENTS[PLAYER_ID]||{}).avatar || '🏆';
-    saveProfile();
-    updateLeaderboardDoc(0);
   }
+  saveProfile();
+  // Do NOT call updateLeaderboardDoc — anonymous students don't appear on leaderboard
   showHome();
 };
 
@@ -1333,6 +1340,8 @@ function getMondayDate(){
 
 async function updateLeaderboardDoc(xpEarned){
   if(!db||!PLAYER_ID) return;
+  // Only appear on leaderboard if student has chosen a nickname
+  if(!state.profile.nickname) return;
   try {
     const monday = getMondayDate();
     const lbRef = doc(db,'leaderboard',PLAYER_ID);
@@ -1341,7 +1350,7 @@ async function updateLeaderboardDoc(xpEarned){
     if(data.weekStart !== monday){ data.weeklyXP=0; data.weekStart=monday; }
     data.weeklyXP = (data.weeklyXP||0) + xpEarned;
     data.totalXP = state.profile.xp||0;
-    data.nickname = state.profile.nickname || (STUDENTS[PLAYER_ID]||{}).name || PLAYER_ID;
+    data.nickname = state.profile.nickname; // never fall back to real name
     data.avatar = state.profile.avatar || (STUDENTS[PLAYER_ID]||{}).avatar || '🏆';
     data.playerId = PLAYER_ID;
     await setDoc(lbRef, data);
@@ -1485,7 +1494,7 @@ function checkStoryUnlocks(){
 window.showHome=function(){
   renderHome();
   _prevUnlockState={lvl3:(state.profile.xp||0)>=50,lvl4:(state.profile.xp||0)>=200};
-  if(!state.profile.nickname && PLAYER_ID){ showAvatarSetup(false); return; }
+  if(!state.profile.avatarSetupSeen && !state.profile.nickname && PLAYER_ID){ showAvatarSetup(false); return; }
   showScreen('home');
 };
 window.showLogin=function(){ document.getElementById('login-name').value=''; document.getElementById('login-password').value=''; showScreen('login'); };
