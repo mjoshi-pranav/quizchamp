@@ -393,6 +393,10 @@ window.addEventListener('DOMContentLoaded', function(){
     <div class="stat-box"><div class="stat-val" id="end-xp">+0</div><div class="stat-lbl">XP Earned</div></div>
     <div class="stat-box"><div class="stat-val" id="end-time">0m</div><div class="stat-lbl">Time</div></div>
   </div>
+  <div id="end-insight" class="card" style="display:none;padding:14px 16px">
+    <div id="end-insight-best" style="font-size:0.9rem;font-weight:700;padding:4px 0"></div>
+    <div id="end-insight-weak" style="font-size:0.9rem;font-weight:700;padding:4px 0;margin-top:6px;border-top:1px solid var(--border)"></div>
+  </div>
   <div id="new-badge-section" style="display:none" class="card">
     <div class="card-title">🎖️ Badge Earned!</div>
     <div id="new-badge-content" style="text-align:center;font-size:2rem;padding:8px"></div>
@@ -941,6 +945,27 @@ async function finishSession(){
   document.getElementById('end-accuracy').textContent=accuracy+'%';
   document.getElementById('end-xp').textContent='+'+xpEarned;
   document.getElementById('end-time').textContent=Math.ceil(duration/60)+'m';
+  // Insight: best and weakest topic this session
+  (function(){
+    const scores=topicSet.map(function(topic){
+      const tQs=s.questions.filter(function(q){return q.t===topic;});
+      const wrongIds=s.wrong.filter(function(w){return w.q.t===topic;}).map(function(w){return w.q.id;});
+      const corr=tQs.filter(function(q){return !wrongIds.includes(q.id);}).length;
+      return {topic:topic,correct:corr,total:tQs.length,pct:tQs.length?Math.round(corr/tQs.length*100):0};
+    });
+    const ins=document.getElementById('end-insight');
+    const best=scores.reduce(function(a,b){return b.pct>a.pct?b:a;});
+    const weak=scores.reduce(function(a,b){return b.pct<a.pct?b:a;});
+    ins.style.display='block';
+    document.getElementById('end-insight-best').innerHTML='<span style="color:var(--success)">✓ Best today:</span> <b>'+best.topic+'</b> — '+best.correct+'/'+best.total+' correct';
+    const weakEl=document.getElementById('end-insight-weak');
+    if(scores.length>=2&&weak.topic!==best.topic){
+      weakEl.style.display='block';
+      weakEl.innerHTML='<span style="color:var(--danger)">⚑ Focus on:</span> <b>'+weak.topic+'</b> — '+weak.correct+'/'+weak.total+' correct';
+    } else {
+      weakEl.style.display='none';
+    }
+  })();
   const trophies=['📋','🥉','🥈','🥇','🏆'];
   document.getElementById('end-trophy').textContent=accuracy>=90?'🏆':accuracy>=75?'🥇':accuracy>=60?'🥈':accuracy>=40?'🥉':'📋';
   const newBadge=topicSet.find(t=>state.profile.badges[t]);
