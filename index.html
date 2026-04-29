@@ -232,7 +232,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 window.addEventListener('DOMContentLoaded', function(){
   document.getElementById('loading-overlay').classList.add('hidden');
   document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
-  document.getElementById('screen-parent-login').classList.add('active');
+  document.getElementById('screen-login').classList.add('active');
 });
 </script>
 <div id="toast"></div>
@@ -322,7 +322,7 @@ window.addEventListener('DOMContentLoaded', function(){
 
   <button class="btn btn-primary" onclick="agreeDisclaimer()">Agree &amp; Start →</button>
   <button class="btn btn-outline" onclick="agreeAndViewDashboard()" style="margin-top:10px">View Student Progress First</button>
-  <button onclick="showScreen('parent-login')" style="background:none;border:none;color:var(--text-muted);font-size:0.85rem;cursor:pointer;font-weight:600;display:block;text-align:center;margin-top:12px">‹ Back</button>
+  
 </div>
 
 <!-- ═══ PARENT DASHBOARD ═══ -->
@@ -393,6 +393,7 @@ window.addEventListener('DOMContentLoaded', function(){
   <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">🚀 Start Session</button>
   <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">📊 My Dashboard</button>
     <button class="btn btn-outline" onclick="showStories()" style="margin-bottom:12px">📚 Story Library</button>
+  <button class="btn btn-ghost btn-sm" onclick="showParentView()" style="display:block;width:100%;margin-bottom:8px;background:rgba(108,99,255,0.07);border-color:rgba(108,99,255,0.2);color:var(--primary)">👨‍👩‍👧‍👦 Parent View</button>
   <button class="btn btn-ghost btn-sm" onclick="showLogin()" style="display:block;width:100%;margin-bottom:8px">Switch Player</button>
 </div>
 
@@ -520,11 +521,11 @@ window.addEventListener('DOMContentLoaded', function(){
 var _toastTimer;
 var PARENT_PASSWORD = 'CHAMPION99';
 var STUDENTS = {
-  pranav:    {name:'Pranav',    password:'SOAR',   avatar:'🦁'},
-  lily:      {name:'Lily',      password:'BLOOM',  avatar:'🌸'},
-  mithran:   {name:'Mithran',   password:'BRAVE',  avatar:'⚡'},
-  kabir:     {name:'Kabir',     password:'APEX',   avatar:'🚀'},
-  trial:     {name:'Trial',     password:'SPARK',  avatar:'⭐'},
+  pranav:    {name:'Pranav',    password:'SOAR27',   avatar:'🦁'},
+  lily:      {name:'Lily',      password:'BLOOM43',  avatar:'🌸'},
+  mithran:   {name:'Mithran',   password:'BRAVE91',  avatar:'⚡'},
+  kabir:     {name:'Kabir',     password:'APEX65',   avatar:'🚀'},
+  trial:     {name:'Trial',     password:'SPARK38',  avatar:'⭐'},
   student06: {name:'Student06', password:'RISE',   avatar:'🌟'},
   student07: {name:'Student07', password:'BOLD',   avatar:'🔥'},
   student08: {name:'Student08', password:'SHINE',  avatar:'💫'},
@@ -558,7 +559,7 @@ window.toast = function(msg) {
 };
 function _shake(id){ var el=document.getElementById(id); el.classList.add('error'); setTimeout(function(){ el.classList.remove('error'); },500); }
 
-window.showLogin = function() { _selectedStudentId=null; window.showScreen('parent-login'); };
+window.showLogin = function() { _selectedStudentId=null; var n=document.getElementById('login-name'); var p=document.getElementById('login-password'); if(n)n.value=''; if(p)p.value=''; window.showScreen('login'); };
 window.showParentLogin = function() { window.showScreen('parent-login'); };
 window.showStudentLogin = function() {
   var n=document.getElementById('login-name'); var p=document.getElementById('login-password');
@@ -748,7 +749,7 @@ function shakeInput(id){
 // ════════════════════════════════════════════════════════
 // LOGIN — PARENT
 // ════════════════════════════════════════════════════════
-window.showParentLogin=function(){ showScreen('parent-login'); };
+window.showParentLogin=function(){ showHome(); };
 
 window.submitParentLogin=function(){
   const pw=document.getElementById('parent-password').value.trim().toUpperCase();
@@ -1156,6 +1157,10 @@ function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.class
 window.showHome=function(){ renderHome(); showScreen('home'); };
 window.showLogin=function(){ document.getElementById('login-name').value=''; document.getElementById('login-password').value=''; showScreen('login'); };
 window.showDashboard=function(){ renderDashboard(); showScreen('dashboard'); };
+window.showParentView=function(){
+  if(typeof loadParentDashboard==='function') loadParentDashboard();
+  showScreen('parent');
+};
 
 // ════════════════════════════════════════════════════════
 // STORY LIBRARY
