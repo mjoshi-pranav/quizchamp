@@ -919,8 +919,8 @@ function renderTopicList(){
   const pool=subj==='mix'?[...TOPICS.maths,...TOPICS.english]:(TOPICS[subj]||TOPICS.maths);
   document.getElementById('topic-list-panel').innerHTML=pool.map(t=>{
     const meta=TOPIC_META[t]||{icon:'📌'};
-    const sel=t===state.manualTopic?' selected':'';
-    return `<div class="topic-list-item${sel}" onclick="selectManualTopic('${t.replace(/'/g,"\\'")}')">
+    const sel=state.manualTopics.includes(t)?' selected':'';
+    return `<div class="topic-list-item${sel}" onclick="toggleManualTopic('${t.replace(/'/g,"\\'")}')">
       <span class="tli-icon">${meta.icon}</span>${t}
     </div>`;
   }).join('');
