@@ -98,7 +98,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .quiz-header { margin-bottom: 16px; }
 .quiz-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .topic-tag { background: var(--primary); color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
-.level-tag { background: var(--warning); color: var(--navy); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; }
+.level-tag { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; transition: background 0.2s; }
 .progress-bar-wrap { background: var(--border); border-radius: 8px; height: 8px; overflow: hidden; }
 .progress-bar-fill { background: linear-gradient(90deg, var(--success), #1DB954); height: 100%; border-radius: 8px; transition: width 0.4s ease; }
 .q-number { font-size: 0.8rem; color: var(--text-muted); text-align: right; margin-top: 4px; font-weight: 600; }
@@ -959,7 +959,11 @@ async function finishSession(){
 function renderQuestion(){
   const s=state.session,q=getCurrentQuestion();
   document.getElementById('q-topic-tag').textContent=q.t;
-  document.getElementById('q-level-tag').textContent='L'+q.l;
+  const levelTag=document.getElementById('q-level-tag');
+  levelTag.textContent='Level '+q.l;
+  const lvlStyles={2:{bg:'#E1F5EE',color:'#085041'},3:{bg:'#E6F1FB',color:'#0C447C'},4:{bg:'#FAEEDA',color:'#633806'},5:{bg:'#FCEBEB',color:'#791F1F'}};
+  const ls=lvlStyles[q.l]||lvlStyles[3];
+  levelTag.style.background=ls.bg; levelTag.style.color=ls.color;
   document.getElementById('quiz-progress').style.width=(s.current/s.count*100)+'%';
   document.getElementById('q-number').textContent=`Q${s.current+1} of ${s.count}`;
   document.getElementById('question-text').textContent=q.q;
