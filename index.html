@@ -1100,8 +1100,9 @@ async function finishSession(){
   showScreen('end');
   const s=state.session;
   const duration=Math.round((Date.now()-s.startTime)/1000);
-  const accuracy=s.count>0?Math.round((s.correct/s.count)*100):0;
-  const xpEarned=s.correct*XP_PER_CORRECT+s.count*XP_PER_QUESTION;
+  const accuracy=s.current>0?Math.round((s.correct/s.current)*100):0;
+  const answered=s.current; // questions actually seen and answered
+  const xpEarned=answered>0?(s.correct*XP_PER_CORRECT+answered*XP_PER_QUESTION):0;
   const topicSet=[...new Set(s.questions.map(q=>q.t))];
   topicSet.forEach(topic=>{
     const tp=getTopicProgress(topic);
@@ -1131,7 +1132,7 @@ async function finishSession(){
   checkStoryUnlocks();
   await saveSessionResult({topics:topicSet,correct:s.correct,total:s.count,accuracy,duration,xpEarned});
   // Render end screen
-  document.getElementById('end-score').textContent=`${s.correct}/${s.count}`;
+  document.getElementById('end-score').textContent=`${s.correct}/${s.current}`;
   document.getElementById('end-accuracy').textContent=accuracy+'%';
   document.getElementById('end-xp').textContent='+'+xpEarned;
   document.getElementById('end-time').textContent=Math.ceil(duration/60)+'m';
