@@ -341,6 +341,24 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 @keyframes ee-fly{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-120px) scale(0.3);}}
 .ee-toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#FFD700,#FF8C00);color:#fff;padding:10px 20px;border-radius:20px;font-weight:900;font-size:1rem;z-index:8001;animation:ee-toast 2s ease forwards;}
 @keyframes ee-toast{0%{opacity:0;transform:translateX(-50%) scale(0.8);}15%{opacity:1;transform:translateX(-50%) scale(1);}80%{opacity:1;}100%{opacity:0;transform:translateX(-50%) scale(0.9);}}
+
+/* AVATAR */
+.av-card{display:flex;align-items:center;gap:12px;background:var(--card-bg);border-radius:14px;padding:12px 16px;margin-bottom:14px;border:1px solid var(--border);cursor:pointer}
+.av-card-info{flex:1}
+.av-card-name{font-weight:800;font-size:1.05rem;color:var(--text)}
+.av-card-sp{font-size:.82rem;color:var(--primary);font-weight:600;margin-top:2px}
+.av-card-edit{font-size:.72rem;color:var(--text-muted);margin-top:2px}
+.ab-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin-bottom:14px}
+.ab-opt{background:var(--card-bg);border:2.5px solid var(--border);border-radius:10px;padding:6px 4px;cursor:pointer;text-align:center;transition:border-color .15s}
+.ab-opt:hover{border-color:var(--primary)}
+.ab-opt.sel{border-color:var(--primary);background:rgba(79,70,229,.09)}
+.ab-opt-lbl{font-size:.6rem;color:var(--text-muted);margin-top:3px;display:block;line-height:1.2}
+.ab-swatches{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.ab-sw{width:34px;height:34px;border-radius:50%;border:3px solid #ccc;cursor:pointer;transition:border-color .15s}
+.ab-sw.sel{border-color:var(--primary)!important;box-shadow:0 0 0 2px rgba(79,70,229,.3)}
+.ab-sec{font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px}
+.flyby-dot{font-size:.8rem;margin-left:3px;display:inline-block;animation:fbpulse 1.5s infinite}
+@keyframes fbpulse{0%,100%{opacity:1}50%{opacity:.4}}
 </style>
 </head>
 <body>
@@ -487,6 +505,14 @@ window.addEventListener('DOMContentLoaded', function(){
     <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:0.1">🏆</div>
   </div>
 
+  <div class="av-card" onclick="showAvatarBuilder()">
+    <div id="home-av-svg"></div>
+    <div class="av-card-info">
+      <div class="av-card-name" id="home-av-nick">Champion</div>
+      <div class="av-card-sp" id="home-av-sp">&#9889; 0 SP</div>
+      <div class="av-card-edit">Tap to customise &#9998;</div>
+    </div>
+  </div>
   <div class="card">
     <div class="card-title">This Week</div>
     <div class="weekly-wrap" id="weekly-dots"></div>
@@ -539,6 +565,27 @@ window.addEventListener('DOMContentLoaded', function(){
   <div id="ss-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9000;align-items:center;justify-content:center">
     <div id="ss-modal-inner" style="background:var(--card-bg);border-radius:16px;padding:20px;max-width:340px;width:90%;max-height:80vh;overflow-y:auto"></div>
   </div>
+</div>
+<div id="screen-avatar-builder" class="screen">
+  <div class="app-header">
+    <button onclick="showScreen(window._abPrev||'home')" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text)">&#8249;</button>
+    <div class="app-logo">&#127775; My Character</div>
+    <button onclick="saveAvatarCfg()" style="background:var(--primary);color:#fff;border:none;border-radius:10px;padding:7px 16px;font-weight:700;font-size:.88rem;cursor:pointer">Save &#10003;</button>
+  </div>
+  <div style="text-align:center;margin:8px 0 14px">
+    <div id="ab-preview" style="display:inline-block;filter:drop-shadow(0 4px 14px rgba(0,0,0,.18))"></div>
+    <div id="ab-nick" style="font-weight:800;font-size:1rem;margin-top:6px;color:var(--text)"></div>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px">
+    <div class="pick-btn active" id="abt-face" onclick="abTab('face')" style="flex:1;text-align:center;cursor:pointer;white-space:nowrap;font-size:.82rem">&#128512; Face</div>
+    <div class="pick-btn" id="abt-hair" onclick="abTab('hair')" style="flex:1;text-align:center;cursor:pointer;white-space:nowrap;font-size:.82rem">&#128135; Hair</div>
+    <div class="pick-btn" id="abt-color" onclick="abTab('color')" style="flex:1;text-align:center;cursor:pointer;white-space:nowrap;font-size:.82rem">&#127912; Colour</div>
+    <div class="pick-btn" id="abt-glasses" onclick="abTab('glasses')" style="flex:1;text-align:center;cursor:pointer;white-space:nowrap;font-size:.82rem">&#128083; Glasses</div>
+  </div>
+  <div id="ab-pane-face" style="overflow-y:auto;max-height:48vh;padding-bottom:16px"></div>
+  <div id="ab-pane-hair" style="display:none;overflow-y:auto;max-height:48vh;padding-bottom:16px"></div>
+  <div id="ab-pane-color" style="display:none;overflow-y:auto;max-height:48vh;padding-bottom:16px"></div>
+  <div id="ab-pane-glasses" style="display:none;overflow-y:auto;max-height:48vh;padding-bottom:16px"></div>
 </div>
 <div id="screen-avatar" class="screen">
   <div class="app-header">
@@ -1588,9 +1635,9 @@ function renderLbRows(sorted, valKey, suffix, medals){
     const pct=Math.round((r[valKey]/maxVal)*100);
     return `<div class="lb-row${isMe?' me':''}">
       <div class="lb-rank-num">${medals[i]||('#'+(i+1))}</div>
-      <div class="lb-av">${r.av||'🏆'}</div>
+      <div class="lb-av">${(typeof renderAvatar==='function'&&r.avatarCfg)?renderAvatar(r.avatarCfg,36):(r.av||'🏆')}</div>
       <div class="lb-info">
-        <div class="lb-nick">${r.nick||'?'}${isMe?' (you)':''}${(_flybyTags||[]).filter(m=>m.toId===r.id).map(m=>`<span class='flyby-tag'>💫 ${m.fromAv} “${m.message.substring(0,32)}”</span>`).join('')}</div>
+        <div class="lb-nick">${r.nick||'?'}${isMe?' (you)':''}${(_flybyTags||[]).filter(m=>m.toId===r.id)${(_flybyTags||[]).some(m=>m.toId===r.id)?'<span class="flyby-dot">&#128142;</span>':''}</div>
         <div class="lb-xp-label">${r[valKey]}${suffix}</div>
       </div>
       <div style="flex:1;margin-left:8px">
@@ -1726,6 +1773,8 @@ function checkStoryUnlocks(){
 
 window.showHome=function(){
   renderHome();
+  setTimeout(updateHomeAvatarCard,80);
+  setTimeout(checkFlybyOnLogin,2500);
   _prevUnlockState={lvl3:(state.profile.xp||0)>=50,lvl4:(state.profile.xp||0)>=200};
   if(!state.profile.avatarSetupSeen && !state.profile.nickname && PLAYER_ID){ showAvatarSetup(false); return; }
   showScreen('home');
@@ -3417,6 +3466,233 @@ function playIntroMusic(theme){
     }
   }catch(e){}
 }
+
+
+
+// ═══ AVATAR SYSTEM ═══════════════════════════════════
+
+const SKIN_TONES=['#FDDBB4','#F5C5A3','#D4956A','#A06040','#6B3F28'];
+
+const FACE_DEFS=[
+  {id:1,name:'Hero',brow:'<path d="M30,47 Q40,41 50,47" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M50,47 Q60,41 70,47" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/>',mouth:'<path d="M38,74 Q50,81 62,74" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>'},
+  {id:2,name:'Fierce',brow:'<path d="M29,46 Q39,52 48,47" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M52,47 Q61,52 71,46" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/>',mouth:'<path d="M40,76 Q50,73 60,76" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>'},
+  {id:3,name:'Cool',brow:'<line x1="29" y1="46" x2="48" y2="45" stroke="#111" stroke-width="3" stroke-linecap="round"/><line x1="52" y1="45" x2="71" y2="46" stroke="#111" stroke-width="3" stroke-linecap="round"/>',mouth:'<path d="M40,74 Q50,79 60,74" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>'},
+  {id:4,name:'Friendly',brow:'<path d="M31,48 Q40,42 49,48" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M51,48 Q60,42 69,48" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>',mouth:'<path d="M36,73 Q50,83 64,73" stroke="#111" stroke-width="3" fill="none" stroke-linecap="round"/>'},
+  {id:5,name:'Surprised',brow:'<path d="M29,43 Q39,37 49,43" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M51,43 Q61,37 71,43" stroke="#111" stroke-width="4" fill="none" stroke-linecap="round"/>',mouth:'<ellipse cx="50" cy="77" rx="8" ry="6" fill="#111"/>'},
+  {id:6,name:'Cheeky',brow:'<path d="M30,47 Q39,41 48,47" stroke="#111" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M52,43 Q61,38 70,44" stroke="#111" stroke-width="3.5" fill="none" stroke-linecap="round"/>',mouth:'<path d="M38,74 Q46,80 54,75 Q58,79 62,77" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>'},
+  {id:7,name:'Bushy',brow:'<path d="M26,48 Q38,40 50,48" stroke="#111" stroke-width="6.5" fill="none" stroke-linecap="round"/><path d="M50,48 Q62,40 74,48" stroke="#111" stroke-width="6.5" fill="none" stroke-linecap="round"/>',mouth:'<path d="M38,74 Q50,80 62,74" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>'},
+  {id:8,name:'Gentle',brow:'<path d="M31,48 Q39,54 48,51" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M52,51 Q61,54 69,48" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>',mouth:'<path d="M38,73 Q50,82 62,73" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>'},
+  {id:9,name:'Anime',brow:'<path d="M31,47 Q40,41 49,47" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M51,47 Q60,41 69,47" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>',mouth:'<path d="M42,74 Q50,80 58,74" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>',bigEyes:true},
+  {id:10,name:'Mischievous',brow:'<path d="M30,44 Q39,38 48,44" stroke="#111" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M52,48 Q61,53 70,46" stroke="#111" stroke-width="3.5" fill="none" stroke-linecap="round"/>',mouth:'<path d="M40,74 Q46,79 52,76 Q56,79 62,76" stroke="#111" stroke-width="2.5" fill="none" stroke-linecap="round"/>'},
+];
+
+const HAIR_DEFS=[
+  {id:1,name:'Spiky Anime',svg:'<polygon points="50,3 43,22 36,6 32,24 24,10 31,26 69,26 76,10 68,24 64,6 57,22" fill="{c}" stroke="#111" stroke-width="2" stroke-linejoin="round"/>'},
+  {id:2,name:'Rock Star',svg:'<path d="M18,27 Q8,12 26,4 Q46,-3 72,3 Q90,8 96,24 Q99,36 92,44 Q78,24 50,30 Q28,38 18,27Z" fill="{c}" stroke="#111" stroke-width="2.5"/><path d="M22,30 Q20,42 30,40 Q38,46 46,38 Q52,46 60,40 Q52,52 40,48 Q26,50 22,30Z" fill="{c}" stroke="#111" stroke-width="2"/>'},
+  {id:3,name:'Side Swept',svg:'<path d="M22,27 Q20,10 44,4 Q68,0 88,18 Q96,30 90,38 Q76,18 48,24 L22,27Z" fill="{c}" stroke="#111" stroke-width="2.5"/><path d="M22,28 Q24,40 34,38 Q42,44 54,34 Q50,44 38,46 Q24,46 22,28Z" fill="{c}" stroke="#111" stroke-width="2"/>'},
+  {id:4,name:'Big Afro',svg:'<ellipse cx="50" cy="16" rx="40" ry="30" fill="{c}" stroke="#111" stroke-width="2.5"/>'},
+  {id:5,name:'Mohawk',svg:'<path d="M44,26 Q43,2 50,0 Q57,2 56,26Z" fill="{c}" stroke="#111" stroke-width="2"/><path d="M22,28 Q22,34 28,32 L32,26Z M78,26 L72,32 Q78,34 78,28Z" fill="{c}" stroke="#111" stroke-width="1.5"/>'},
+  {id:6,name:'Long Flowing',svg:'<path d="M22,26 Q22,8 50,4 Q78,8 78,26 L82,105 Q72,112 60,114 Q50,116 40,114 Q28,112 18,105Z" fill="{c}" stroke="#111" stroke-width="2.5"/>'},
+  {id:7,name:'Braids',svg:'<path d="M22,26 Q22,8 50,4 Q78,8 78,26 L78,52 Q68,46 62,112 Q57,122 50,120 Q43,122 38,112 Q32,46 22,52Z" fill="{c}" stroke="#111" stroke-width="2.5"/><line x1="44" y1="52" x2="42" y2="118" stroke="#111" stroke-width="1.5" opacity="0.35"/><line x1="50" y1="52" x2="50" y2="120" stroke="#111" stroke-width="1.5" opacity="0.35"/><line x1="56" y1="52" x2="58" y2="118" stroke="#111" stroke-width="1.5" opacity="0.35"/>'},
+  {id:8,name:'Double Buns',svg:'<circle cx="34" cy="20" r="16" fill="{c}" stroke="#111" stroke-width="2.5"/><circle cx="66" cy="20" r="16" fill="{c}" stroke="#111" stroke-width="2.5"/><rect x="34" y="22" width="32" height="10" fill="{c}" stroke="none"/>'},
+  {id:9,name:'Buzz Cut',svg:'<path d="M22,30 Q22,14 50,10 Q78,14 78,30 L78,26 Q78,20 50,18 Q22,20 22,26Z" fill="{c}" stroke="#111" stroke-width="2"/>'},
+  {id:10,name:'Curly Burst',svg:'<path d="M50,2 Q64,-2 72,8 Q82,0 86,12 Q96,6 96,20 Q104,26 98,36 Q104,46 94,50 Q96,60 84,58 Q80,66 68,60 Q62,68 52,64 Q50,70 48,64 Q38,68 32,60 Q20,66 16,58 Q4,60 6,50 Q-4,46 4,36 Q-2,26 6,20 Q6,6 16,12 Q20,0 30,8 Q38,-2 50,2Z" fill="{c}" stroke="#111" stroke-width="2.5"/>'},
+  {id:11,name:'Undercut',svg:'<path d="M22,34 Q22,26 26,28 L34,26 Q22,26 22,34Z M78,34 Q78,26 74,28 L66,26 Q78,26 78,34Z" fill="{c}" stroke="#111" stroke-width="1.5"/><path d="M36,26 Q36,4 50,2 Q64,4 64,26Z" fill="{c}" stroke="#111" stroke-width="2.5"/>'},
+  {id:12,name:'High Ponytail',svg:'<path d="M22,28 Q22,12 50,8 Q78,12 78,28 Q78,26 50,25 Q22,26 22,28Z" fill="{c}" stroke="#111" stroke-width="2"/><path d="M44,8 Q42,0 50,0 Q58,0 56,8 Q62,-4 64,8 Q68,20 60,26 L40,26 Q32,20 44,8Z" fill="{c}" stroke="#111" stroke-width="2"/>'},
+  {id:13,name:'Einstein',svg:'<path d="M22,27 Q16,18 20,10 Q14,4 24,6 Q26,0 34,4 Q38,-2 44,2 Q50,-4 56,2 Q62,-2 66,4 Q74,0 76,6 Q86,4 80,10 Q84,18 78,27 Q72,16 60,20 Q56,12 50,14 Q44,12 40,20 Q28,16 22,27Z" fill="{c}" stroke="#111" stroke-width="2.5"/>'},
+  {id:14,name:'Sleek Straight',svg:'<path d="M22,26 Q22,8 50,4 Q78,8 78,26 L78,115 L22,115Z" fill="{c}" stroke="#111" stroke-width="2.5"/>'},
+  {id:15,name:'Wavy Fringe',svg:'<path d="M18,28 Q16,12 30,6 Q46,0 70,4 Q88,8 94,24 Q98,36 92,44 Q80,26 50,32 Q26,38 18,28Z" fill="{c}" stroke="#111" stroke-width="2.5"/><path d="M22,32 Q30,52 42,46 Q50,54 60,46 Q70,52 78,38 Q74,50 68,52 Q58,60 50,54 Q42,60 34,54 Q24,52 22,32Z" fill="{c}" stroke="#111" stroke-width="2"/>'},
+];
+
+const HAIR_COLORS=[
+  {id:'k', label:'Black',      fill:'#1a1a1a'},
+  {id:'br',label:'Dark Brown', fill:'#5C3317'},
+  {id:'lb',label:'Lt Brown',   fill:'#A0522D'},
+  {id:'bl',label:'Blonde',     fill:'#F4C430'},
+  {id:'re',label:'Red',        fill:'#CC2200'},
+  {id:'si',label:'Silver',     fill:'#C0C0C0'},
+  {id:'or',label:'Orange',     fill:'#FF6600'},
+  {id:'wh',label:'White',      fill:'#F0F0F0'},
+  {id:'kb',label:'Black+Blue', base:'#1a1a1a',tip:'#3366FF'},
+  {id:'bp',label:'Brown+Gold', base:'#5C3317', tip:'#F4C430'},
+  {id:'dp',label:'Dark+Purple',base:'#1a1a1a',tip:'#8B00FF'},
+  {id:'pk',label:'Blond+Pink', base:'#F4C430', tip:'#FF69B4'},
+];
+
+const GLASSES_DEFS=[
+  {id:0,name:'None',svg:''},
+  {id:1,name:'Round',svg:'<circle cx="38" cy="60" r="9" fill="none" stroke="#333" stroke-width="2.5"/><circle cx="62" cy="60" r="9" fill="none" stroke="#333" stroke-width="2.5"/><line x1="47" y1="60" x2="53" y2="60" stroke="#333" stroke-width="2"/><line x1="29" y1="57" x2="23" y2="55" stroke="#333" stroke-width="2"/><line x1="71" y1="57" x2="77" y2="55" stroke="#333" stroke-width="2"/>'},
+  {id:2,name:'Rectangular',svg:'<rect x="29" y="54" width="18" height="11" rx="2.5" fill="none" stroke="#333" stroke-width="2.5"/><rect x="53" y="54" width="18" height="11" rx="2.5" fill="none" stroke="#333" stroke-width="2.5"/><line x1="47" y1="60" x2="53" y2="60" stroke="#333" stroke-width="2"/><line x1="29" y1="58" x2="23" y2="56" stroke="#333" stroke-width="2"/><line x1="71" y1="58" x2="77" y2="56" stroke="#333" stroke-width="2"/>'},
+  {id:3,name:'Sunglasses',svg:'<path d="M29,54 Q50,51 71,54 L71,65 Q62,69 50,67 Q38,69 29,65Z" fill="#111" stroke="#333" stroke-width="2"/><line x1="29" y1="57" x2="23" y2="55" stroke="#333" stroke-width="2"/><line x1="71" y1="57" x2="77" y2="55" stroke="#333" stroke-width="2"/><line x1="50" y1="54" x2="50" y2="67" stroke="#555" stroke-width="1.5"/>'},
+];
+
+function renderAvatar(cfg,size){
+  if(!cfg)return '<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:linear-gradient(135deg,#e0e7ff,#c7d2fe);display:flex;align-items:center;justify-content:center;font-size:'+(size*0.45)+'px">&#128100;</div>';
+  var face=FACE_DEFS.find(function(f){return f.id===(cfg.faceId||1);})||FACE_DEFS[0];
+  var hair=HAIR_DEFS.find(function(h){return h.id===(cfg.hairId||1);})||HAIR_DEFS[0];
+  var gl=GLASSES_DEFS.find(function(g){return g.id===(cfg.glassesId||0);})||GLASSES_DEFS[0];
+  var skin=cfg.skinTone||SKIN_TONES[0];
+  var hcObj=HAIR_COLORS.find(function(h){return h.id===(cfg.hairColorId||'k');})||HAIR_COLORS[0];
+  var hairFill,defs2='';
+  if(hcObj&&hcObj.base){
+    var gid='hg'+Math.random().toString(36).slice(2,7);
+    defs2='<defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+hcObj.base+'"/><stop offset="100%" stop-color="'+hcObj.tip+'"/></linearGradient></defs>';
+    hairFill='url(#'+gid+')';
+  }else{hairFill=(hcObj&&hcObj.fill)||'#1a1a1a';}
+  var hairSVG=(hair.svg||'').split('{c}').join(hairFill);
+  var eyeR=face.bigEyes?7:5.5,eyeIr=face.bigEyes?5:3.5;
+  return '<svg viewBox="0 0 100 120" width="'+size+'" height="'+size+'" xmlns="http://www.w3.org/2000/svg">'
+    +defs2+hairSVG
+    +'<ellipse cx="50" cy="60" rx="28" ry="32" fill="'+skin+'" stroke="#111" stroke-width="2.5"/>'
+    +face.brow
+    +'<ellipse cx="40" cy="62" rx="'+eyeR+'" ry="'+eyeR+'" fill="white" stroke="#111" stroke-width="2"/>'
+    +'<ellipse cx="40" cy="62" rx="'+eyeIr+'" ry="'+eyeIr+'" fill="#222"/>'
+    +'<circle cx="42" cy="60" r="1.5" fill="white"/>'
+    +'<ellipse cx="60" cy="62" rx="'+eyeR+'" ry="'+eyeR+'" fill="white" stroke="#111" stroke-width="2"/>'
+    +'<ellipse cx="60" cy="62" rx="'+eyeIr+'" ry="'+eyeIr+'" fill="#222"/>'
+    +'<circle cx="62" cy="60" r="1.5" fill="white"/>'
+    +'<path d="M50,70 Q47,75 50,76 Q53,75 50,70" fill="none" stroke="#999" stroke-width="1.5" stroke-linecap="round"/>'
+    +face.mouth+gl.svg+'</svg>';
+}
+
+var _abCfg={faceId:1,skinTone:SKIN_TONES[0],hairId:1,hairColorId:'k',glassesId:0};
+
+window.showAvatarBuilder=function(from){
+  window._abPrev=from||'home';
+  _abCfg=Object.assign({faceId:1,skinTone:SKIN_TONES[0],hairId:1,hairColorId:'k',glassesId:0},(state.profile&&state.profile.avatarCfg)||{});
+  showScreen('avatar-builder');
+  var n=document.getElementById('ab-nick');
+  if(n)n.textContent=(state.profile&&state.profile.nickname)||'Champion';
+  abTab('face');abUpdatePreview();
+};
+
+function abUpdatePreview(){var el=document.getElementById('ab-preview');if(el)el.innerHTML=renderAvatar(_abCfg,90);}
+
+window.abTab=function(tab){
+  ['face','hair','color','glasses'].forEach(function(t){
+    var p=document.getElementById('ab-pane-'+t),b=document.getElementById('abt-'+t);
+    if(p)p.style.display=t===tab?'block':'none';
+    if(b)b.className='pick-btn'+(t===tab?' active':'');
+  });
+  if(tab==='face')abRenderFaces();
+  else if(tab==='hair')abRenderHairs();
+  else if(tab==='color')abRenderColors();
+  else abRenderGlasses();
+};
+
+function abRenderFaces(){
+  var el=document.getElementById('ab-pane-face');if(!el)return;
+  el.innerHTML='<div class="ab-sec">Face Style</div><div class="ab-grid">'
+    +FACE_DEFS.map(function(f){
+      return '<div class="ab-opt'+((_abCfg.faceId===f.id)?' sel':'')+'" onclick="abPickFace('+f.id+')">'
+        +renderAvatar(Object.assign({},_abCfg,{faceId:f.id}),56)
+        +'<span class="ab-opt-lbl">'+f.name+'</span></div>';
+    }).join('')+'</div>'
+    +'<div class="ab-sec">Skin Tone</div><div class="ab-swatches">'
+    +SKIN_TONES.map(function(t){
+      return '<div class="ab-sw'+((_abCfg.skinTone===t)?' sel':'')+'" style="background:'+t+';border-color:'+(_abCfg.skinTone===t?'var(--primary)':'#ccc')+'" onclick="abPickSkin(\''+t+'\')" title="Skin tone"></div>';
+    }).join('')+'</div>';
+}
+window.abPickFace=function(id){_abCfg.faceId=id;abRenderFaces();abUpdatePreview();};
+window.abPickSkin=function(t){_abCfg.skinTone=t;abRenderFaces();abUpdatePreview();};
+
+function abRenderHairs(){
+  var el=document.getElementById('ab-pane-hair');if(!el)return;
+  el.innerHTML='<div class="ab-sec">Hairstyle</div><div class="ab-grid">'
+    +HAIR_DEFS.map(function(h){
+      return '<div class="ab-opt'+((_abCfg.hairId===h.id)?' sel':'')+'" onclick="abPickHair('+h.id+')">'
+        +renderAvatar(Object.assign({},_abCfg,{hairId:h.id}),56)
+        +'<span class="ab-opt-lbl">'+h.name+'</span></div>';
+    }).join('')+'</div>';
+}
+window.abPickHair=function(id){_abCfg.hairId=id;abRenderHairs();abUpdatePreview();};
+
+function abRenderColors(){
+  var el=document.getElementById('ab-pane-color');if(!el)return;
+  var solid=HAIR_COLORS.filter(function(h){return !h.base;}),two=HAIR_COLORS.filter(function(h){return !!h.base;});
+  el.innerHTML='<div class="ab-sec">Solid Colours</div><div class="ab-swatches">'
+    +solid.map(function(h){
+      return '<div class="ab-sw'+((_abCfg.hairColorId===h.id)?' sel':'')+'" style="background:'+h.fill+';border-color:'+(_abCfg.hairColorId===h.id?'var(--primary)':'#ccc')+'" onclick="abPickColor(\''+h.id+'\')" title="'+h.label+'"></div>';
+    }).join('')+'</div>'
+    +'<div class="ab-sec">Two-Tone</div><div class="ab-swatches">'
+    +two.map(function(h){
+      return '<div class="ab-sw'+((_abCfg.hairColorId===h.id)?' sel':'')+'" style="background:linear-gradient(135deg,'+h.base+' 50%,'+h.tip+' 50%);border-color:'+(_abCfg.hairColorId===h.id?'var(--primary)':'#ccc')+'" onclick="abPickColor(\''+h.id+'\')" title="'+h.label+'"></div>';
+    }).join('')+'</div>';
+}
+window.abPickColor=function(id){_abCfg.hairColorId=id;abRenderColors();abUpdatePreview();};
+
+function abRenderGlasses(){
+  var el=document.getElementById('ab-pane-glasses');if(!el)return;
+  el.innerHTML='<div class="ab-sec">Glasses</div><div class="ab-grid">'
+    +GLASSES_DEFS.map(function(g){
+      return '<div class="ab-opt'+((_abCfg.glassesId===g.id)?' sel':'')+'" onclick="abPickGlasses('+g.id+')">'
+        +renderAvatar(Object.assign({},_abCfg,{glassesId:g.id}),56)
+        +'<span class="ab-opt-lbl">'+g.name+'</span></div>';
+    }).join('')+'</div>';
+}
+window.abPickGlasses=function(id){_abCfg.glassesId=id;abRenderGlasses();abUpdatePreview();};
+
+window.saveAvatarCfg=async function(){
+  if(!PLAYER_ID)return;
+  state.profile.avatarCfg=JSON.parse(JSON.stringify(_abCfg));
+  try{
+    await setDoc(doc(db,'players',PLAYER_ID),{profile:state.profile});
+    var lbSnap=await getDoc(doc(db,'leaderboard',PLAYER_ID));
+    if(lbSnap.exists())await setDoc(doc(db,'leaderboard',PLAYER_ID),{avatarCfg:_abCfg},{merge:true});
+  }catch(e){console.warn('avatar save',e);}
+  updateHomeAvatarCard();
+  showScreen(window._abPrev||'home');
+};
+
+function updateHomeAvatarCard(){
+  var svg=document.getElementById('home-av-svg');
+  var nick=document.getElementById('home-av-nick');
+  var sp=document.getElementById('home-av-sp');
+  if(!svg)return;
+  svg.innerHTML=renderAvatar((state.profile&&state.profile.avatarCfg)||null,72);
+  if(nick)nick.textContent=(state.profile&&state.profile.nickname)||'Champion';
+  if(sp)sp.textContent='Lightning '+((state.profile&&state.profile.xp)||0)+' SP';
+}
+
+window.checkFlybyOnLogin=async function(){
+  if(!PLAYER_ID||!db)return;
+  try{
+    var snap=await getDocs(collection(db,'sparkMessages'));
+    var now=Date.now(),msgs=[];
+    snap.forEach(function(d){
+      var m=d.data();
+      if(m.toId===PLAYER_ID&&m.type==='flyby'&&!m.seenByRecipient){
+        var ms=m.sentAt&&m.sentAt.toMillis?m.sentAt.toMillis():0;
+        if(now-ms<172800000)msgs.push({id:d.id,data:m});
+      }
+    });
+    msgs.forEach(function(m,i){
+      setTimeout(function(){
+        triggerFlybyLoginAnim(m.data);
+        try{setDoc(doc(db,'sparkMessages',m.id),{seenByRecipient:true},{merge:true});}catch(e){}
+      },2000+i*3500);
+    });
+  }catch(e){console.warn('flyby check',e);}
+};
+
+function triggerFlybyLoginAnim(msgData){
+  var fromNick=msgData.fromNick||'Someone';
+  var message=msgData.message||'';
+  var w=document.createElement('div');
+  w.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:11000;overflow:hidden';
+  var avHTML=msgData.fromAvatarCfg?renderAvatar(msgData.fromAvatarCfg,52):'<div style="font-size:2.8rem">'+(msgData.fromAvatar||'✨')+'</div>';
+  w.innerHTML='<div style="position:absolute;top:38%;left:-160px;display:flex;align-items:flex-end;gap:8px;animation:fb-fly 3.2s ease-out forwards">'
+    +'<div>'+avHTML+'</div>'
+    +'<div style="background:#fff;border-radius:14px 14px 14px 4px;padding:10px 14px;box-shadow:0 4px 20px rgba(0,0,0,.18);max-width:190px;margin-bottom:6px">'
+    +'<div style="font-size:.68rem;color:#4F46E5;font-weight:700;margin-bottom:3px">'+fromNick+' says:</div>'
+    +'<div style="font-size:.84rem;color:#333;font-weight:500">'+message+'</div>'
+    +'</div></div>';
+  var s=document.createElement('style');
+  s.textContent='@keyframes fb-fly{0%{transform:translateX(0)}75%{opacity:1;transform:translateX(calc(100vw + 80px)) translateY(-20px)}100%{opacity:0;transform:translateX(calc(100vw+80px)) translateY(-50px)}}';
+  document.head.appendChild(s);document.body.appendChild(w);
+  setTimeout(function(){if(w.parentNode)w.parentNode.removeChild(w);},3800);
+}
+
 
 }
 </script>
