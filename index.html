@@ -973,6 +973,13 @@ window.flagQuestion=function(){
 window._loadAndGo=async function(id){
   PLAYER_ID=id;
   await loadProfile();
+  // Auto-set nickname from login name on first login — never ask again
+  if(!state.profile.nickname){
+    var sName=(STUDENTS[id]||{}).name||id;
+    state.profile.nickname=sName.charAt(0).toUpperCase()+sName.slice(1);
+    state.profile.avatarSetupSeen=true;
+    try{await setDoc(doc(db,'players',id),{profile:state.profile});}catch(_e){}
+  }
   document.getElementById('loading-overlay').classList.add('hidden');
   try{ playIntroMusic((state.profile.sparkStore||{}).activeTheme||'rock'); }catch(_e){}
   showHome();
@@ -1768,7 +1775,7 @@ window.showHome=function(){
   setTimeout(updateHomeAvatarCard,80);
   setTimeout(checkFlybyOnLogin,2500);
   _prevUnlockState={lvl3:(state.profile.xp||0)>=50,lvl4:(state.profile.xp||0)>=200};
-  if(!state.profile.avatarSetupSeen && !state.profile.nickname && PLAYER_ID){ showAvatarSetup(false); return; }
+  if(!state.profile.avatarSetupSeen && !(state.profile.avatarCfg&&state.profile.avatarCfg.avatarId) && PLAYER_ID){ showAvatarSetup(false); return; }
   showScreen('home');
 };
 window.showLogin=function(){ document.getElementById('login-name').value=''; document.getElementById('login-password').value=''; showScreen('login'); };
@@ -3556,6 +3563,7 @@ window.abTapSkin=function(){
 window.saveAvatarCfg=async function(){
   if(!PLAYER_ID)return;
   state.profile.avatarCfg=JSON.parse(JSON.stringify(_abCfg));
+  state.profile.avatarSetupSeen=true;
   try{
     await setDoc(doc(db,'players',PLAYER_ID),{profile:state.profile});
     var lbSnap=await getDoc(doc(db,'leaderboard',PLAYER_ID));
