@@ -246,6 +246,17 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 
 /* ── LEADERBOARD ── */
 .lb-rows{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.flyby-tag{display:block;font-size:0.7rem;color:var(--primary);background:rgba(255,200,0,0.15);border-radius:8px;padding:2px 6px;margin-top:2px;font-style:italic;}
+.ss-item-card{background:var(--card-bg);border-radius:12px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;border:1px solid var(--border);}
+.ss-item-icon{font-size:2rem;min-width:40px;text-align:center;}
+.ss-item-info{flex:1;}
+.ss-item-name{font-weight:700;font-size:0.95rem;}
+.ss-item-desc{font-size:0.78rem;color:var(--text-muted);margin-top:2px;}
+.ss-badge{display:inline-block;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;}
+.ss-badge-owned{background:#E1F5EE;color:#085041;}
+.ss-badge-active{background:#FAEEDA;color:#633806;}
+@keyframes flyby-anim{0%{transform:translateX(-120%);opacity:1;}80%{transform:translateX(120%) translateY(-40px);opacity:0.8;}100%{transform:translateX(200%) translateY(-80px);opacity:0;}}
+.flyby-emoji{position:fixed;font-size:2.5rem;z-index:10000;pointer-events:none;animation:flyby-anim 1.8s ease-out forwards;top:45%;}
 .lb-row{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:14px;padding:12px 14px;}
 .lb-row.me{background:linear-gradient(135deg,#EEF0FF,#E8F4FF);border:2px solid var(--primary);}
 .lb-rank-num{font-size:1.1rem;font-weight:900;width:28px;text-align:center;}
@@ -502,6 +513,7 @@ window.addEventListener('DOMContentLoaded', function(){
   <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">🚀 Start Session</button>
   <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">📊 My Dashboard</button>
   <button class="btn btn-outline" onclick="showStories()" style="margin-bottom:12px">📚 Story Library</button>
+  <button class="btn btn-outline" onclick="showSparkStore()" style="margin-bottom:12px">⚡ Spark Store</button>
   <div style="position:relative;margin-bottom:12px">
     <button class="btn btn-outline" onclick="showLeaderboard()" style="width:100%">🏆 Leaderboard</button>
     <span class="cheer-notif" id="home-cheer-dot"></span>
@@ -831,7 +843,7 @@ let PLAYER_ID = null;
 let state = {
   subject:'maths', pickMode:'auto', manualTopics:[],
   session:null,
-  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[],nickname:'',avatar:'',dailyChallenge:{},mysteryBox:{lastDate:null,owned:[]},easterEggs:{},consecutivePerfect:0,cheersSentToday:{date:null,count:0}},
+  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[],nickname:'',avatar:'',dailyChallenge:{},mysteryBox:{lastDate:null,owned:[]},easterEggs:{},consecutivePerfect:0,cheersSentToday:{date:null,count:0},sparkStore:{accessories:[],equippedAccessory:null,ownedThemes:['rock'],activeTheme:'rock'}},
   dashFilter:'maths', dashTab:'progress'
 };
 const XP_PER_CORRECT=15, XP_PER_QUESTION=5, XP_PER_LEVEL=200;
@@ -902,6 +914,7 @@ window._loadAndGo=async function(id){
   PLAYER_ID=id;
   await loadProfile();
   document.getElementById('loading-overlay').classList.add('hidden');
+  try{ playIntroMusic((state.profile.sparkStore||{}).activeTheme||'rock'); }catch(_e){}
   showHome();
   // Night Owl easter egg: login between midnight and 1am
   const hr=new Date().getHours();
@@ -1124,7 +1137,7 @@ function getCurrentQuestion(){ return state.session.questions[state.session.curr
 window.handleAnswer=function(idx,btn){
   if(state.session.answered) return;
   state.session.answered=true;
-  const q=getCurrentQuestion(); const chosen=q.o[idx];
+  const q=getCurrentQuestion(); const chosen=(state.session._shuf||q.o)[idx];
   btn.classList.add('picked');
   document.querySelectorAll('.option-btn').forEach(b=>b.disabled=true);
   if(chosen!==q.a){
@@ -1281,7 +1294,8 @@ function renderQuestion(){
   // Reset flag button for each new question
   const fb=document.getElementById('flag-btn');
   if(fb){ fb.classList.remove('flagged'); fb.textContent='🚩 Flag — something wrong here'; fb.disabled=false; }
-  document.getElementById('options-grid').innerHTML=q.o.map((opt,i)=>
+  const _shuf=shuffle([...q.o]); state.session._shuf=_shuf;
+  document.getElementById('options-grid').innerHTML=_shuf.map((opt,i)=>
     `<button class="option-btn" onclick="handleAnswer(${i},this)">${opt}</button>`).join('');
 }
 
@@ -1555,7 +1569,7 @@ function renderLbRows(sorted, valKey, suffix, medals){
       <div class="lb-rank-num">${medals[i]||('#'+(i+1))}</div>
       <div class="lb-av">${r.av||'🏆'}</div>
       <div class="lb-info">
-        <div class="lb-nick">${r.nick||'?'}${isMe?' (you)':''}</div>
+        <div class="lb-nick">${r.nick||'?'}${isMe?' (you)':''}${(_flybyTags||[]).filter(m=>m.toId===r.id).map(m=>`<span class='flyby-tag'>💫 ${m.fromAv} “${m.message.substring(0,32)}”</span>`).join('')}</div>
         <div class="lb-xp-label">${r[valKey]}${suffix}</div>
       </div>
       <div style="flex:1;margin-left:8px">
@@ -1566,14 +1580,26 @@ function renderLbRows(sorted, valKey, suffix, medals){
   }).join('');
 }
 
+var _flybyTags=[];
 window.showLeaderboard = async function(){
   showScreen('leaderboard');
   document.getElementById('lb-rows').innerHTML = '<div class="lb-empty">Loading…</div>';
   checkCheersNotification();
   try {
-    const snap = await getDocs(collection(db,'leaderboard'));
+    const [lbSnap,msgSnap] = await Promise.all([
+      getDocs(collection(db,'leaderboard')),
+      getDocs(collection(db,'sparkMessages'))
+    ]);
     _lbData = [];
-    snap.forEach(d=>{ const data=d.data(); _lbData.push({id:d.id,...data,av:data.avatar||'🏆',nick:data.nickname||'?'}); });
+    lbSnap.forEach(d=>{ const data=d.data(); _lbData.push({id:d.id,...data,av:data.avatar||'🏆',nick:data.nickname||'?'}); });
+    const now=Date.now(), cut48=now-48*60*60*1000;
+    _flybyTags=[];
+    msgSnap.forEach(d=>{
+      const m=d.data();
+      if(m.type==='flyby'&&m.sentAt&&m.sentAt.toMillis&&m.sentAt.toMillis()>cut48){
+        _flybyTags.push({toId:m.toId,fromAv:m.fromAvatar||'',message:m.message||''});
+      }
+    });
     switchLbTab(_lbTab);
   } catch(e){
     document.getElementById('lb-rows').innerHTML='<div class="lb-empty">Leaderboard unavailable right now</div>';
@@ -3091,6 +3117,286 @@ function updateCheersNotification(hasUnread){
     const el=document.getElementById(id);
     if(el) el.classList.toggle('visible', hasUnread);
   });
+
+// ════════════════════════════════════════════════════════
+// SPARK STORE — constants, UI, purchase, messaging
+// ════════════════════════════════════════════════════════
+const ACCESSORIES=[
+  {id:'jacket',name:'Champion Jacket',icon:'\u{1F9E5}',price:75,desc:'Shown on your avatar'},
+  {id:'trainers',name:'Trainers',icon:'\u{1F45F}',price:50,desc:'Shown on your avatar'},
+  {id:'football',name:'Football',icon:'⚽',price:40,desc:'Badge beside avatar'},
+  {id:'cricket',name:'Cricket Bat',icon:'\u{1F3CF}',price:50,desc:'Badge beside avatar'},
+  {id:'guitar',name:'Guitar',icon:'\u{1F3B8}',price:75,desc:'Badge beside avatar'},
+];
+const MUSIC_THEMES=[
+  {id:'rock',name:'Rock Riff',icon:'\u{1F3B8}',price:0,desc:'Default theme — always free'},
+  {id:'electronic',name:'Electronic Beat',icon:'\u{1F39B}',price:100,desc:'Buy once, yours forever'},
+  {id:'hiphop',name:'Hip-Hop Beat',icon:'\u{1F3A4}',price:100,desc:'Buy once, yours forever'},
+  {id:'fanfare',name:'Epic Fanfare',icon:'\u{1F3C6}',price:200,desc:'Premium theme'},
+];
+const SPARK_MESSAGES=[
+  "You're on fire this week! \u{1F525}",
+  "Keep going — you've got this! \u{1F4AA}",
+  "Amazing streak! I see you! \u{1F440}",
+  "You're inspiring me to practise more ⭐",
+  "Top of the leaderboard soon — watch out! \u{1F3C6}",
+  "Genius energy today! \u{1F9E0}",
+  "You are unstoppable! \u{1F680}",
+  "Level 4 incoming! ⚡",
+  "The grind is paying off! \u{1F48E}",
+  "Best in the group — facts! \u{1F3AF}",
+  "Consistent. Focused. Dangerous. \u{1F510}",
+  "Nothing stops a prepared mind! \u{1F4DA}",
+];
+
+function ssGetStore(){
+  if(!state.profile.sparkStore) state.profile.sparkStore={accessories:[],equippedAccessory:null,ownedThemes:['rock'],activeTheme:'rock'};
+  return state.profile.sparkStore;
+}
+
+window.showSparkStore=function(){
+  showScreen('spark-store');
+  document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';
+  ssTab('acc');
+};
+
+window.ssTab=function(tab){
+  ['acc','music','msg'].forEach(function(t){
+    document.getElementById('ss-pane-'+t).style.display=t===tab?'block':'none';
+    var el=document.getElementById('sst-'+t);
+    if(el) el.className='pick-btn'+(t===tab?' active':'');
+  });
+  if(tab==='acc') renderSSAcc();
+  else if(tab==='music') renderSSMusic();
+  else renderSSMsg();
+};
+
+function renderSSAcc(){
+  var st=ssGetStore();
+  var el=document.getElementById('ss-pane-acc');
+  var h='<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Accessories appear on your leaderboard card. Equip one at a time.</p>';
+  ACCESSORIES.forEach(function(item){
+    var owned=st.accessories.includes(item.id);
+    var equipped=st.equippedAccessory===item.id;
+    var act='';
+    if(!owned){
+      act='<button class="btn btn-primary btn-sm" onclick="ssBuyAcc(\''+item.id+'\')" style="margin-top:8px">Buy — '+item.price+' SP</button>';
+    } else if(equipped){
+      act='<span class="ss-badge ss-badge-active">✓ Equipped</span> <button class="btn btn-outline btn-sm" onclick="ssEquip(null)" style="margin-top:8px;margin-left:6px">Unequip</button>';
+    } else {
+      act='<span class="ss-badge ss-badge-owned">Owned</span> <button class="btn btn-primary btn-sm" onclick="ssEquip(\''+item.id+'\')" style="margin-top:8px;margin-left:6px">Equip</button>';
+    }
+    h+='<div class="ss-item-card"><div class="ss-item-icon">'+item.icon+'</div><div class="ss-item-info"><div class="ss-item-name">'+item.name+'</div><div class="ss-item-desc">'+item.desc+'</div>'+act+'</div></div>';
+  });
+  el.innerHTML=h;
+}
+
+function renderSSMusic(){
+  var st=ssGetStore();
+  var el=document.getElementById('ss-pane-music');
+  var h='<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Intro music plays 3 seconds when you log in. Preview before buying!</p>';
+  MUSIC_THEMES.forEach(function(theme){
+    var owned=st.ownedThemes.includes(theme.id)||theme.price===0;
+    var active=st.activeTheme===theme.id;
+    var act='';
+    if(owned){
+      if(active){
+        act='<span class="ss-badge ss-badge-active">▶ Playing now</span> <button class="btn btn-outline btn-sm" onclick="ssPreviewTheme(\''+theme.id+'\')" style="margin-left:6px;margin-top:8px">Preview</button>';
+      } else {
+        act='<span class="ss-badge ss-badge-owned">Owned</span> <button class="btn btn-primary btn-sm" onclick="ssSetTheme(\''+theme.id+'\')" style="margin-left:6px;margin-top:8px">Set Active</button> <button class="btn btn-outline btn-sm" onclick="ssPreviewTheme(\''+theme.id+'\')" style="margin-top:8px;margin-left:4px">Preview</button>';
+      }
+    } else {
+      act='<button class="btn btn-primary btn-sm" onclick="ssBuyTheme(\''+theme.id+'\')" style="margin-top:8px">Buy — '+theme.price+' SP</button> <button class="btn btn-outline btn-sm" onclick="ssPreviewTheme(\''+theme.id+'\')" style="margin-top:8px;margin-left:6px">Preview</button>';
+    }
+    h+='<div class="ss-item-card"><div class="ss-item-icon">'+theme.icon+'</div><div class="ss-item-info"><div class="ss-item-name">'+theme.name+'</div><div class="ss-item-desc">'+theme.desc+'</div>'+act+'</div></div>';
+  });
+  el.innerHTML=h;
+}
+
+function renderSSMsg(){
+  var el=document.getElementById('ss-pane-msg');
+  var nick=state.profile.nickname||'';
+  var dis=nick?'':'disabled';
+  var hint=nick?'':' (set a nickname first)';
+  el.innerHTML='<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Send a positive message to any student. Choose from 12 approved messages — no free text allowed.</p>'
+    +'<div class="ss-item-card" style="flex-direction:column;align-items:flex-start">'
+    +'<div style="display:flex;align-items:center;gap:10px"><div style="font-size:1.8rem">\u{1F4EC}</div>'
+    +'<div><div class="ss-item-name">Normal Message — 40 SP</div><div class="ss-item-desc">Private inbox only · 24-hour lifespan</div></div></div>'
+    +'<button class="btn btn-primary" onclick="openSendMsg(\'normal\')" '+dis+' style="margin-top:12px;width:100%">Send a Normal Message'+hint+'</button></div>'
+    +'<div class="ss-item-card" style="flex-direction:column;align-items:flex-start">'
+    +'<div style="display:flex;align-items:center;gap:10px"><div style="font-size:1.8rem">\u{1F4AB}</div>'
+    +'<div><div class="ss-item-name">Fly-By Message — 100 SP</div><div class="ss-item-desc">Public leaderboard tag (48h) · animation plays when sent</div></div></div>'
+    +'<button class="btn btn-primary" onclick="openSendMsg(\'flyby\')" '+dis+' style="margin-top:12px;width:100%">Send a Fly-By Message'+hint+'</button></div>'
+    +'<div style="margin-top:16px"><div style="font-weight:700;font-size:0.85rem;margin-bottom:8px">\u{1F4EC} My Inbox</div>'
+    +'<div id="ss-inbox">Loading...</div></div>';
+  loadSparkInbox();
+}
+
+async function loadSparkInbox(){
+  var el=document.getElementById('ss-inbox');
+  if(!el) return;
+  try{
+    var snap=await getDocs(collection(db,'sparkMessages'));
+    var now=Date.now(),cut24=now-86400000,cut48=now-172800000;
+    var mine=[];
+    snap.forEach(function(d){
+      var m=Object.assign({id:d.id},d.data());
+      if(m.toId!==PLAYER_ID) return;
+      var ts=m.sentAt&&m.sentAt.toMillis?m.sentAt.toMillis():0;
+      if(ts>(m.type==='flyby'?cut48:cut24)) mine.push(m);
+    });
+    if(!mine.length){el.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem">No messages yet. Get on that leaderboard! \u{1F3C6}</p>';return;}
+    mine.sort(function(a,b){return(b.sentAt&&b.sentAt.toMillis?b.sentAt.toMillis():0)-(a.sentAt&&a.sentAt.toMillis?a.sentAt.toMillis():0);});
+    el.innerHTML=mine.map(function(m){
+      return '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px">'
+        +'<div style="font-size:0.75rem;color:var(--text-muted)">'+(m.type==='flyby'?'\u{1F4AB} Fly-By from':'\u{1F4EC} From')+' '+(m.fromAvatar||'')+' '+(m.fromNick||'Someone')+'</div>'
+        +'<div style="font-weight:600;margin-top:4px">'+m.message+'</div></div>';
+    }).join('');
+  }catch(e){el.innerHTML='<p style="color:var(--text-muted)">Could not load messages.</p>';}
+}
+
+window.openSendMsg=async function(type){
+  var cost=type==='flyby'?100:40;
+  if((state.profile.xp||0)<cost){toast('Need '+cost+' SP to send this!');return;}
+  var modal=document.getElementById('ss-modal');
+  var inner=document.getElementById('ss-modal-inner');
+  inner.innerHTML='<p style="text-align:center;padding:20px">Loading players...</p>';
+  modal.style.display='block';
+  try{
+    var snap=await getDocs(collection(db,'leaderboard'));
+    var players=[];
+    snap.forEach(function(d){
+      if(d.id!==PLAYER_ID){var dat=d.data();if(dat.nickname)players.push({id:d.id,nick:dat.nickname,av:dat.avatar||'\u{1F3C6}'});}
+    });
+    if(!players.length){inner.innerHTML='<p>No other players found.</p><button class="btn btn-outline" onclick="document.getElementById(\'ss-modal\').style.display=\'none\'">Close</button>';return;}
+    var rows=players.map(function(pp){
+      return '<div class="ss-item-card" style="cursor:pointer" onclick="openMsgPicker(\''+type+'\',\''+pp.id+'\',\''+pp.nick.replace(/['"]/g,'')+'\',\''+pp.av+'\')"><div style="font-size:1.6rem">'+pp.av+'</div><div class="ss-item-name" style="margin-left:4px">'+pp.nick+'</div></div>';
+    }).join('');
+    inner.innerHTML='<h3 style="margin:0 0 12px">'+(type==='flyby'?'\u{1F4AB}':'\u{1F4EC}')+' Pick a recipient</h3>'+rows
+      +'<button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="document.getElementById(\'ss-modal\').style.display=\'none\'">Cancel</button>';
+  }catch(e){inner.innerHTML='<p>Could not load players.</p><button class="btn btn-outline" onclick="document.getElementById(\'ss-modal\').style.display=\'none\'">Close</button>';}
+};
+
+window.openMsgPicker=function(type,toId,toNick,toAv){
+  var cost=type==='flyby'?100:40;
+  var inner=document.getElementById('ss-modal-inner');
+  var msgs=SPARK_MESSAGES.map(function(msg,i){
+    return '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer" onclick="confirmSendMsg(\''+type+'\',\''+toId+'\',\''+toNick+'\',\''+toAv+'\','+i+')">'+msg+'</div>';
+  }).join('');
+  inner.innerHTML='<h3 style="margin:0 0 4px">'+(type==='flyby'?'\u{1F4AB}':'\u{1F4EC}')+' To: '+toAv+' '+toNick+'</h3>'
+    +'<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Pick a message — costs '+cost+' SP</p>'
+    +msgs+'<button class="btn btn-outline" style="width:100%;margin-top:8px" onclick="document.getElementById(\'ss-modal\').style.display=\'none\'">Cancel</button>';
+};
+
+window.confirmSendMsg=async function(type,toId,toNick,toAv,msgIdx){
+  var cost=type==='flyby'?100:40;
+  if((state.profile.xp||0)<cost){toast('Not enough SP!');return;}
+  try{
+    await addDoc(collection(db,'sparkMessages'),{
+      fromId:PLAYER_ID,fromNick:state.profile.nickname||'',fromAvatar:state.profile.avatar||'\u{1F3C6}',
+      toId:toId,toNick:toNick,message:SPARK_MESSAGES[msgIdx],type:type,sentAt:serverTimestamp(),read:false
+    });
+    state.profile.xp=Math.max(0,(state.profile.xp||0)-cost);
+    saveProfile();
+    document.getElementById('ss-modal').style.display='none';
+    document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';
+    if(type==='flyby'){toast('\u{1F4AB} Fly-By sent! Tag will show on the leaderboard!');triggerFlybyAnim(state.profile.avatar||'\u{1F3C6}');}
+    else{toast('\u{1F4EC} Message sent!');}
+  }catch(e){toast('Could not send — check your connection');}
+};
+
+function triggerFlybyAnim(av){
+  var el=document.createElement('div');el.className='flyby-emoji';el.textContent=av;
+  document.body.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},2200);
+}
+
+window.ssBuyAcc=function(id){
+  var item=ACCESSORIES.find(function(a){return a.id===id;});if(!item)return;
+  var st=ssGetStore();
+  if(st.accessories.includes(id)){state.profile.xp=(state.profile.xp||0)+20;saveProfile();toast('Already owned! +20 SP \u{1F381}');document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';return;}
+  if((state.profile.xp||0)<item.price){toast('Need '+item.price+' SP!');return;}
+  state.profile.xp-=item.price;st.accessories.push(id);saveProfile();
+  document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';
+  toast(item.icon+' '+item.name+' unlocked! \u{1F389}');renderSSAcc();
+};
+
+window.ssEquip=function(id){
+  ssGetStore().equippedAccessory=id||null;saveProfile();
+  toast(id?'Equipped! Shows on the leaderboard \u{1F44D}':'Unequipped');renderSSAcc();
+};
+
+window.ssBuyTheme=function(id){
+  var theme=MUSIC_THEMES.find(function(t){return t.id===id;});if(!theme)return;
+  var st=ssGetStore();
+  if(st.ownedThemes.includes(id)){toast('Already owned!');return;}
+  if((state.profile.xp||0)<theme.price){toast('Need '+theme.price+' SP!');return;}
+  state.profile.xp-=theme.price;st.ownedThemes.push(id);saveProfile();
+  document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';
+  toast(theme.icon+' '+theme.name+' unlocked! \u{1F389}');renderSSMusic();
+};
+
+window.ssSetTheme=function(id){
+  ssGetStore().activeTheme=id;saveProfile();
+  var th=MUSIC_THEMES.find(function(t){return t.id===id;})||{icon:'',name:id};
+  toast(th.icon+' '+th.name+' is now your intro!');renderSSMusic();
+};
+
+window.ssPreviewTheme=function(id){try{playIntroMusic(id);toast('\u{1F3B5} Previewing...');}catch(e){}};
+
+// ════════════════════════════════════════════════════════
+// INTRO MUSIC — Web Audio API (3 seconds)
+// ════════════════════════════════════════════════════════
+function playIntroMusic(theme){
+  try{
+    var C=new(window.AudioContext||window.webkitAudioContext)();
+    var t=C.currentTime;
+    if(theme==='rock'){
+      [[82.4,0],[110,0.28],[147,0.56],[82.4,0.84],[110,1.12],[164.8,1.4]].forEach(function(pr){
+        var f=pr[0],dt=pr[1],o=C.createOscillator(),g=C.createGain(),ws=C.createWaveShaper();
+        var n=256,cv=new Float32Array(n);
+        for(var i=0;i<n;i++){var x=i*2/n-1;cv[i]=Math.tanh(5*x);}
+        ws.curve=cv;o.type='sawtooth';o.frequency.value=f;
+        o.connect(ws);ws.connect(g);g.connect(C.destination);
+        g.gain.setValueAtTime(0,t+dt);g.gain.linearRampToValueAtTime(0.22,t+dt+0.03);
+        g.gain.exponentialRampToValueAtTime(0.001,t+dt+0.24);o.start(t+dt);o.stop(t+dt+0.28);
+      });
+    }else if(theme==='electronic'){
+      [261.6,329.6,392,523.2,659.2].forEach(function(f,i){
+        var o=C.createOscillator(),g=C.createGain(),fl=C.createBiquadFilter();
+        o.type='square';fl.type='lowpass';fl.frequency.value=300+i*200;o.frequency.value=f;
+        o.connect(fl);fl.connect(g);g.connect(C.destination);
+        var dt=i*0.22;g.gain.setValueAtTime(0,t+dt);g.gain.linearRampToValueAtTime(0.18,t+dt+0.02);
+        g.gain.exponentialRampToValueAtTime(0.001,t+dt+0.2);fl.frequency.linearRampToValueAtTime(3500,t+dt+0.18);
+        o.start(t+dt);o.stop(t+dt+0.25);
+      });
+    }else if(theme==='hiphop'){
+      [0,0.5,0.75,1.25].forEach(function(dt){
+        var o=C.createOscillator(),g=C.createGain();o.type='sine';
+        o.frequency.setValueAtTime(200,t+dt);o.frequency.exponentialRampToValueAtTime(45,t+dt+0.18);
+        g.gain.setValueAtTime(0.5,t+dt);g.gain.exponentialRampToValueAtTime(0.001,t+dt+0.35);
+        o.connect(g);g.connect(C.destination);o.start(t+dt);o.stop(t+dt+0.4);
+      });
+      [0.25,0.5,0.75,1.0,1.25,1.5].forEach(function(dt){
+        var buf=C.createBuffer(1,Math.floor(C.sampleRate*0.06),C.sampleRate);
+        var d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+        var src=C.createBufferSource(),g=C.createGain(),fl=C.createBiquadFilter();
+        src.buffer=buf;fl.type='highpass';fl.frequency.value=7000;
+        src.connect(fl);fl.connect(g);g.connect(C.destination);
+        g.gain.setValueAtTime(0.12,t+dt);g.gain.exponentialRampToValueAtTime(0.001,t+dt+0.06);src.start(t+dt);
+      });
+    }else{
+      [261.6,329.6,392,523.2].forEach(function(f,i){
+        var o=C.createOscillator(),g=C.createGain();o.type='triangle';o.frequency.value=f;
+        o.connect(g);g.connect(C.destination);var dt=i*0.38;
+        g.gain.setValueAtTime(0,t+dt);g.gain.linearRampToValueAtTime(0.28,t+dt+0.08);
+        g.gain.setValueAtTime(0.28,t+dt+0.28);g.gain.exponentialRampToValueAtTime(0.001,t+dt+0.7);
+        o.start(t+dt);o.stop(t+dt+0.75);
+      });
+    }
+  }catch(e){}
+}
+
 }
 </script>
 
