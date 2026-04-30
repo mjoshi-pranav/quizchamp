@@ -522,6 +522,24 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- ═══ AVATAR SETUP SCREEN ═══ -->
+<div id="screen-spark-store" class="screen">
+  <div class="app-header">
+    <button onclick="showHome()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text)">&#8249;</button>
+    <div class="app-logo">&#9889; Spark Store</div>
+    <div id="ss-balance" style="font-weight:700;color:var(--primary)">0 SP</div>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px">
+    <div class="pick-btn active" id="sst-acc" onclick="ssTab('acc')" style="flex:1;text-align:center;cursor:pointer">&#129399; Accessories</div>
+    <div class="pick-btn" id="sst-music" onclick="ssTab('music')" style="flex:1;text-align:center;cursor:pointer">&#127925; Music</div>
+    <div class="pick-btn" id="sst-msg" onclick="ssTab('msg')" style="flex:1;text-align:center;cursor:pointer">&#128140; Messages</div>
+  </div>
+  <div id="ss-pane-acc"></div>
+  <div id="ss-pane-music" style="display:none"></div>
+  <div id="ss-pane-msg" style="display:none"></div>
+  <div id="ss-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9000;align-items:center;justify-content:center">
+    <div id="ss-modal-inner" style="background:var(--card-bg);border-radius:16px;padding:20px;max-width:340px;width:90%;max-height:80vh;overflow-y:auto"></div>
+  </div>
+</div>
 <div id="screen-avatar" class="screen">
   <div class="app-header">
     <div class="app-logo">Quiz<span>Champ</span> 🏆</div>
