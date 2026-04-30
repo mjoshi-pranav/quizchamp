@@ -572,20 +572,24 @@ window.addEventListener('DOMContentLoaded', function(){
     <div class="app-logo">&#127775; My Character</div>
     <button onclick="saveAvatarCfg()" style="background:var(--primary);color:#fff;border:none;border-radius:10px;padding:7px 16px;font-weight:700;font-size:.88rem;cursor:pointer">Save &#10003;</button>
   </div>
-  <div style="text-align:center;margin:8px 0 14px">
-    <div id="ab-preview" style="display:inline-block;filter:drop-shadow(0 4px 14px rgba(0,0,0,.18))"></div>
-    <div id="ab-nick" style="font-weight:800;font-size:1rem;margin-top:6px;color:var(--text)"></div>
+  <!-- Preview + skin tone tap -->
+  <div style="text-align:center;margin:8px 0 6px">
+    <div id="ab-preview" onclick="abTapSkin()" title="Tap to change skin tone" style="display:inline-block;filter:drop-shadow(0 4px 14px rgba(0,0,0,.18));cursor:pointer"></div>
+    <div style="margin-top:6px;display:flex;align-items:center;justify-content:center;gap:10px">
+      <div id="ab-nick" style="font-weight:800;font-size:1rem;color:var(--text)"></div>
+      <div id="ab-skin-tap" onclick="abTapSkin()" title="Tap to change skin tone" style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border);cursor:pointer;flex-shrink:0"></div>
+    </div>
+    <div style="font-size:.72rem;color:var(--text-muted);margin-top:2px">Tap face or circle to change skin tone</div>
   </div>
-  <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px">
-    <div class="pick-btn active" id="abt-face" onclick="abTab('face')" style="flex:1;text-align:center;cursor:pointer;white-space:nowrap;font-size:.82rem">&#128512; Face</div>
-    <div class="pick-btn" id="abt-hair" onclick="abTab('hair')" style="flex:1;text-align:center;cursor:pointer;white-space:nowrap;font-size:.82rem">&#128135; Hair</div>
-    <div class="pick-btn" id="abt-color" onclick="abTab('color')" style="flex:1;text-align:center;cursor:pointer;white-space:nowrap;font-size:.82rem">&#127912; Colour</div>
-    <div class="pick-btn" id="abt-glasses" onclick="abTab('glasses')" style="flex:1;text-align:center;cursor:pointer;white-space:nowrap;font-size:.82rem">&#128083; Glasses</div>
-  </div>
-  <div id="ab-pane-face" style="overflow-y:auto;max-height:48vh;padding-bottom:16px"></div>
-  <div id="ab-pane-hair" style="display:none;overflow-y:auto;max-height:48vh;padding-bottom:16px"></div>
-  <div id="ab-pane-color" style="display:none;overflow-y:auto;max-height:48vh;padding-bottom:16px"></div>
-  <div id="ab-pane-glasses" style="display:none;overflow-y:auto;max-height:48vh;padding-bottom:16px"></div>
+  <!-- Face grid -->
+  <div style="padding:6px 14px 4px;font-weight:700;font-size:.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em">Choose your face</div>
+  <div id="ab-face-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:4px 12px 16px;overflow-y:auto;max-height:34vh"></div>
+  <!-- Hair colour -->
+  <div style="padding:6px 14px 4px;font-weight:700;font-size:.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em">Hair colour</div>
+  <div id="ab-hair-colors" style="display:flex;gap:10px;padding:4px 16px 14px;flex-wrap:wrap"></div>
+  <!-- Glasses -->
+  <div style="padding:6px 14px 4px;font-weight:700;font-size:.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em">Glasses</div>
+  <div id="ab-glasses-row" style="display:flex;gap:10px;padding:4px 16px 16px;overflow-x:auto"></div>
 </div>
 <div id="screen-avatar" class="screen">
   <div class="app-header">
