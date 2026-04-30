@@ -1637,7 +1637,7 @@ function renderLbRows(sorted, valKey, suffix, medals){
       <div class="lb-rank-num">${medals[i]||('#'+(i+1))}</div>
       <div class="lb-av">${(typeof renderAvatar==='function'&&r.avatarCfg)?renderAvatar(r.avatarCfg,36):(r.av||'🏆')}</div>
       <div class="lb-info">
-        <div class="lb-nick">${r.nick||'?'}${isMe?' (you)':''}${(_flybyTags||[]).filter(m=>m.toId===r.id)${(_flybyTags||[]).some(m=>m.toId===r.id)?'<span class="flyby-dot">&#128142;</span>':''}</div>
+        <div class="lb-nick">${r.nick||'?'}${isMe?' (you)':''}${(_flybyTags||[]).some(m=>m.toId===r.id)?'<span class="flyby-dot">&#128142;</span>':''}</div>
         <div class="lb-xp-label">${r[valKey]}${suffix}</div>
       </div>
       <div style="flex:1;margin-left:8px">
