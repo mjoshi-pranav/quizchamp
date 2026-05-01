@@ -3639,32 +3639,7 @@ function renderSSMsg(){
     +'<div style="display:flex;align-items:center;gap:10px"><div style="font-size:1.8rem">\u{1F4AB}</div>'
     +'<div><div class="ss-item-name">Animated Message — 100 SP</div><div class="ss-item-desc">Their avatar flies across their screen on login · 24 hours</div></div></div>'
     +'<button class="btn btn-primary" onclick="openSendMsg(\'flyby\')" '+dis+' style="margin-top:12px;width:100%">Send an animated message to a friend'+hint+'</button></div>'
-    +'<div style="margin-top:16px"><div style="font-weight:700;font-size:0.85rem;margin-bottom:8px">\u{1F4EC} My Inbox</div>'
-    +'<div id="ss-inbox">Loading...</div></div>';
-  loadSparkInbox();
-}
-
-async function loadSparkInbox(){
-  var el=document.getElementById('ss-inbox');
-  if(!el) return;
-  try{
-    var snap=await getDocs(collection(db,'sparkMessages'));
-    var now=Date.now(),cut24=now-86400000;
-    var mine=[];
-    snap.forEach(function(d){
-      var m=Object.assign({id:d.id},d.data());
-      if(m.toId!==PLAYER_ID) return;
-      var ts=m.sentAt&&m.sentAt.toMillis?m.sentAt.toMillis():0;
-      if(ts>cut24) mine.push(m);
-    });
-    if(!mine.length){el.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem">No messages yet. Get on that leaderboard! \u{1F3C6}</p>';return;}
-    mine.sort(function(a,b){return(b.sentAt&&b.sentAt.toMillis?b.sentAt.toMillis():0)-(a.sentAt&&a.sentAt.toMillis?a.sentAt.toMillis():0);});
-    el.innerHTML=mine.map(function(m){
-      return '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px">'
-        +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'+(m.fromAvatarCfg&&typeof renderAvatar==='function'?renderAvatar(m.fromAvatarCfg,28):'<span style="font-size:1.1rem">'+(m.fromAvatar||'🏆')+'</span>')+'<span style="font-size:0.75rem;font-weight:700">'+(m.fromNick||'Someone')+'</span><span style="font-size:0.65rem;color:var(--text-muted);margin-left:auto">'+(m.type==='flyby'?'💫 Animated':'📬 Encouraging')+'</span></div>'
-        +'<div style="font-weight:600;margin-top:4px">'+m.message+'</div></div>';
-    }).join('');
-  }catch(e){el.innerHTML='<p style="color:var(--text-muted)">Could not load messages.</p>';}
+  ;
 }
 
 window.openSendMsg=async function(type){
