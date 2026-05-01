@@ -676,12 +676,16 @@ window.addEventListener('DOMContentLoaded', function(){
     <div></div>
   </div>
   <div class="nav-tabs">
-    <div class="nav-tab active" onclick="switchDashTab('progress')">Progress</div>
-    <div class="nav-tab" onclick="switchDashTab('tips')">Tips</div>
+    <div class="nav-tab active" onclick="switchDashTab('overview')">Overview</div>
+    <div class="nav-tab" onclick="switchDashTab('deepdive')">Deep Dive</div>
   </div>
-  <div id="dash-progress">
+  <div id="dash-overview">
     <div id="exam-readiness-card" style="margin-bottom:8px"></div>
+    <div id="dash-wrong-answers" style="margin-bottom:8px"></div>
     <div id="immediate-insights" style="margin-bottom:8px"></div>
+    <div id="tips-content"></div>
+  </div>
+  <div id="dash-deepdive" style="display:none">
     <div class="card" style="margin-bottom:8px;padding:12px 14px">
       <div style="font-size:0.65rem;font-weight:800;color:var(--text-muted);letter-spacing:0.05em;margin-bottom:8px">FILTER</div>
       <div style="display:flex;gap:8px">
@@ -691,9 +695,6 @@ window.addEventListener('DOMContentLoaded', function(){
       </div>
     </div>
     <div class="topic-cards-grid" id="dash-topics-list"></div>
-  </div>
-  <div id="dash-tips" style="display:none">
-    <div id="tips-content"></div>
   </div>
 </div>
 
@@ -942,6 +943,7 @@ function seedTrialAccount(){
     state.profile.avatarCfg = {avatarId:1};
   }
   if(!state.profile.nickname) state.profile.nickname = 'Trial';
+  if(!state.profile.recentWrong) state.profile.recentWrong=[];
   state.profile.trialSeeded = true;
   saveProfile();
 }
@@ -1229,6 +1231,10 @@ window.handleAnswer=function(idx,btn){
   if(chosen!==q.a){
     state.session.wrong.push({q,chosen});
     state.session.correctStreak=0;
+    // Persist to recentWrong (capped at 30, newest first)
+    if(!state.profile.recentWrong) state.profile.recentWrong=[];
+    state.profile.recentWrong.unshift({topic:q.t,question:q.q,correct:q.a,given:chosen,ts:Date.now()});
+    if(state.profile.recentWrong.length>30) state.profile.recentWrong=state.profile.recentWrong.slice(0,30);
   } else {
     state.session.correct++;
     state.session.correctStreak=(state.session.correctStreak||0)+1;
@@ -1463,13 +1469,21 @@ function renderHome(){
 // ════════════════════════════════════════════════════════
 // DASHBOARD
 // ════════════════════════════════════════════════════════
-function renderDashboard(){ renderReadinessCard(); renderImmediateInsights(); setDashFilter(state.dashFilter); renderTips(); }
+function renderDashboard(){
+  renderReadinessCard();
+  renderWrongAnswers();
+  renderImmediateInsights();
+  setDashFilter(state.dashFilter||'maths');
+  renderTips();
+  // Ensure correct tab shown on open
+  switchDashTab(state.dashTab||'overview');
+}
 
 window.switchDashTab=function(tab){
   state.dashTab=tab;
-  document.querySelectorAll('#screen-dashboard .nav-tab').forEach((el,i)=>el.classList.toggle('active',['progress','tips'][i]===tab));
-  document.getElementById('dash-progress').style.display=tab==='progress'?'block':'none';
-  document.getElementById('dash-tips').style.display=tab==='tips'?'block':'none';
+  document.querySelectorAll('#screen-dashboard .nav-tab').forEach((el,i)=>el.classList.toggle('active',['overview','deepdive'][i]===tab));
+  document.getElementById('dash-overview').style.display=tab==='overview'?'block':'none';
+  document.getElementById('dash-deepdive').style.display=tab==='deepdive'?'block':'none';
 };
 
 window.setDashFilter=function(filter){
@@ -1592,7 +1606,7 @@ function renderReadinessCard(){
   el.innerHTML='<div style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light,#6d5fd5) 100%);border-radius:16px;padding:16px 18px;color:#fff;margin-bottom:0">'
     // Readiness badge + label
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-    +'<div style="font-size:0.65rem;font-weight:800;opacity:0.8;letter-spacing:0.08em">11+ READINESS</div>'
+    +'<div style="font-size:0.65rem;font-weight:800;opacity:0.8;letter-spacing:0.08em">READINESS SCORE</div>'
     +'<div style="background:'+r.bg+';color:'+r.color+';font-size:0.72rem;font-weight:800;padding:3px 10px;border-radius:20px">'+r.label+'</div>'
     +'</div>'
     // Maths | English split
@@ -1625,6 +1639,48 @@ function renderReadinessCard(){
     +'<div style="text-align:center"><div style="font-size:1.1rem;font-weight:900">⏱ '+(totalSecs>0?timeStr:'0m')+'</div><div style="font-size:0.55rem;opacity:0.7;margin-top:1px">time spent</div></div>'
     +'<div style="text-align:center"><div style="font-size:1.1rem;font-weight:900">📅 '+weekDone+'</div><div style="font-size:0.55rem;opacity:0.7;margin-top:1px">this week</div></div>'
     +'</div>'
+    +'</div>';
+}
+
+// ── Wrong Answers Panel ──────────────────────────────────
+function renderWrongAnswers(){
+  var el=document.getElementById('dash-wrong-answers');
+  if(!el) return;
+  var wrongs=state.profile.recentWrong||[];
+  if(wrongs.length===0){
+    el.innerHTML='';
+    return;
+  }
+  var show=wrongs.slice(0,5);
+  var rows=show.map(function(w){
+    var subj=TOPICS.maths.includes(w.topic)?'📐':'📖';
+    var topicLabel=w.topic||'Unknown';
+    var ts=w.ts?new Date(w.ts):null;
+    var timeAgo='';
+    if(ts){
+      var diff=Math.round((Date.now()-ts.getTime())/60000);
+      timeAgo=diff<60?(diff+'m ago'):diff<1440?(Math.round(diff/60)+'h ago'):(Math.round(diff/1440)+'d ago');
+    }
+    return '<div style="border-left:3px solid #dc2626;padding:10px 12px;background:#fff8f8;border-radius:0 10px 10px 0;margin-bottom:8px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+      +'<span style="font-size:0.65rem;font-weight:800;color:#dc2626;letter-spacing:0.04em">'+subj+' '+topicLabel.toUpperCase()+'</span>'
+      +(timeAgo?'<span style="font-size:0.6rem;color:var(--text-muted)">'+timeAgo+'</span>':'')
+      +'</div>'
+      +'<div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.4">'+w.question+'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+      +'<span style="font-size:0.68rem;background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:20px">✗ '+w.given+'</span>'
+      +'<span style="font-size:0.68rem;background:#dcfce7;color:#166534;padding:2px 8px;border-radius:20px">✓ '+w.correct+'</span>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+  var moreNote=wrongs.length>5?'<div style="text-align:center;font-size:0.68rem;color:var(--text-muted);padding:4px 0">+'+(wrongs.length-5)+' more in history</div>':'';
+  el.innerHTML='<div class="card" style="padding:14px 16px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<div style="font-size:0.75rem;font-weight:900;color:var(--text)">❌ Recent Wrong Answers</div>'
+    +'<div style="font-size:0.65rem;color:var(--text-muted)">Last '+show.length+' of '+wrongs.length+'</div>'
+    +'</div>'
+    +rows
+    +moreNote
     +'</div>';
 }
 
