@@ -1434,6 +1434,9 @@ function renderLevelRibbon(){
   const lvEmoji=LEVEL_EMOJIS[lvIdx]||'👑';
   const pct=Math.round(xpInLevel/xpForLevel*100);
 
+  // Level colours — one per level
+  const LV_COLORS=['#4CAF50','#2196F3','#FF9800','#9C27B0','#FFD700'];
+
   // Overall accuracy across all attempted topics
   const allTopics=[...TOPICS.maths,...TOPICS.english];
   const attempted=allTopics.filter(t=>(state.profile.topicProgress[t]?.sessions||0)>0);
@@ -1441,36 +1444,44 @@ function renderLevelRibbon(){
     ?Math.round(attempted.reduce((s,t)=>s+(state.profile.topicProgress[t]?.lastAccuracy||0),0)/attempted.length)
     :null;
 
-  // Level roadmap dots
-  const dots=LEVEL_NAMES.map((n,i)=>{
-    const active=i===lvIdx, done=i<lvIdx;
-    return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">
-      <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;
-        background:${done?'rgba(255,255,255,0.9)':active?'#fff':'rgba(255,255,255,0.25)'};
-        box-shadow:${active?'0 0 0 3px rgba(255,255,255,0.6)':'none'};
-        opacity:${done||active?1:0.55}">${LEVEL_EMOJIS[i]}</div>
-      <div style="font-size:0.58rem;font-weight:${active?800:600};opacity:${active?1:0.7};text-align:center;white-space:nowrap">${n}</div>
+  // Build the 5-segment coloured track
+  // Each segment is 20% wide; current level gets a marker above it
+  const segments=LEVEL_NAMES.map((n,i)=>{
+    const isCurrent=i===lvIdx;
+    const isDone=i<lvIdx;
+    const col=LV_COLORS[i];
+    const opacity=isDone||isCurrent?1:0.28;
+    return `<div style="flex:1;position:relative;display:flex;flex-direction:column;align-items:center">
+      ${isCurrent?`<div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);
+          background:#fff;color:${col};font-size:0.62rem;font-weight:900;padding:1px 7px;
+          border-radius:20px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18)">
+          YOU ▼</div>`:''}
+      <div style="width:100%;height:12px;background:${col};opacity:${opacity};
+        border-radius:${i===0?'8px 0 0 8px':i===4?'0 8px 8px 0':'0'}"></div>
+      <div style="font-size:0.58rem;font-weight:${isCurrent?800:500};margin-top:5px;
+        color:${isCurrent?'#fff':'rgba(255,255,255,0.6)'};text-align:center;white-space:nowrap">
+        ${LEVEL_EMOJIS[i]} ${n}</div>
     </div>`;
-  });
-  // Connector lines
-  const roadmap=dots.map((d,i)=>i<dots.length-1
-    ?d+`<div style="flex:0.3;height:2px;background:rgba(255,255,255,0.35);margin-bottom:18px;align-self:center"></div>`
-    :d).join('');
+  }).join('<div style="width:2px;flex:none"></div>');
 
   el.innerHTML=`
-    <div style="font-size:0.72rem;opacity:0.8;font-weight:700;margin-bottom:10px;letter-spacing:0.04em">MY LEVEL</div>
-    <div style="display:flex;align-items:center;margin-bottom:14px">${roadmap}</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+    <div style="font-size:0.72rem;opacity:0.8;font-weight:700;margin-bottom:18px;letter-spacing:0.04em">MY PROGRESS</div>
+    <div style="display:flex;align-items:flex-end;margin-bottom:4px;padding-top:26px">${segments}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
       <div>
-        <div style="font-size:1.1rem;font-weight:900">${lvEmoji} Level ${level} — ${lvName}</div>
-        ${avgAcc!==null?`<div style="font-size:0.78rem;opacity:0.85;margin-top:2px">📊 Overall accuracy: <b>${avgAcc}%</b></div>`:'<div style="font-size:0.75rem;opacity:0.7;margin-top:2px">Complete a quiz to see your accuracy</div>'}
+        <div style="font-size:1.05rem;font-weight:900">${lvEmoji} Level ${level} — ${lvName}</div>
+        ${avgAcc!==null
+          ?`<div style="font-size:0.8rem;opacity:0.85;margin-top:3px">📊 Accuracy: <b>${avgAcc}%</b></div>`
+          :'<div style="font-size:0.75rem;opacity:0.65;margin-top:3px">Complete a quiz to see your accuracy</div>'}
       </div>
-      <div style="text-align:right;font-size:0.75rem;opacity:0.85">${xpInLevel}<br><span style="opacity:0.6">/ ${xpForLevel} XP</span></div>
+      <div style="text-align:right">
+        <div style="font-size:0.78rem;opacity:0.9;font-weight:700">${xpInLevel} / ${xpForLevel} XP</div>
+        <div style="margin-top:5px;background:rgba(255,255,255,0.25);border-radius:6px;height:7px;width:100px;overflow:hidden">
+          <div style="background:#fff;width:${pct}%;height:100%;border-radius:6px;transition:width 0.5s ease"></div>
+        </div>
+        <div style="font-size:0.65rem;opacity:0.7;margin-top:3px">${xpForLevel-xpInLevel} XP to ${LEVEL_NAMES[Math.min(lvIdx+1,4)]}</div>
+      </div>
     </div>
-    <div style="background:rgba(255,255,255,0.25);border-radius:6px;height:8px;overflow:hidden">
-      <div style="background:#fff;width:${pct}%;height:100%;border-radius:6px;transition:width 0.5s ease"></div>
-    </div>
-    <div style="font-size:0.68rem;opacity:0.75;margin-top:5px">${xpForLevel-xpInLevel} XP to ${LEVEL_NAMES[Math.min(lvIdx+1,4)]}</div>
   `;
 }
 
