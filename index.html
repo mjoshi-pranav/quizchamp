@@ -1549,7 +1549,7 @@ function computeReadiness(){
   var score=Math.round(0.40*avgAcc+0.30*levelScore+0.20*conScore+0.10*coverage);
   var label,color,bg,desc;
   if(score>=88){label='Outstanding';color='#16a34a';bg='#f0fdf4';desc='Performing above expectation across all areas';}
-  else if(score>=72){label='On Track';color='#2563eb';bg:'#eff6ff';desc='Good progress — keep the daily habit going';}
+  else if(score>=72){label='On Track';color='#2563eb';bg='#eff6ff';desc='Good progress — keep the daily habit going';}
   else if(score>=50){label='Building Up';color='#d97706';bg='#fffbeb';desc='Progress is happening — a few gaps to close';}
   else{label='Needs Attention';color='#dc2626';bg='#fef2f2';desc='More regular sessions needed to build momentum';}
   return {score:score,label:label,color:color,bg:bg,desc:desc,avgAcc:Math.round(avgAcc),coverage:Math.round(coverage)};
