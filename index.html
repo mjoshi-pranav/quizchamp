@@ -673,10 +673,12 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="nav-tabs">
     <div class="nav-tab active" onclick="switchDashTab('progress')">Progress</div>
-    <div class="nav-tab" onclick="switchDashTab('badges')">Badges</div>
     <div class="nav-tab" onclick="switchDashTab('tips')">Tips</div>
   </div>
   <div id="dash-progress">
+    <div class="card" id="level-ribbon-card" style="margin-bottom:8px;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);color:#fff;padding:16px 18px">
+      <div id="level-ribbon-content"><!-- filled by renderLevelRibbon() --></div>
+    </div>
     <div class="card" style="margin-bottom:8px">
       <div class="card-title">Filter</div>
       <div style="display:flex;gap:8px">
@@ -687,11 +689,8 @@ window.addEventListener('DOMContentLoaded', function(){
     </div>
     <div class="topic-cards-grid" id="dash-topics-list"></div>
   </div>
-  <div id="dash-badges" style="display:none">
-    <div class="card"><div class="card-title">Your Badges</div><div class="badge-grid" id="badge-grid"></div></div>
-  </div>
   <div id="dash-tips" style="display:none">
-    <div class="card"><div class="card-title">📌 Recommendations</div><div id="recs-list"></div></div>
+    <div id="tips-content"></div>
   </div>
 </div>
 
@@ -1388,13 +1387,12 @@ function renderHome(){
 // ════════════════════════════════════════════════════════
 // DASHBOARD
 // ════════════════════════════════════════════════════════
-function renderDashboard(){ setDashFilter(state.dashFilter); renderBadges(); renderRecs(); }
+function renderDashboard(){ setDashFilter(state.dashFilter); renderLevelRibbon(); renderTips(); }
 
 window.switchDashTab=function(tab){
   state.dashTab=tab;
-  document.querySelectorAll('.nav-tab').forEach((el,i)=>el.classList.toggle('active',['progress','badges','tips'][i]===tab));
+  document.querySelectorAll('#screen-dashboard .nav-tab').forEach((el,i)=>el.classList.toggle('active',['progress','tips'][i]===tab));
   document.getElementById('dash-progress').style.display=tab==='progress'?'block':'none';
-  document.getElementById('dash-badges').style.display=tab==='badges'?'block':'none';
   document.getElementById('dash-tips').style.display=tab==='tips'?'block':'none';
 };
 
@@ -1417,37 +1415,113 @@ window.setDashFilter=function(filter){
 };
 
 function renderBadges(){
+  const el=document.getElementById('badge-grid'); if(!el)return;
   const badges=state.profile.badges||{},icons={bronze:'🥉',silver:'🥈',gold:'🏅'};
-  document.getElementById('badge-grid').innerHTML=[...TOPICS.maths,...TOPICS.english].slice(0,12).map(t=>{
+  el.innerHTML=[...TOPICS.maths,...TOPICS.english].slice(0,12).map(t=>{
     const b=badges[t],meta=TOPIC_META[t]||{icon:'📌'};
     return `<div class="badge-item${b?' earned':''}"><div class="b-icon">${b?icons[b]:meta.icon}</div><div class="b-name">${t.length>12?t.slice(0,11)+'…':t}</div></div>`;
   }).join('');
 }
 
+const LEVEL_NAMES=['Starter','Rising Star','Achiever','Champion','Legend'];
+const LEVEL_EMOJIS=['🌱','⭐','🔥','💫','👑'];
 
-function computeRecs(){
-  var recs=[];
-  var subj=state.dashFilter;
-  var topics=subj==='all'?[].concat(TOPICS.maths,TOPICS.english):(TOPICS[subj]||[]);
-  topics.forEach(function(t){
-    var p=getTopicProgress(t);
-    var sessions=p.sessions||0;
-    var acc=p.lastAccuracy!==undefined?p.lastAccuracy:0;
-    if(sessions===0){
-      recs.push({type:"Try This",text:"Start practising "+t+" - no sessions yet!"});
-    } else if(acc<60){
-      recs.push({type:"Needs Work",text:t+" accuracy is "+Math.round(acc)+"% - keep going!"});
-    } else if(acc>=80){
-      recs.push({type:"Great Work",text:"You are nailing "+t+"! Keep the streak going."});
-    }
+function renderLevelRibbon(){
+  const el=document.getElementById('level-ribbon-content'); if(!el) return;
+  const {level,xpInLevel,xpForLevel}=getXPLevel();
+  const lvIdx=Math.min(level-1,4);
+  const lvName=LEVEL_NAMES[lvIdx]||'Legend';
+  const lvEmoji=LEVEL_EMOJIS[lvIdx]||'👑';
+  const pct=Math.round(xpInLevel/xpForLevel*100);
+
+  // Overall accuracy across all attempted topics
+  const allTopics=[...TOPICS.maths,...TOPICS.english];
+  const attempted=allTopics.filter(t=>(state.profile.topicProgress[t]?.sessions||0)>0);
+  const avgAcc=attempted.length>0
+    ?Math.round(attempted.reduce((s,t)=>s+(state.profile.topicProgress[t]?.lastAccuracy||0),0)/attempted.length)
+    :null;
+
+  // Level roadmap dots
+  const dots=LEVEL_NAMES.map((n,i)=>{
+    const active=i===lvIdx, done=i<lvIdx;
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex:1">
+      <div style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;
+        background:${done?'rgba(255,255,255,0.9)':active?'#fff':'rgba(255,255,255,0.25)'};
+        box-shadow:${active?'0 0 0 3px rgba(255,255,255,0.6)':'none'};
+        opacity:${done||active?1:0.55}">${LEVEL_EMOJIS[i]}</div>
+      <div style="font-size:0.58rem;font-weight:${active?800:600};opacity:${active?1:0.7};text-align:center;white-space:nowrap">${n}</div>
+    </div>`;
   });
-  return recs;
+  // Connector lines
+  const roadmap=dots.map((d,i)=>i<dots.length-1
+    ?d+`<div style="flex:0.3;height:2px;background:rgba(255,255,255,0.35);margin-bottom:18px;align-self:center"></div>`
+    :d).join('');
+
+  el.innerHTML=`
+    <div style="font-size:0.72rem;opacity:0.8;font-weight:700;margin-bottom:10px;letter-spacing:0.04em">MY LEVEL</div>
+    <div style="display:flex;align-items:center;margin-bottom:14px">${roadmap}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div>
+        <div style="font-size:1.1rem;font-weight:900">${lvEmoji} Level ${level} — ${lvName}</div>
+        ${avgAcc!==null?`<div style="font-size:0.78rem;opacity:0.85;margin-top:2px">📊 Overall accuracy: <b>${avgAcc}%</b></div>`:'<div style="font-size:0.75rem;opacity:0.7;margin-top:2px">Complete a quiz to see your accuracy</div>'}
+      </div>
+      <div style="text-align:right;font-size:0.75rem;opacity:0.85">${xpInLevel}<br><span style="opacity:0.6">/ ${xpForLevel} XP</span></div>
+    </div>
+    <div style="background:rgba(255,255,255,0.25);border-radius:6px;height:8px;overflow:hidden">
+      <div style="background:#fff;width:${pct}%;height:100%;border-radius:6px;transition:width 0.5s ease"></div>
+    </div>
+    <div style="font-size:0.68rem;opacity:0.75;margin-top:5px">${xpForLevel-xpInLevel} XP to ${LEVEL_NAMES[Math.min(lvIdx+1,4)]}</div>
+  `;
 }
-function renderRecs(){
-  var recs=computeRecs();
-  document.getElementById('recs-list').innerHTML=recs.length>0
-    ?recs.slice(0,5).map(function(r){return '<div style="background:linear-gradient(135deg,#EEF0FF,#E8EAFF);border-radius:14px;padding:14px 16px;margin-bottom:8px;border-left:4px solid var(--primary)"><div style="font-size:0.7rem;font-weight:800;color:var(--primary);margin-bottom:4px">'+r.type+'</div><div style="font-size:0.9rem;font-weight:600">'+r.text+'</div></div>';}).join('')
-    :'<div style="color:var(--text-muted);text-align:center;padding:16px;font-weight:600">Complete some sessions to get personalised tips!</div>';
+
+function renderTips(){
+  const el=document.getElementById('tips-content'); if(!el) return;
+  const allTopics=[...TOPICS.maths,...TOPICS.english];
+  const attempted=allTopics.filter(t=>(state.profile.topicProgress[t]?.sessions||0)>0);
+
+  if(attempted.length===0){
+    el.innerHTML=`<div class="card" style="text-align:center;padding:28px 20px">
+      <div style="font-size:2.5rem;margin-bottom:10px">📊</div>
+      <div style="font-weight:800;font-size:1rem;margin-bottom:6px">No data yet</div>
+      <div style="color:var(--text-muted);font-size:0.88rem">Complete a quiz to generate your personalised tips!</div>
+    </div>`;
+    return;
+  }
+
+  const cards=[];
+
+  // 🎯 Focus this week — weakest topic by accuracy (min 1 session)
+  const sorted=[...attempted].sort((a,b)=>(state.profile.topicProgress[a]?.lastAccuracy||0)-(state.profile.topicProgress[b]?.lastAccuracy||0));
+  const weakest=sorted[0];
+  const weakAcc=Math.round(state.profile.topicProgress[weakest]?.lastAccuracy||0);
+  cards.push({icon:'🎯',label:'Focus This Week',text:`<b>${weakest}</b> — your accuracy is <b>${weakAcc}%</b>. Put extra time here this week.`,color:'#FFF4E5',border:'#FF9800'});
+
+  // ✅ Strongest topic
+  const strongest=[...attempted].sort((a,b)=>(state.profile.topicProgress[b]?.lastAccuracy||0)-(state.profile.topicProgress[a]?.lastAccuracy||0))[0];
+  const strongAcc=Math.round(state.profile.topicProgress[strongest]?.lastAccuracy||0);
+  if(strongAcc>=70) cards.push({icon:'✅',label:'Strongest Area',text:`<b>${strongest}</b> — great work at <b>${strongAcc}%</b> accuracy. Keep it up!`,color:'#E8F5E9',border:'#4CAF50'});
+
+  // 🆕 Topics not yet tried
+  const notTried=allTopics.filter(t=>!(state.profile.topicProgress[t]?.sessions));
+  if(notTried.length>0){
+    const sample=notTried.slice(0,2).join(' and ');
+    cards.push({icon:'🆕',label:'Not Yet Tried',text:`${notTried.length} topic${notTried.length>1?'s':''} untouched — start with <b>${sample}</b>.`,color:'#EEF0FF',border:'var(--primary)'});
+  }
+
+  // 📅 Session consistency
+  const weekDone=(state.profile.weekSessions||[]).length;
+  if(weekDone<4) cards.push({icon:'📅',label:'Consistency',text:`<b>${weekDone} session${weekDone!==1?'s':''}</b> this week. Aim for 5 to build momentum!`,color:'#FDE8F5',border:'#E91E8C'});
+  else cards.push({icon:'📅',label:'Great Consistency!',text:`<b>${weekDone} sessions</b> this week — excellent habit building!`,color:'#E8F5E9',border:'#4CAF50'});
+
+  // 🔥 Streak tip
+  const streak=state.profile.streak||0;
+  if(streak<3) cards.push({icon:'🔥',label:'Build Your Streak',text:`${streak} day streak. Quiz daily — you earn a Shield every 4 days!`,color:'#FFF4E5',border:'#FF9800'});
+
+  el.innerHTML=cards.map(c=>`
+    <div style="background:${c.color};border-radius:14px;padding:14px 16px;margin-bottom:10px;border-left:4px solid ${c.border}">
+      <div style="font-size:0.7rem;font-weight:800;color:${c.border};margin-bottom:5px">${c.icon} ${c.label}</div>
+      <div style="font-size:0.88rem;font-weight:500;color:#222;line-height:1.45">${c.text}</div>
+    </div>`).join('');
 }
 
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); window.scrollTo(0,0); }
@@ -2945,6 +3019,9 @@ function showMysteryBox(){
   const today=new Date().toISOString().split('T')[0];
   const mb=state.profile.mysteryBox||{};
   if(mb.lastDate===today) return;
+  // Only unlock after student has attempted at least 10 questions total
+  const totalAttempts=Object.values(state.profile.topicProgress||{}).reduce((sum,p)=>sum+(p.attempts||0),0);
+  if(totalAttempts<10) return;
   document.getElementById('mb-box-phase').style.display='';
   document.getElementById('mb-reward-phase').style.display='none';
   document.getElementById('mb-subtitle').textContent="You earned it — open to see what's inside!";
