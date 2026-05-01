@@ -3553,7 +3553,7 @@ window.showSparkStore=function(){
     if(timerEl) timerEl.textContent=m+':'+(s<10?'0':'')+s;
     if(secsLeft<=0){
       clearInterval(_ssTimerInterval);
-      toast('⏱ Time's up! Come back after your next quiz.');
+      toast('⏱ Time up! Come back after your next quiz.');
       showHome();
     }
   }
