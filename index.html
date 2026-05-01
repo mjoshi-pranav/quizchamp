@@ -515,6 +515,17 @@ window.addEventListener('DOMContentLoaded', function(){
     </div>
     <button onclick="resetTrialAccount()" style="background:#e94560;border:none;color:#fff;font-size:0.65rem;font-weight:800;padding:5px 10px;border-radius:20px;cursor:pointer;white-space:nowrap">🔄 Reset</button>
   </div>
+  <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.15);padding-top:10px">
+    <div style="font-size:0.6rem;font-weight:900;letter-spacing:0.06em;color:#e94560;margin-bottom:7px">🎭 VICTORY SHOW TESTER</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <button onclick="showVictoryShow(30,  45,  null)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.62rem;font-weight:700;padding:4px 9px;border-radius:20px;cursor:pointer">&lt;50% Rehearsal</button>
+      <button onclick="showVictoryShow(55,  80,  null)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.62rem;font-weight:700;padding:4px 9px;border-radius:20px;cursor:pointer">50% Warm-Up</button>
+      <button onclick="showVictoryShow(70,  120, null)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.62rem;font-weight:700;padding:4px 9px;border-radius:20px;cursor:pointer">65% Local Show</button>
+      <button onclick="showVictoryShow(85,  175, 'Fractions')" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.62rem;font-weight:700;padding:4px 9px;border-radius:20px;cursor:pointer">80% Big Gig 🏆PB</button>
+      <button onclick="showVictoryShow(95,  220, null)" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:0.62rem;font-weight:700;padding:4px 9px;border-radius:20px;cursor:pointer">90% Arena Night</button>
+      <button onclick="showVictoryShow(100, 300, 'Vocabulary')" style="background:#ffd700;border:none;color:#1a1a2e;font-size:0.62rem;font-weight:900;padding:4px 9px;border-radius:20px;cursor:pointer">100% HEADLINER 👑</button>
+    </div>
+  </div>
   <div class="app-header">
     <div class="app-logo">Quiz<span>Champ</span></div>
     <div class="header-stats"></div>
