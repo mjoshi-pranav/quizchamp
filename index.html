@@ -1371,9 +1371,8 @@ function renderHome(){
   const shields=Math.min(6,state.profile.shields||0);
   const shieldRow=document.getElementById('shield-row');
   if(shieldRow){
-    let sh='';
-    for(let i=0;i<6;i++) sh+=`<span style="font-size:1.3rem;opacity:${i<shields?1:0.2}">🛡️</span>`;
-    sh+=`<span style="font-size:0.72rem;color:var(--text-muted);margin-left:6px">${shields}/6</span>`;
+    let sh='<span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);margin-right:6px;white-space:nowrap">Streak Shield</span>';
+    for(let i=0;i<6;i++) sh+=`<span style="font-size:1.3rem;filter:${i<shields?'invert(40%) sepia(1) saturate(4) hue-rotate(90deg)':'none'};opacity:${i<shields?1:0.2}">🛡️</span>`;
     shieldRow.innerHTML=sh;
   }
   // Weekly dots
