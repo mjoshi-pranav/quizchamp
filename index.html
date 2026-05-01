@@ -220,6 +220,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .sc-level-3 { background: #E6F1FB; color: #0C447C; }
 .sc-level-4 { background: #FAEEDA; color: #633806; }
 .sc-lock-icon { position: absolute; top: 10px; right: 10px; font-size: 1rem; }
+@keyframes avPopIn { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .sc-read-badge { position:absolute; top:8px; right:8px; background:#E53935; color:#fff; font-size:0.6rem; font-weight:900; padding:2px 7px; border-radius:10px; letter-spacing:0.05em; }
 /* story reader */
 #story-reader { position: fixed; inset: 0; background: #fff; z-index: 500; overflow-y: auto; display: none; padding: 0; }
@@ -506,7 +507,8 @@ window.addEventListener('DOMContentLoaded', function(){
   <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);border-radius:var(--radius);padding:18px 110px 18px 20px;margin-bottom:16px;color:#fff;position:relative;overflow:visible;cursor:pointer;min-height:90px" onclick="showAvatarBuilder()">
     <div style="font-size:0.78rem;opacity:0.75;font-weight:600">Welcome back,</div>
     <div style="font-size:1.45rem;font-weight:900;margin-top:3px" id="home-welcome">Champion!</div>
-    <div style="font-size:0.88rem;font-weight:700;margin-top:10px" id="home-av-sp">&#9889; 0 SP</div>
+    <div id="home-daily-quote" style="font-size:0.72rem;opacity:0.88;font-style:italic;margin-top:6px;line-height:1.4;max-width:195px"></div>
+    <div style="font-size:0.88rem;font-weight:700;margin-top:6px" id="home-av-sp">&#9889; 0 SP</div>
     <div style="font-size:0.7rem;opacity:0.7;margin-top:3px">Tap to customise &#9998;</div>
     <div id="home-av-svg" style="position:absolute;right:8px;top:-18px;width:95px;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.18))"></div>
     <div id="home-av-nick" style="display:none"></div>
@@ -518,11 +520,10 @@ window.addEventListener('DOMContentLoaded', function(){
     </div>
     <div class="weekly-wrap" id="weekly-dots"></div>
     <div style="text-align:center;font-size:0.82rem;color:var(--text-muted);margin-top:6px;font-weight:600"><span id="weekly-count">0</span>/5 sessions this week</div>
-    <div style="display:flex;justify-content:center;align-items:center;gap:4px;margin-top:10px" id="shield-row"></div>
-    <div style="margin-top:12px;padding:10px 14px;background:linear-gradient(135deg,rgba(99,85,164,0.08),rgba(99,85,164,0.03));border-left:3px solid var(--primary);border-radius:0 8px 8px 0">
-      <div style="font-size:0.72rem;font-weight:800;color:var(--primary);opacity:0.7;margin-bottom:2px;letter-spacing:0.04em">💡 REMEMBER</div>
-      <div style="font-size:0.78rem;font-weight:600;color:var(--text);line-height:1.45;font-style:italic">"Consistency beats talent. Showing up every day matters more than what you start with."</div>
+    <div style="margin-bottom:10px;padding:7px 12px;background:linear-gradient(135deg,rgba(99,85,164,0.07),rgba(99,85,164,0.02));border-left:3px solid var(--primary);border-radius:0 8px 8px 0">
+      <div style="font-size:0.78rem;font-weight:900;color:var(--primary);line-height:1.35">Consistency beats talent. Show up every day. 💡</div>
     </div>
+    <div style="display:flex;justify-content:center;align-items:center;gap:4px;margin-top:4px" id="shield-row"></div>
   </div>
 
   <div class="card">
@@ -554,7 +555,10 @@ window.addEventListener('DOMContentLoaded', function(){
   <div class="app-header">
     <button onclick="showHome()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text)">&#8249;</button>
     <div class="app-logo">&#9889; Spark Store</div>
-    <div id="ss-balance" style="font-weight:700;color:var(--primary)">0 SP</div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+      <div id="ss-balance" style="font-weight:700;color:var(--primary)">0 SP</div>
+      <div id="ss-timer" style="font-size:0.65rem;font-weight:700;color:var(--text-muted)">5:00</div>
+    </div>
   </div>
   <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px">
     <div class="pick-btn active" id="sst-acc" onclick="ssTab('acc')" style="flex:1;text-align:center;cursor:pointer">&#129399; Accessories</div>
@@ -1381,7 +1385,7 @@ async function finishSession(){
   if(newBadge){ const icons={bronze:'🥉',silver:'🥈',gold:'🏅'}; const b=state.profile.badges[newBadge]; document.getElementById('new-badge-section').style.display='block'; document.getElementById('new-badge-content').textContent=`${icons[b]} ${b.toUpperCase()} badge for ${newBadge}!`; }
   else document.getElementById('new-badge-section').style.display='none';
   document.getElementById('wrong-count').textContent=s.wrong.length;
-  setTimeout(showMysteryBox, 900);
+  resetSparkStoreTimer(); setTimeout(showMysteryBox, 900);
   document.getElementById('review-list').innerHTML=s.wrong.length===0
     ?'<div style="text-align:center;color:#1DB954;font-weight:800;padding:16px">🎉 Perfect score! No wrong answers!</div>'
     :s.wrong.map(w=>`<div class="review-item"><div class="q-text">${w.q.q}</div><div class="your-ans">✗ Your answer: ${w.chosen}</div><div class="correct-ans">✓ Correct: ${w.q.a}</div>${w.q.e?`<div class="explanation">💡 ${w.q.e}</div>`:''}</div>`).join('');
@@ -1434,6 +1438,44 @@ function renderHome(){
   document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).length;
   renderDailyChallengeCard();
   checkCheersNotification();
+  // Daily motivational quote
+  const DAILY_QUOTES=[
+    "Small steps every day lead to big results.",
+    "You don't have to be perfect — just consistent.",
+    "Every expert was once a beginner.",
+    "Your brain grows stronger every time you practise.",
+    "Hard work beats talent when talent doesn't work hard.",
+    "Champions are made in the moments they want to quit.",
+    "One quiz a day keeps the gaps away.",
+    "Progress, not perfection.",
+    "The secret is to show up — every single day.",
+    "Mistakes are proof that you are trying.",
+    "Believe you can and you're halfway there.",
+    "A little progress each day adds up to big results.",
+    "Don't wish for it — work for it.",
+    "You are smarter than you think.",
+    "Success is the sum of small efforts repeated daily.",
+    "Push yourself — nobody else will do it for you.",
+    "Today's effort is tomorrow's result.",
+    "Discipline is choosing what you want most over what you want now.",
+    "Every question you practise is a step closer to your goal.",
+    "The harder you work, the luckier you get.",
+    "Focus on progress, not the finish line.",
+    "Great things take time — keep going.",
+    "Your future self will thank you for today.",
+    "Learning never exhausts the mind.",
+    "Do something today that your future self will be proud of.",
+    "Strive for progress, not perfection.",
+    "It always seems impossible until it's done.",
+    "The only limit is the one you set yourself.",
+    "Keep going — you're closer than you think.",
+    "Winners are not people who never fail — they never quit."
+  ];
+  const qEl=document.getElementById('home-daily-quote');
+  if(qEl){
+    const dayIdx=new Date().getDate()%DAILY_QUOTES.length;
+    qEl.textContent='"'+DAILY_QUOTES[dayIdx]+'"';
+  }
   // Trial account indicator
   const trialBanner=document.getElementById('trial-banner');
   if(trialBanner) trialBanner.style.display=PLAYER_ID==='trial'?'flex':'none';
@@ -3488,11 +3530,39 @@ function ssGetStore(){
   return state.profile.sparkStore;
 }
 
+var _ssTimerInterval=null;
+
 window.showSparkStore=function(){
+  // SP gate — must afford at least one item
+  var sp=state.profile.xp||0;
+  var canAfford=(ACCESSORIES||[]).some(function(a){return a.price<=sp&&!ssGetStore().accessories.includes(a.id);});
+  if(!canAfford){
+    toast('Save up more SP to shop here! ⚡');
+    return;
+  }
   showScreen('spark-store');
-  document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';
+  document.getElementById('ss-balance').textContent=sp+' SP';
   ssTab('acc');
+  // 5-minute timer
+  if(_ssTimerInterval) clearInterval(_ssTimerInterval);
+  var secsLeft=300;
+  var timerEl=document.getElementById('ss-timer');
+  function _tick(){
+    secsLeft--;
+    var m=Math.floor(secsLeft/60), s=secsLeft%60;
+    if(timerEl) timerEl.textContent=m+':'+(s<10?'0':'')+s;
+    if(secsLeft<=0){
+      clearInterval(_ssTimerInterval);
+      toast('⏱ Time's up! Come back after your next quiz.');
+      showHome();
+    }
+  }
+  if(timerEl) timerEl.textContent='5:00';
+  _ssTimerInterval=setInterval(_tick,1000);
 };
+
+// Reset store timer when a quiz is completed
+function resetSparkStoreTimer(){ if(_ssTimerInterval){clearInterval(_ssTimerInterval);_ssTimerInterval=null;} }
 
 window.ssTab=function(tab){
   ['acc','music','msg'].forEach(function(t){
@@ -3789,6 +3859,81 @@ function renderAvatar(cfg,size){
   return '<img src="'+def.img+'" style="width:'+size+'px;height:auto;display:block" alt="'+def.name+'">';
 }
 
+// ── LAYERED HOME AVATAR (grows with accessories) ──
+var INTERACTIVE_ITEMS={
+  football: {emoji:'⚽', anim:'goal',   dur:2500, css:'av-anim-football'},
+  cricket:  {emoji:'🏏', anim:'six',    dur:2000, css:'av-anim-cricket'},
+  guitar:   {emoji:'🎸', anim:'strum',  dur:3500, css:'av-anim-guitar'},
+  mic:      {emoji:'🎤', anim:'sing',   dur:3000, css:'av-anim-mic'},
+  drums:    {emoji:'🥁', anim:'beat',   dur:5000, css:'av-anim-drums'}
+};
+// Map store accessory IDs → interactive item keys
+var ITEM_MAP={ac_foot:'football',ac_cricket:'cricket',ac_guitar:'guitar',ac_mic:'mic',ac_drums:'drums'};
+
+function renderHomeAvatar(cfg, store){
+  var faceImg=renderAvatar(cfg, 72);
+  var acc=(store&&store.accessories)||[];
+  var equipped=(store&&store.equippedAccessory)||null;
+  var hasJacket=acc.includes('jacket');
+  var hasShoes=acc.includes('trainers');
+  var interactiveKey=equipped&&ITEM_MAP[equipped]?ITEM_MAP[equipped]:null;
+  var item=interactiveKey?INTERACTIVE_ITEMS[interactiveKey]:null;
+
+  var bodyHTML='';
+  if(hasJacket){
+    bodyHTML+='<div style="font-size:'+(hasShoes?'1.9':'2.1')+'rem;line-height:1;margin-top:-6px;text-align:center">🧥</div>';
+    if(hasShoes) bodyHTML+='<div style="font-size:1.5rem;line-height:1;margin-top:2px;text-align:center;letter-spacing:4px">👟👟</div>';
+  }
+
+  var itemHTML='';
+  if(item){
+    itemHTML='<div id="home-av-item" style="position:absolute;right:-12px;top:'+(hasJacket?(hasShoes?'52':'36'):'18')+'px;font-size:1.8rem;cursor:pointer;transition:transform 0.15s" onclick="tapAvatarItem()">'
+      +item.emoji+'</div>';
+  }
+
+  return '<div style="position:relative;display:flex;flex-direction:column;align-items:center;width:85px" id="av-character-wrap">'
+    +'<div style="font-size:0;line-height:0">' + faceImg + '</div>'
+    + bodyHTML
+    + itemHTML
+    +'</div>';
+}
+
+window.tapAvatarItem=function(){
+  // Check daily limit
+  var today=new Date().toDateString();
+  var ac=state.profile.avatarAnimCount||{date:'',count:0};
+  if(ac.date!==today) ac={date:today,count:0};
+  if(ac.count>=5){ toast('Come back tomorrow for more! 😄'); return; }
+  ac.count++;
+  state.profile.avatarAnimCount=ac;
+  saveProfile();
+
+  var store=ssGetStore();
+  var equipped=store.equippedAccessory;
+  var iKey=equipped&&ITEM_MAP[equipped]?ITEM_MAP[equipped]:null;
+  if(!iKey) return;
+  var item=INTERACTIVE_ITEMS[iKey];
+  var wrap=document.getElementById('av-character-wrap');
+  if(!wrap) return;
+
+  // Show animation overlay
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:9999;pointer-events:none';
+  var msgs={football:['⚽ GOAL! 🥅','⚽ WHAT A STRIKE!'],cricket:['🏏 SIX! 🌟','🏏 FOUR! 💥'],guitar:['🎸 🎵 🎶','🎸 SHRED! 🤘'],mic:['🎤 🎵 🎶 🎵','🎤 SUPERSTAR! ⭐'],drums:['🥁 BOOM BOOM BOOM!','🥁 DRUMROLL! 🎶']};
+  var msgArr=msgs[iKey]||['✨'];
+  var msg=msgArr[Math.floor(Math.random()*msgArr.length)];
+  overlay.innerHTML='<div style="font-size:2.2rem;font-weight:900;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.5);background:linear-gradient(135deg,var(--primary),var(--primary-light));padding:18px 28px;border-radius:20px;animation:avPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards">'+msg+'</div>';
+  document.body.appendChild(overlay);
+  setTimeout(function(){ overlay.style.opacity='0'; overlay.style.transition='opacity 0.4s'; setTimeout(function(){overlay.remove();},400); }, item.dur-400);
+
+  // Bounce the item emoji
+  var itemEl=document.getElementById('home-av-item');
+  if(itemEl){ itemEl.style.transform='scale(1.6) rotate(-15deg)'; setTimeout(function(){itemEl.style.transform='';},300); }
+
+  var left=5-ac.count;
+  if(left>0) setTimeout(function(){toast(''+left+' animation'+(left!==1?'s':'')+' left today');},item.dur);
+};
+
 var _abCfg={avatarId:1,skinTone:SKIN_TONES[0],hairColor:'#1a1a1a',glassesId:0};
 
 window.showAvatarBuilder=function(from){
@@ -3837,7 +3982,7 @@ window.saveAvatarCfg=async function(){
   state.profile.avatarCfg=JSON.parse(JSON.stringify(_abCfg));
   state.profile.avatarSetupSeen=true;
   try{
-    await setDoc(doc(db,'players',PLAYER_ID),{profile:state.profile});
+    await saveProfile();
     var lbSnap=await getDoc(doc(db,'leaderboard',PLAYER_ID));
     if(lbSnap.exists())await setDoc(doc(db,'leaderboard',PLAYER_ID),{avatarCfg:_abCfg},{merge:true});
   }catch(e){console.warn('avatar save',e);}
@@ -3850,7 +3995,8 @@ function updateHomeAvatarCard(){
   var nick=document.getElementById('home-av-nick');
   var sp=document.getElementById('home-av-sp');
   if(!svg)return;
-  svg.innerHTML=renderAvatar((state.profile&&state.profile.avatarCfg)||null,72);
+  var store=ssGetStore();
+  svg.innerHTML=renderHomeAvatar((state.profile&&state.profile.avatarCfg)||null, store);
   if(nick)nick.textContent=(state.profile&&state.profile.nickname)||'Champion';
   if(sp)sp.textContent='⚡ '+((state.profile&&state.profile.xp)||0)+' SP';
   showFlybyBadge();
