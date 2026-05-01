@@ -516,14 +516,14 @@ window.addEventListener('DOMContentLoaded', function(){
       <div class="subj-btn" id="subj-english" onclick="setSubject('english')">📖 English</div>
     </div>
     <div class="pick-toggle" style="margin-top:10px">
-      <div class="pick-btn active" id="pick-auto" onclick="setPickMode('auto')">🎯 QuizChamp Picks</div>
-      <div class="pick-btn" id="pick-manual" onclick="setPickMode('manual')">📋 I'll Choose</div>
+      <div class="pick-btn active" id="pick-auto" onclick="setPickMode('auto')">🎯 Recommended Quiz</div>
+      <div class="pick-btn" id="pick-manual" onclick="setPickMode('manual')">📋 Choose My Topics</div>
     </div>
     <div class="topic-list-panel" id="topic-list-panel"></div>
   </div>
 
-  <div id="daily-challenge-card"></div>
   <button class="btn btn-primary" onclick="startAutoSession()" style="margin-bottom:12px">🚀 Start Session</button>
+  <div id="daily-challenge-card"></div>
   <button class="btn btn-outline" onclick="showDashboard()" style="margin-bottom:12px">📊 My Dashboard</button>
   <button class="btn btn-outline" onclick="showStories()" style="margin-bottom:12px">📚 Story Library</button>
   <button class="btn btn-outline" onclick="showSparkStore()" style="margin-bottom:12px">⚡ Spark Store</button>
@@ -1128,7 +1128,7 @@ function buildTopicPool(topic,count){
 // ════════════════════════════════════════════════════════
 window.setSubject=function(s){
   state.subject=s; state.manualTopics=[];
-  ['maths','mix','english'].forEach(id=>document.getElementById('subj-'+id).classList.toggle('active',id===s));
+  ['maths','english'].forEach(id=>{const el=document.getElementById('subj-'+id);if(el)el.classList.toggle('active',id===s);});
   if(state.pickMode==='manual') renderTopicList();
 };
 
@@ -1697,14 +1697,14 @@ function renderDailyChallengeCard(){
   if(!q){ el.innerHTML=''; return; }
   if(done){
     el.innerHTML=`<div class="daily-card done">
-      <div class="daily-xp-pill">✓ +50 XP</div>
+      <div class="daily-xp-pill">✓ +50 SP</div>
       <div class="daily-card-tag">🎯 Daily Challenge</div>
       <div class="daily-card-title">Challenge Complete!</div>
       <div class="daily-card-sub">Come back tomorrow for a new one</div>
     </div>`;
   } else {
     el.innerHTML=`<div class="daily-card" onclick="openDailyChallenge()">
-      <div class="daily-xp-pill">+50 XP</div>
+      <div class="daily-xp-pill">+50 SP</div>
       <div class="daily-card-title">Tap to take today's challenge!</div>
     </div>`;
   }
