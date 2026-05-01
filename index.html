@@ -618,17 +618,8 @@ window.addEventListener('DOMContentLoaded', function(){
       <span class="cheer-notif" id="lb-cheer-dot"></span>
     </div>
   </div>
-  <div class="lb-tabs">
-    <div class="lb-tab active" id="lbt-sparks" onclick="switchLbTab('sparks')">⚡ SPARKS</div>
-    <div class="lb-tab" id="lbt-consistency" onclick="switchLbTab('consistency')">🔥 Consistency</div>
-    <div class="lb-tab" id="lbt-daily" onclick="switchLbTab('daily')">🎯 Daily King</div>
-    <div class="lb-tab" id="lbt-accuracy" onclick="switchLbTab('accuracy')">🎯 Accuracy</div>
-    <div class="lb-tab" id="lbt-maths" onclick="switchLbTab('maths')">📈 Maths</div>
-    <div class="lb-tab" id="lbt-english" onclick="switchLbTab('english')">📈 English</div>
-  </div>
-  <div class="lb-cat-desc" id="lb-cat-desc">Most SPARKS earned this week</div>
-  <div class="lb-rows" id="lb-rows"><div class="lb-empty">Loading…</div></div>
-  <div style="margin-top:16px;text-align:center">
+  <div id="lb-all-cats" style="padding:0 4px 16px"><div class="lb-empty">Loading…</div></div>
+  <div style="margin-top:4px;text-align:center;padding-bottom:16px">
     <button class="btn btn-ghost btn-sm" onclick="showAvatarSetup(true)">✏️ Change my nickname/avatar</button>
   </div>
 </div>
@@ -1863,99 +1854,88 @@ async function updateLeaderboardDoc(xpEarned, sessionStats){
   } catch(e){ console.warn('leaderboard update failed', e); }
 }
 
-let _lbTab = 'sparks';
 let _lbData = [];
 
-const LB_TAB_DESC = {
-  sparks:      'Most SPARKS earned this week',
-  consistency: 'Most days active this week (min 5 questions/day)',
-  daily:       'Most Daily Challenges completed this week',
-  accuracy:    'Highest accuracy this week (min 30 questions)',
-  maths:       'Most improved Maths accuracy vs last week',
-  english:     'Most improved English accuracy vs last week',
-};
+// ── Build one avatar card ───────────────────────────────────────────────────
+function buildLbCard(r, i){
+  const crowns=['🥇','🥈','🥉'];
+  const isMe=r.id===PLAYER_ID;
+  const crown=crowns[i]?('<div style="font-size:1.3rem;line-height:1;margin-bottom:2px">'+crowns[i]+'</div>'):'<div style="height:22px"></div>';
+  const avImg=(typeof renderAvatar==='function'&&r.avatarCfg)
+    ?renderAvatar(r.avatarCfg,46)
+    :'<div style="width:46px;height:46px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:1.4rem">'+(r.av||'🏆')+'</div>';
+  const border=isMe?'border:3px solid var(--primary);':'border:2px solid var(--border,#e5e7eb);';
+  const nameColor=isMe?'var(--primary)':'var(--text)';
+  const name=(r.nick||'?')+(isMe?' ✦':'');
+  return '<div style="display:flex;flex-direction:column;align-items:center;gap:3px;min-width:60px;max-width:68px">'
+    +crown
+    +'<div style="width:50px;height:50px;border-radius:50%;overflow:hidden;'+border+'display:flex;align-items:center;justify-content:center;background:var(--surface);box-sizing:border-box">'
+    +avImg
+    +'</div>'
+    +'<div style="font-size:0.65rem;font-weight:700;color:'+nameColor+';text-align:center;word-break:break-word;line-height:1.2;max-width:64px">'+name+'</div>'
+    +'</div>';
+}
 
-window.switchLbTab = function(tab){
-  _lbTab = tab;
-  document.querySelectorAll('.lb-tab').forEach(el=>el.classList.remove('active'));
-  const el=document.getElementById('lbt-'+tab); if(el)el.classList.add('active');
-  document.getElementById('lb-cat-desc').textContent=LB_TAB_DESC[tab]||'';
-  renderLbTab(tab, _lbData);
-};
-
-function renderLbTab(tab, rows){
+// ── Compute sorted rows for each category ───────────────────────────────────
+function getLbSorted(tab, rows){
   const monday=getMondayDate();
   const medals=['🥇','🥈','🥉'];
   let sorted=[];
   if(tab==='sparks'){
-    sorted=rows.map(r=>({...r,val:r.weekStart===monday?(r.weeklyXP||0):0})).sort((a,b)=>b.val-a.val);
-    renderLbRows(sorted,'val',' XP',medals);
+    sorted=rows.map(r=>({...r,val:r.weekStart===monday?(r.weeklyXP||0):0})).sort((a,b)=>b.val-a.val).filter(r=>r.val>0);
   } else if(tab==='consistency'){
-    sorted=rows.map(r=>({...r,val:(r.weeklyDays||[]).length})).sort((a,b)=>b.val-a.val);
-    renderLbRows(sorted,'val',' day(s)',medals);
+    sorted=rows.map(r=>({...r,val:(r.weeklyDays||[]).length})).sort((a,b)=>b.val-a.val).filter(r=>r.val>0);
   } else if(tab==='daily'){
-    sorted=rows.map(r=>({...r,val:r.weekStart===monday?(r.weeklyDailyChallenges||0):0})).sort((a,b)=>b.val-a.val);
-    renderLbRows(sorted,'val',' challenge(s)',medals);
+    sorted=rows.map(r=>({...r,val:r.weekStart===monday?(r.weeklyDailyChallenges||0):0})).sort((a,b)=>b.val-a.val).filter(r=>r.val>0);
   } else if(tab==='accuracy'){
     sorted=rows.filter(r=>r.weekStart===monday&&(r.weeklyTotal||0)>=30)
       .map(r=>({...r,val:Math.round((r.weeklyCorrect||0)/(r.weeklyTotal)*100)}))
       .sort((a,b)=>b.val-a.val);
-    if(sorted.length===0){
-      document.getElementById('lb-rows').innerHTML='<div class="lb-empty">Need 30+ questions answered this week to appear here. Keep practising! 💪</div>';
-      return;
-    }
-    renderLbRows(sorted,'val','%',medals);
   } else if(tab==='maths'||tab==='english'){
     const totKey=tab==='maths'?'weeklyMathsTotal':'weeklyEngTotal';
     const corKey=tab==='maths'?'weeklyMathsCorrect':'weeklyEngCorrect';
     const prevKey=tab==='maths'?'prevWeekMathsAcc':'prevWeekEngAcc';
-    const qualified=rows.filter(r=>r.weekStart===monday&&(r[totKey]||0)>=20&&r[prevKey]!=null);
-    if(qualified.length===0){
-      document.getElementById('lb-rows').innerHTML='<div class="lb-empty">Not enough data yet — need 20+ '+tab+' questions this week AND last week to appear here 📈</div>';
-      return;
-    }
-    sorted=qualified.map(r=>{
-      const thisAcc=Math.round((r[corKey]||0)/(r[totKey])*100);
-      const improvement=thisAcc-(r[prevKey]||0);
-      return {...r,val:improvement,thisAcc,prevAcc:r[prevKey]};
-    }).sort((a,b)=>b.val-a.val);
-    renderLbCards(sorted,medals);
-    return;
+    sorted=rows.filter(r=>r.weekStart===monday&&(r[totKey]||0)>=20&&r[prevKey]!=null)
+      .map(r=>({...r,val:Math.round((r[corKey]||0)/(r[totKey])*100)-(r[prevKey]||0)}))
+      .sort((a,b)=>b.val-a.val);
   }
+  return sorted.slice(0,5);
 }
 
-function renderLbCards(rows, medals){
-  const el=document.getElementById('lb-rows');
-  if(!rows||rows.length===0){el.innerHTML='<div class="lb-empty">No data yet for this category this week 🚀</div>';return;}
-  const crowns=['🥇','🥈','🥉'];
-  el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;padding:12px 4px">'
-    +rows.map((r,i)=>{
-      const isMe=r.id===PLAYER_ID;
-      const crown=crowns[i]?('<div style="font-size:1.4rem;line-height:1;margin-bottom:2px">'+crowns[i]+'</div>'):'<div style="height:24px"></div>';
-      const avImg=(typeof renderAvatar==='function'&&r.avatarCfg)
-        ?renderAvatar(r.avatarCfg,54)
-        :'<div style="width:54px;height:54px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:1.6rem">'+(r.av||'🏆')+'</div>';
-      const border=isMe?'border:3px solid var(--primary);':'border:3px solid transparent;';
-      const name=(r.nick||'?')+(isMe?' ✦':'');
-      return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:72px">'
-        +crown
-        +'<div style="width:58px;height:58px;border-radius:50%;overflow:hidden;'+border+'display:flex;align-items:center;justify-content:center;background:var(--surface)">'
-        +avImg
-        +'</div>'
-        +'<div style="font-size:0.7rem;font-weight:700;color:'+(isMe?'var(--primary)':'var(--text)')+';text-align:center;max-width:72px;line-height:1.2">'+name+'</div>'
+// ── Render all categories at once ────────────────────────────────────────────
+const LB_CATS=[
+  {id:'sparks',   label:'⚡ Sparks',      desc:'Most SP earned this week'},
+  {id:'consistency',label:'🔥 Consistency', desc:'Most days active this week'},
+  {id:'daily',    label:'🎯 Daily King',   desc:'Most daily challenges done'},
+  {id:'accuracy', label:'🎯 Accuracy',     desc:'Highest accuracy (30+ questions)'},
+  {id:'maths',    label:'📐 Maths',        desc:'Most improved maths score'},
+  {id:'english',  label:'📖 English',      desc:'Most improved English score'},
+];
+
+function renderAllLbCats(rows){
+  const el=document.getElementById('lb-all-cats');
+  if(!el) return;
+  el.innerHTML=LB_CATS.map(cat=>{
+    const sorted=getLbSorted(cat.id,rows);
+    const cardsHtml=sorted.length===0
+      ?'<div style="font-size:0.75rem;color:var(--text-muted);padding:8px 0">No data yet this week</div>'
+      :'<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-start">'
+        +sorted.map((r,i)=>buildLbCard(r,i)).join('')
         +'</div>';
-    }).join('')
-    +'</div>';
-}
-
-function renderLbRows(sorted, valKey, suffix, medals){
-  renderLbCards(sorted, medals);
+    return '<div style="background:var(--surface);border-radius:16px;padding:12px 14px;margin-bottom:12px">'
+      +'<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:10px">'
+      +'<span style="font-size:1rem;font-weight:800;color:var(--text)">'+cat.label+'</span>'
+      +'<span style="font-size:0.68rem;color:var(--text-muted);font-weight:500">'+cat.desc+'</span>'
+      +'</div>'
+      +cardsHtml
+      +'</div>';
+  }).join('');
 }
 
 var _flybyTags=[];
 window.showLeaderboard = async function(){
   showScreen('leaderboard');
-  document.getElementById('lb-rows').innerHTML = '<div class="lb-empty">Loading…</div>';
+  const _lbAllEl=document.getElementById('lb-all-cats'); if(_lbAllEl)_lbAllEl.innerHTML='<div class="lb-empty">Loading…</div>';
   checkCheersNotification();
   try {
     const [lbSnap,msgSnap] = await Promise.all([
@@ -1972,9 +1952,10 @@ window.showLeaderboard = async function(){
         _flybyTags.push({toId:m.toId,fromAv:m.fromAvatar||'',message:m.message||''});
       }
     });
-    switchLbTab(_lbTab);
+    renderAllLbCats(_lbData);
   } catch(e){
-    document.getElementById('lb-rows').innerHTML='<div class="lb-empty">Leaderboard unavailable right now</div>';
+    const el2=document.getElementById('lb-all-cats');
+    if(el2)el2.innerHTML='<div class="lb-empty">Leaderboard unavailable right now</div>';
     console.warn(e);
   }
 };
