@@ -1462,59 +1462,91 @@ const LEVEL_EMOJIS=['🌱','⭐','🔥','💫','👑'];
 
 function renderLevelRibbon(){
   const el=document.getElementById('level-ribbon-content'); if(!el) return;
-  const {level,xpInLevel,xpForLevel}=getXPLevel();
-  const lvIdx=Math.min(level-1,4);
-  const lvName=LEVEL_NAMES[lvIdx]||'Legend';
-  const lvEmoji=LEVEL_EMOJIS[lvIdx]||'👑';
-  const pct=Math.round(xpInLevel/xpForLevel*100);
-
-  // Level colours — one per level
-  const LV_COLORS=['#4CAF50','#2196F3','#FF9800','#9C27B0','#FFD700'];
-
-  // Overall accuracy across all attempted topics
   const allTopics=[...TOPICS.maths,...TOPICS.english];
-  const attempted=allTopics.filter(t=>(state.profile.topicProgress[t]?.sessions||0)>0);
-  const avgAcc=attempted.length>0
-    ?Math.round(attempted.reduce((s,t)=>s+(state.profile.topicProgress[t]?.lastAccuracy||0),0)/attempted.length)
-    :null;
 
-  // Build the 5-segment coloured track
-  // Each segment is 20% wide; current level gets a marker above it
-  const segments=LEVEL_NAMES.map((n,i)=>{
-    const isCurrent=i===lvIdx;
-    const isDone=i<lvIdx;
-    const col=LV_COLORS[i];
-    const opacity=isDone||isCurrent?1:0.28;
-    return `<div style="flex:1;position:relative;display:flex;flex-direction:column;align-items:center">
-      ${isCurrent?`<div style="position:absolute;top:-22px;left:50%;transform:translateX(-50%);
-          background:#fff;color:${col};font-size:0.62rem;font-weight:900;padding:1px 7px;
-          border-radius:20px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,0.18)">
-          YOU ▼</div>`:''}
-      <div style="width:100%;height:12px;background:${col};opacity:${opacity};
-        border-radius:${i===0?'8px 0 0 8px':i===4?'0 8px 8px 0':'0'}"></div>
-      <div style="font-size:0.58rem;font-weight:${isCurrent?800:500};margin-top:5px;
-        color:${isCurrent?'#fff':'rgba(255,255,255,0.6)'};text-align:center;white-space:nowrap">
-        ${LEVEL_EMOJIS[i]} ${n}</div>
-    </div>`;
-  }).join('<div style="width:2px;flex:none"></div>');
+  // ── Maths stats ──
+  const mathsAttempted=TOPICS.maths.filter(t=>(state.profile.topicProgress[t]?.sessions||0)>0);
+  const mathsAcc=mathsAttempted.length>0
+    ?Math.round(mathsAttempted.reduce((s,t)=>s+(state.profile.topicProgress[t]?.lastAccuracy||0),0)/mathsAttempted.length):null;
+  const mathsSessions=TOPICS.maths.reduce((s,t)=>s+(state.profile.topicProgress[t]?.sessions||0),0);
+  // Highest phase across maths topics
+  const mathsMaxPhase=TOPICS.maths.reduce((mx,t)=>Math.max(mx,getTopicPhase(t)),1);
+  const mathsLvl=['L3','L4','L5','L6'][Math.min(Math.floor((mathsMaxPhase-1)/1.4),3)];
+
+  // ── English stats ──
+  const engAttempted=TOPICS.english.filter(t=>(state.profile.topicProgress[t]?.sessions||0)>0);
+  const engAcc=engAttempted.length>0
+    ?Math.round(engAttempted.reduce((s,t)=>s+(state.profile.topicProgress[t]?.lastAccuracy||0),0)/engAttempted.length):null;
+  const engSessions=TOPICS.english.reduce((s,t)=>s+(state.profile.topicProgress[t]?.sessions||0),0);
+  const engMaxPhase=TOPICS.english.reduce((mx,t)=>Math.max(mx,getTopicPhase(t)),1);
+  const engLvl=['L2','L3','L4','L5','L6'][Math.min(engMaxPhase-1,4)];
+
+  // ── Overall stats ──
+  const totalSecs=allTopics.reduce((s,t)=>s+(state.profile.topicProgress[t]?.totalTime||0),0);
+  const hrs=Math.floor(totalSecs/3600), mins=Math.floor((totalSecs%3600)/60);
+  const timeStr=hrs>0?`${hrs}h ${mins}m`:`${mins}m`;
+  const totalQs=allTopics.reduce((s,t)=>s+(state.profile.topicProgress[t]?.attempts||0),0);
+  const streak=state.profile.streak||0;
+  const weekDone=(state.profile.weekSessions||[]).length;
+
+  // ── Best topic ──
+  const attempted=allTopics.filter(t=>(state.profile.topicProgress[t]?.sessions||0)>0);
+  const bestTopic=attempted.length>0
+    ?[...attempted].sort((a,b)=>(state.profile.topicProgress[b]?.lastAccuracy||0)-(state.profile.topicProgress[a]?.lastAccuracy||0))[0]
+    :null;
+  const bestAcc=bestTopic?Math.round(state.profile.topicProgress[bestTopic]?.lastAccuracy||0):0;
+
+  // ── Accent colours ──
+  const accCol=(acc)=>acc===null?'rgba(255,255,255,0.5)':acc>=80?'#4ade80':acc>=60?'#fbbf24':'#f87171';
 
   el.innerHTML=`
-    <div style="font-size:0.72rem;opacity:0.8;font-weight:700;margin-bottom:18px;letter-spacing:0.04em">MY PROGRESS</div>
-    <div style="display:flex;align-items:flex-end;margin-bottom:4px;padding-top:26px">${segments}</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
-      <div>
-        <div style="font-size:1.05rem;font-weight:900">${lvEmoji} Level ${level} — ${lvName}</div>
-        ${avgAcc!==null
-          ?`<div style="font-size:0.8rem;opacity:0.85;margin-top:3px">📊 Accuracy: <b>${avgAcc}%</b></div>`
-          :'<div style="font-size:0.75rem;opacity:0.65;margin-top:3px">Complete a quiz to see your accuracy</div>'}
-      </div>
-      <div style="text-align:right">
-        <div style="font-size:0.78rem;opacity:0.9;font-weight:700">${xpInLevel} / ${xpForLevel} XP</div>
-        <div style="margin-top:5px;background:rgba(255,255,255,0.25);border-radius:6px;height:7px;width:100px;overflow:hidden">
-          <div style="background:#fff;width:${pct}%;height:100%;border-radius:6px;transition:width 0.5s ease"></div>
+    <div style="font-size:0.68rem;font-weight:800;opacity:0.75;letter-spacing:0.06em;margin-bottom:12px">MY PROGRESS</div>
+    <div style="display:grid;grid-template-columns:1fr 1px 1fr;gap:0;margin-bottom:14px">
+      <!-- MATHS -->
+      <div style="padding-right:14px">
+        <div style="font-size:0.78rem;font-weight:800;opacity:0.9;margin-bottom:8px">🔢 MATHS</div>
+        <div style="font-size:2rem;font-weight:900;line-height:1;color:${accCol(mathsAcc)}">${mathsAcc!==null?mathsAcc+'%':'—'}</div>
+        <div style="font-size:0.7rem;opacity:0.8;margin-top:3px">accuracy</div>
+        <div style="margin-top:10px;font-size:0.72rem;opacity:0.85;display:flex;flex-direction:column;gap:3px">
+          <div>📚 ${mathsSessions} session${mathsSessions!==1?'s':''}</div>
+          <div>↑ Reached ${mathsLvl}</div>
         </div>
-        <div style="font-size:0.65rem;opacity:0.7;margin-top:3px">${xpForLevel-xpInLevel} XP to ${LEVEL_NAMES[Math.min(lvIdx+1,4)]}</div>
       </div>
+      <!-- Divider -->
+      <div style="background:rgba(255,255,255,0.2);margin:0 2px"></div>
+      <!-- ENGLISH -->
+      <div style="padding-left:14px">
+        <div style="font-size:0.78rem;font-weight:800;opacity:0.9;margin-bottom:8px">📖 ENGLISH</div>
+        <div style="font-size:2rem;font-weight:900;line-height:1;color:${accCol(engAcc)}">${engAcc!==null?engAcc+'%':'—'}</div>
+        <div style="font-size:0.7rem;opacity:0.8;margin-top:3px">accuracy</div>
+        <div style="margin-top:10px;font-size:0.72rem;opacity:0.85;display:flex;flex-direction:column;gap:3px">
+          <div>📚 ${engSessions} session${engSessions!==1?'s':''}</div>
+          <div>↑ Reached ${engLvl}</div>
+        </div>
+      </div>
+    </div>
+    <!-- Bottom stats strip -->
+    <div style="border-top:1px solid rgba(255,255,255,0.2);padding-top:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px">
+      <div style="text-align:center">
+        <div style="font-size:1rem;font-weight:900">🔥 ${streak}</div>
+        <div style="font-size:0.58rem;opacity:0.7;margin-top:1px">day streak</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:1rem;font-weight:900">❓ ${totalQs}</div>
+        <div style="font-size:0.58rem;opacity:0.7;margin-top:1px">questions</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:1rem;font-weight:900">⏱ ${totalSecs>0?timeStr:'0m'}</div>
+        <div style="font-size:0.58rem;opacity:0.7;margin-top:1px">time spent</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:1rem;font-weight:900">📅 ${weekDone}</div>
+        <div style="font-size:0.58rem;opacity:0.7;margin-top:1px">this week</div>
+      </div>
+      ${bestTopic?`<div style="text-align:center;max-width:70px">
+        <div style="font-size:0.75rem;font-weight:900;color:#4ade80">✅ ${bestAcc}%</div>
+        <div style="font-size:0.55rem;opacity:0.8;margin-top:1px;line-height:1.2">${bestTopic.length>12?bestTopic.slice(0,11)+'…':bestTopic}</div>
+      </div>`:''}
     </div>
   `;
 }
@@ -1562,11 +1594,66 @@ function renderTips(){
   const streak=state.profile.streak||0;
   if(streak<3) cards.push({icon:'🔥',label:'Build Your Streak',text:`${streak} day streak. Quiz daily — you earn a Shield every 4 days!`,color:'#FFF4E5',border:'#FF9800'});
 
+  // ── Strong topics ──
+  const strong=attempted.filter(t=>(state.profile.topicProgress[t]?.lastAccuracy||0)>=80)
+    .sort((a,b)=>(state.profile.topicProgress[b]?.lastAccuracy||0)-(state.profile.topicProgress[a]?.lastAccuracy||0));
+
+  let strongHtml='';
+  if(strong.length>0){
+    strongHtml=`<div style="background:#E8F5E9;border-radius:14px;padding:14px 16px;margin-bottom:10px;border-left:4px solid #4CAF50">
+      <div style="font-size:0.7rem;font-weight:800;color:#4CAF50;margin-bottom:8px">💪 STRONG TOPICS</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${strong.map(t=>{
+          const acc=Math.round(state.profile.topicProgress[t]?.lastAccuracy||0);
+          const meta=TOPIC_META[t]||{icon:'📌'};
+          return `<div style="background:#fff;border:1.5px solid #4CAF50;border-radius:20px;padding:3px 10px;font-size:0.72rem;font-weight:700;color:#1b5e20">
+            ${meta.icon} ${t} <span style="color:#4CAF50">${acc}%</span></div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // ── Heatmap ──
+  const heatmapRows=['maths','english'].map(subj=>{
+    const subjTopics=TOPICS[subj];
+    const cells=subjTopics.map(t=>{
+      const acc=state.profile.topicProgress[t]?.sessions>0?(state.profile.topicProgress[t]?.lastAccuracy||0):null;
+      const meta=TOPIC_META[t]||{icon:'📌'};
+      let bg,textCol;
+      if(acc===null){bg='#F0F0F5';textCol='#aaa';}
+      else if(acc>=80){bg='#4CAF50';textCol='#fff';}
+      else if(acc>=60){bg='#FF9800';textCol='#fff';}
+      else{bg='#F44336';textCol='#fff';}
+      const label=t.length>10?t.slice(0,9)+'…':t;
+      return `<div title="${t}: ${acc!==null?acc+'%':'No data'}" style="background:${bg};border-radius:8px;padding:6px 4px;text-align:center;cursor:default">
+        <div style="font-size:0.9rem">${meta.icon}</div>
+        <div style="font-size:0.48rem;font-weight:700;color:${textCol};margin-top:2px;line-height:1.2">${label}</div>
+        <div style="font-size:0.6rem;font-weight:900;color:${textCol};margin-top:1px">${acc!==null?acc+'%':'—'}</div>
+      </div>`;
+    }).join('');
+    return `<div style="margin-bottom:10px">
+      <div style="font-size:0.65rem;font-weight:800;color:var(--text-muted);margin-bottom:5px;letter-spacing:0.05em">${subj==='maths'?'🔢 MATHS':'📖 ENGLISH'}</div>
+      <div style="display:grid;grid-template-columns:repeat(${subjTopics.length<=6?3:4},1fr);gap:5px">${cells}</div>
+    </div>`;
+  }).join('');
+
+  const heatmapHtml=`<div style="background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow)">
+    <div style="font-size:0.7rem;font-weight:800;color:var(--text-muted);margin-bottom:10px">🗺️ TOPIC HEATMAP
+      <span style="font-weight:500;margin-left:8px">
+        <span style="display:inline-block;width:8px;height:8px;background:#4CAF50;border-radius:2px"></span> ≥80%
+        <span style="display:inline-block;width:8px;height:8px;background:#FF9800;border-radius:2px;margin-left:4px"></span> 60–79%
+        <span style="display:inline-block;width:8px;height:8px;background:#F44336;border-radius:2px;margin-left:4px"></span> &lt;60%
+        <span style="display:inline-block;width:8px;height:8px;background:#F0F0F5;border-radius:2px;margin-left:4px"></span> No data
+      </span>
+    </div>
+    ${heatmapRows}
+  </div>`;
+
   el.innerHTML=cards.map(c=>`
     <div style="background:${c.color};border-radius:14px;padding:14px 16px;margin-bottom:10px;border-left:4px solid ${c.border}">
       <div style="font-size:0.7rem;font-weight:800;color:${c.border};margin-bottom:5px">${c.icon} ${c.label}</div>
       <div style="font-size:0.88rem;font-weight:500;color:#222;line-height:1.45">${c.text}</div>
-    </div>`).join('');
+    </div>`).join('')+strongHtml+heatmapHtml;
 }
 
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById('screen-'+id).classList.add('active'); window.scrollTo(0,0); }
