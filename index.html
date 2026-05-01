@@ -428,7 +428,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="disclaimer-box">
     <h3>1. About QuizChamp</h3>
-    QuizChamp is an educational quiz application designed to help children aged 9–12 develop core skills in Maths and English. It is operated by an independent tutor/developer and is not affiliated with any official examination board, school, or local authority.
+    QuizChamp is an educational quiz application designed to help Year 5 students develop core skills in Maths and English for 11+ preparation. It is operated by an independent tutor/developer and is not affiliated with any official examination board, school, or local authority.
 
     <h3>2. Educational Use Only</h3>
     QuizChamp is provided for educational and practice purposes only. Results within the app do not constitute official assessment scores or guarantees of examination performance. Parents and guardians should not rely solely on this application for academic preparation.
@@ -1117,7 +1117,7 @@ function getTopicPhase(t){
   if(p.correct3>=21) return 2;
   return 1;
 }
-function getLevelLabel(t){ const ph=getTopicPhase(t); return ph>=5?'L4+':ph>=4?'L3–5':ph>=3?'L3–4':ph>=2?'L3*':'L3'; }
+function getLevelLabel(t){ const ph=getTopicPhase(t); return ph>=5?'Level 4':ph>=4?'Level 3+':ph>=3?'Level 3':ph>=2?'Level 2':'Level 1'; }
 
 // ════════════════════════════════════════════════════════
 // AUTO-TOPIC SELECTION
@@ -1382,7 +1382,8 @@ function renderQuestion(){
   const s=state.session,q=getCurrentQuestion();
   document.getElementById('q-topic-tag').textContent=q.t;
   const levelTag=document.getElementById('q-level-tag');
-  levelTag.textContent='Level '+q.l;
+  var _lvlMap=q.s==='maths'?{3:'Level 1',4:'Level 2',5:'Level 3',6:'Level 4'}:{2:'Level 1',3:'Level 2',4:'Level 3',5:'Level 4',6:'Level 5'};
+  levelTag.textContent=_lvlMap[q.l]||('Level '+q.l);
   const lvlStyles={2:{bg:'#E1F5EE',color:'#085041'},3:{bg:'#E6F1FB',color:'#0C447C'},4:{bg:'#FAEEDA',color:'#633806'},5:{bg:'#FCEBEB',color:'#791F1F'}};
   const ls=lvlStyles[q.l]||lvlStyles[3];
   levelTag.style.background=ls.bg; levelTag.style.color=ls.color;
@@ -1496,7 +1497,7 @@ window.setDashFilter=function(filter){
     const ph=getTopicPhase(t); // 1–5
     const isMaths=TOPICS.maths.includes(t);
     // Maths: L3,L4,L5,L6 (4 levels). English: L2,L3,L4,L5,L6 (5 levels)
-    const LVL_LABELS=isMaths?['L3','L4','L5','L6']:['L2','L3','L4','L5','L6'];
+    const LVL_LABELS=isMaths?['Lv 1','Lv 2','Lv 3','Lv 4']:['Lv 1','Lv 2','Lv 3','Lv 4','Lv 5'];
     const LVL_COLORS=['#4CAF50','#2196F3','#FF9800','#9C27B0','#FFD700'];
     // Map phase (1-5) to current level index
     // Maths 4 segs: ph1-2→0, ph3-4→1, ph5→2
@@ -1580,14 +1581,14 @@ function renderReadinessCard(){
   var mathsAtt=TOPICS.maths.filter(function(t){return (state.profile.topicProgress[t]?.sessions||0)>0;});
   var mathsAcc=mathsAtt.length>0?Math.round(mathsAtt.reduce(function(s,t){return s+(state.profile.topicProgress[t]?.lastAccuracy||0);},0)/mathsAtt.length):null;
   var mathsMaxPh=TOPICS.maths.reduce(function(mx,t){return Math.max(mx,getTopicPhase(t));},1);
-  var mathsLvl=['L3','L4','L5','L6'][Math.min(Math.floor((mathsMaxPh-1)/1.4),3)];
+  var mathsLvl=['Level 1','Level 2','Level 3','Level 4'][Math.min(Math.floor((mathsMaxPh-1)/1.4),3)];
   var mathsSess=TOPICS.maths.reduce(function(s,t){return s+(state.profile.topicProgress[t]?.sessions||0);},0);
 
   // English stats
   var engAtt=TOPICS.english.filter(function(t){return (state.profile.topicProgress[t]?.sessions||0)>0;});
   var engAcc=engAtt.length>0?Math.round(engAtt.reduce(function(s,t){return s+(state.profile.topicProgress[t]?.lastAccuracy||0);},0)/engAtt.length):null;
   var engMaxPh=TOPICS.english.reduce(function(mx,t){return Math.max(mx,getTopicPhase(t));},1);
-  var engLvl=['L2','L3','L4','L5','L6'][Math.min(engMaxPh-1,4)];
+  var engLvl=['Level 1','Level 2','Level 3','Level 4','Level 5'][Math.min(engMaxPh-1,4)];
   var engSess=TOPICS.english.reduce(function(s,t){return s+(state.profile.topicProgress[t]?.sessions||0);},0);
 
   // Totals
@@ -1723,7 +1724,7 @@ function renderImmediateInsights(){
   if(phaseGaps.length>0){
     var pg=phaseGaps[0];
     var pgMeta=TOPIC_META[pg.t]||{icon:'📌'};
-    var nextLvl=['L4','L5','L6'][Math.min(pg.ph-1,2)];
+    var nextLvl=['Level 2','Level 3','Level 4'][Math.min(pg.ph-1,2)];
     cards.push({icon:'🚀',label:'Next Level',color:'#eff6ff',border:'#3b82f6',text:pgMeta.icon+' '+pg.t,sub:pg.gap+' more correct answers to reach '+nextLvl,btn:'Go',action:"startTopicQuiz('"+pg.t+"')"});
   }
 
