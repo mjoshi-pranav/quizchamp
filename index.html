@@ -1919,37 +1919,37 @@ function renderLbTab(tab, rows){
       const improvement=thisAcc-(r[prevKey]||0);
       return {...r,val:improvement,thisAcc,prevAcc:r[prevKey]};
     }).sort((a,b)=>b.val-a.val);
-    const el=document.getElementById('lb-rows');
-    el.innerHTML=sorted.map((r,i)=>{
-      const isMe=r.id===PLAYER_ID;
-      const sign=r.val>=0?'+':'';
-      const cheerBtn=(!isMe&&state.profile.nickname)?'<button class="cheer-btn" onclick="openSendCheer(\''+r.id+'\',\''+String(r.nick||'?').replace(/'/g,'')+'\')">🔥</button>':'';
-      return '<div class="lb-row'+(isMe?' me':'')+'"><div class="lb-rank-num">'+(medals[i]||('#'+(i+1)))+'</div><div class="lb-av">'+(r.av||'🏆')+'</div><div class="lb-info"><div class="lb-nick">'+(r.nick||'?')+(isMe?' (you)':'')+'</div><div class="lb-xp-label">'+sign+r.val+'pp improvement · Now '+r.thisAcc+'%</div></div>'+cheerBtn+'</div>';
-    }).join('');
+    renderLbCards(sorted,medals);
     return;
   }
 }
 
-function renderLbRows(sorted, valKey, suffix, medals){
-  const maxVal=sorted[0]?.[valKey]||1;
+function renderLbCards(rows, medals){
   const el=document.getElementById('lb-rows');
-  if(sorted.length===0){ el.innerHTML='<div class="lb-empty">No data yet for this category this week 🚀</div>'; return; }
-  el.innerHTML=sorted.map((r,i)=>{
-    const isMe=r.id===PLAYER_ID;
-    const pct=Math.round((r[valKey]/maxVal)*100);
-    return `<div class="lb-row${isMe?' me':''}">
-      <div class="lb-rank-num">${medals[i]||('#'+(i+1))}</div>
-      <div class="lb-av">${(typeof renderAvatar==='function'&&r.avatarCfg)?renderAvatar(r.avatarCfg,36):(r.av||'🏆')}</div>
-      <div class="lb-info">
-        <div class="lb-nick">${r.nick||'?'}${isMe?' (you)':''}${(_flybyTags||[]).some(m=>m.toId===r.id)?'<span class="flyby-dot">&#128142;</span>':''}</div>
-        <div class="lb-xp-label">${r[valKey]}${suffix}</div>
-      </div>
-      <div style="flex:1;margin-left:8px">
-        <div class="lb-bar-wrap"><div class="lb-bar-fill" style="width:${pct}%"></div></div>
-      </div>
-      ${!isMe&&state.profile.nickname?`<button class="cheer-btn" onclick="openSendCheer('${r.id}','${(r.nick||'?').replace(/'/g,'')}')">🔥</button>`:''}
-    </div>`;
-  }).join('');
+  if(!rows||rows.length===0){el.innerHTML='<div class="lb-empty">No data yet for this category this week 🚀</div>';return;}
+  const crowns=['🥇','🥈','🥉'];
+  el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;padding:12px 4px">'
+    +rows.map((r,i)=>{
+      const isMe=r.id===PLAYER_ID;
+      const crown=crowns[i]?('<div style="font-size:1.4rem;line-height:1;margin-bottom:2px">'+crowns[i]+'</div>'):'<div style="height:24px"></div>';
+      const avImg=(typeof renderAvatar==='function'&&r.avatarCfg)
+        ?renderAvatar(r.avatarCfg,54)
+        :'<div style="width:54px;height:54px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:1.6rem">'+(r.av||'🏆')+'</div>';
+      const border=isMe?'border:3px solid var(--primary);':'border:3px solid transparent;';
+      const name=(r.nick||'?')+(isMe?' ✦':'');
+      return '<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:72px">'
+        +crown
+        +'<div style="width:58px;height:58px;border-radius:50%;overflow:hidden;'+border+'display:flex;align-items:center;justify-content:center;background:var(--surface)">'
+        +avImg
+        +'</div>'
+        +'<div style="font-size:0.7rem;font-weight:700;color:'+(isMe?'var(--primary)':'var(--text)')+';text-align:center;max-width:72px;line-height:1.2">'+name+'</div>'
+        +'</div>';
+    }).join('')
+    +'</div>';
+}
+
+function renderLbRows(sorted, valKey, suffix, medals){
+  renderLbCards(sorted, medals);
 }
 
 var _flybyTags=[];
