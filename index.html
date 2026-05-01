@@ -3514,7 +3514,7 @@ const GLASSES_DEFS=[
 function renderAvatar(cfg,size){
   if(!cfg||!cfg.avatarId)return '<div style="width:'+size+'px;height:'+size+'px;display:flex;align-items:center;justify-content:center;font-size:'+(size*0.5)+'px">🏆</div>';
   var def=AVATAR_DEFS.find(function(a){return a.id===(cfg.avatarId||1);})||AVATAR_DEFS[0];
-  return '<img src="'+def.img+'" width="'+size+'" height="'+size+'" style="display:block" alt="'+def.name+'">';
+  return '<img src="'+def.img+'" style="width:'+size+'px;height:auto;display:block" alt="'+def.name+'">';
 }
 
 var _abCfg={avatarId:1,skinTone:SKIN_TONES[0],hairColor:'#1a1a1a',glassesId:0};
@@ -3543,7 +3543,7 @@ function abRenderFaceGrid(){
     var sel=_abCfg.avatarId===def.id;
     var border=sel?'3px solid var(--primary)':'3px solid transparent';
     return '<div class="ab-face-item" onclick="abPickFace('+def.id+')" title="'+def.name+'" style="cursor:pointer;text-align:center;padding:6px 2px;border-radius:12px;background:'+(sel?'var(--primary-light, #eef)':'transparent')+'">'
-      +'<img src="'+def.img+'" width="64" height="64" style="display:block;margin:0 auto;border:'+border+'" alt="'+def.name+'">'
+      +'<img src="'+def.img+'" style="width:100%;height:auto;display:block;border:'+border+'" alt="'+def.name+'">'
       
       +'</div>';
   }).join('');
