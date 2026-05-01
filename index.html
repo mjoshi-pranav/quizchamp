@@ -127,6 +127,22 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .review-item .correct-ans { color: #1DB954; font-size: 0.85rem; font-weight: 800; }
 .review-item .explanation { color: var(--text-muted); font-size: 0.82rem; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
 
+
+/* ── VICTORY SHOW ── */
+#victory-overlay{position:fixed;inset:0;z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;}
+#victory-overlay.show{display:flex;}
+#victory-inner{position:relative;z-index:2;text-align:center;padding:32px 24px;max-width:400px;width:100%;animation:victoryEntry 0.5s ease-out forwards;}
+@keyframes victoryEntry{from{transform:scale(0.85) translateY(30px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+@keyframes crowdWave{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+@keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+@keyframes spotlightSweep{0%,100%{transform:translateX(-40%) rotate(-8deg);opacity:0.12;}50%{transform:translateX(40%) rotate(8deg);opacity:0.22;}}
+@keyframes crownDrop{0%{transform:translateY(-80px) rotate(-20deg);opacity:0;}60%{transform:translateY(6px) rotate(4deg);opacity:1;}100%{transform:translateY(0);opacity:1;}}
+@keyframes goldPulse{0%,100%{text-shadow:0 0 20px rgba(255,215,0,0.4);}50%{text-shadow:0 0 40px rgba(255,215,0,0.9),0 0 60px rgba(255,215,0,0.5);}}
+@keyframes tapPulse{0%,100%{opacity:0.35;}50%{opacity:0.8;}}
+.v-crowd-emoji{display:inline-block;animation:crowdWave ease-in-out infinite;}
+.v-confetti{position:absolute;border-radius:2px;animation:confettiFall linear forwards;}
+#victory-spotlight{position:absolute;top:-20%;left:35%;width:280px;height:650px;border-radius:50%;pointer-events:none;animation:spotlightSweep 2.2s ease-in-out infinite;}
+
 /* ── DASHBOARD TABS ── */
 .nav-tabs { display: flex; gap: 4px; background: var(--card); border-radius: 12px; padding: 4px; margin-bottom: 16px; box-shadow: var(--shadow); }
 .nav-tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
@@ -638,6 +654,26 @@ window.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <!-- ═══ END / REVIEW SCREEN ═══ -->
+<!-- ═══ VICTORY SHOW OVERLAY ═══ -->
+<div id="victory-overlay" onclick="dismissVictory()">
+  <div id="victory-spotlight" style="display:none"></div>
+  <div id="victory-inner">
+    <div id="victory-crown" style="display:none;font-size:3rem;margin-bottom:4px;animation:crownDrop 0.7s ease-out forwards">&#x1F451;</div>
+    <div id="victory-avatar" style="margin:0 auto 10px;width:76px;height:76px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,0.3)"></div>
+    <div id="victory-stage" style="font-size:2rem;margin:4px 0;letter-spacing:6px"></div>
+    <div id="victory-headline" style="font-size:1.55rem;font-weight:900;color:#fff;margin:8px 0;text-shadow:0 2px 12px rgba(0,0,0,0.6)"></div>
+    <div id="victory-sub" style="font-size:0.82rem;color:rgba(255,255,255,0.7);margin-bottom:10px"></div>
+    <div id="victory-crowd" style="font-size:1.4rem;line-height:1.9;min-height:36px"></div>
+    <div id="victory-pb" style="display:none;background:rgba(255,215,0,0.18);border:1.5px solid rgba(255,215,0,0.5);border-radius:20px;padding:5px 14px;font-size:0.75rem;font-weight:800;color:#ffd700;margin:10px auto 0;width:fit-content"></div>
+    <div style="margin-top:18px">
+      <div style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;color:rgba(255,255,255,0.5);margin-bottom:2px">&#x26A1; SP EARNED</div>
+      <div id="victory-sp" style="font-size:3.2rem;font-weight:900;color:#ffd700;line-height:1;animation:goldPulse 1.5s ease-in-out infinite">+0</div>
+    </div>
+    <div id="victory-score-line" style="margin-top:8px;font-size:0.82rem;color:rgba(255,255,255,0.5)"></div>
+    <div style="margin-top:22px;font-size:0.68rem;color:rgba(255,255,255,0.35);animation:tapPulse 1.8s ease-in-out infinite">Tap anywhere to continue &#x2192;</div>
+  </div>
+</div>
+
 <div id="screen-end" class="screen">
   <div class="app-header"><div class="app-logo">Quiz<span>Champ</span></div></div>
   <div class="trophy-section">
@@ -1308,7 +1344,8 @@ async function finishSession(){
   if(!state.profile.weekSessions.includes(today))state.profile.weekSessions.push(today);
   state.profile.weekSessions=state.profile.weekSessions.filter(d=>week.includes(d));
   const pb=state.profile.personalBest||{};
-  topicSet.forEach(t=>{ const tp=getTopicProgress(t); if(!pb[t]||tp.lastAccuracy>pb[t])pb[t]=tp.lastAccuracy; });
+  var _pbTopicForShow=null;
+  topicSet.forEach(t=>{ const tp=getTopicProgress(t); if(!pb[t]||tp.lastAccuracy>pb[t]){if(!_pbTopicForShow)_pbTopicForShow=t; pb[t]=tp.lastAccuracy;} });
   state.profile.personalBest=pb;
   // Compute session stats for leaderboard categories
   const mathsSet=new Set(TOPICS.maths), engSet=new Set(TOPICS.english);
@@ -1372,8 +1409,116 @@ async function finishSession(){
   document.getElementById('review-list').innerHTML=s.wrong.length===0
     ?'<div style="text-align:center;color:#1DB954;font-weight:800;padding:16px">🎉 Perfect score! No wrong answers!</div>'
     :s.wrong.map(w=>`<div class="review-item"><div class="q-text">${w.q.q}</div><div class="your-ans">✗ Your answer: ${w.chosen}</div><div class="correct-ans">✓ Correct: ${w.q.a}</div>${w.q.e?`<div class="explanation">💡 ${w.q.e}</div>`:''}</div>`).join('');
+  // Launch Victory Show
+  setTimeout(function(){ showVictoryShow(accuracy, xpEarned, _pbTopicForShow); }, 200);
   renderHome();
 }
+
+
+// ════════════════════════════════════════════════════════
+// VICTORY SHOW
+// ════════════════════════════════════════════════════════
+var _victoryTimer=null;
+
+window.showVictoryShow=function(accuracy, spEarned, pbTopic){
+  var tiers=[
+    {min:0,   bg:'linear-gradient(160deg,#1a1a2e,#16213e)', stage:'🥁',         headline:'Still Rehearsing…',    sub:'The crowd is waiting for you',       crowd:'',                                                                              confetti:false, spotlight:false, crown:false},
+    {min:50,  bg:'linear-gradient(160deg,#1a1020,#2d1b4e)', stage:'🥁 🎸', headline:'Warm-Up Complete!',        sub:'Small crowd, real energy',           crowd:'🧙 🙋 🧙‍♀️ 🙋‍♀️ 🧙', confetti:false, spotlight:false, crown:false},
+    {min:65,  bg:'linear-gradient(160deg,#0f1a14,#1a2e1a)', stage:'🥁 🎸 🎤', headline:'Local Show! 🎶',        sub:"The band's getting tight",           crowd:'🙋 🙋‍♀️ 🙌 🙋 🙋‍♀️ 🙌 🙋 🙋‍♀️', confetti:false, spotlight:false, crown:false},
+    {min:80,  bg:'linear-gradient(160deg,#0d0d2b,#1a0a3d)', stage:'🥁 🎸 🎤 🎹', headline:'Big Gig! 🔥',            sub:"They're calling for an encore!",     crowd:'🙌 🙋 🙌 🙋‍♀️ 🙌 🙋 🙌 🙋‍♀️ 🙌 🙋 🙌', confetti:true,  spotlight:false, crown:false},
+    {min:90,  bg:'linear-gradient(160deg,#050510,#0a0520)',  stage:'🥁 🎸 🎤 🎹 🎵', headline:'ARENA NIGHT 🏟️',        sub:'ARENA SOLD OUT',                     crowd:'🙌🙌🙌🙌🙌🙌🙌🙌\n👏🎉🙌👏🎉🙌👏🎉\n🎊🎊🎊🎊🎊🎊🎊🎊', confetti:true,  spotlight:true,  crown:false},
+    {min:100, bg:'linear-gradient(160deg,#050510,#0d0820)',  stage:'🎸 🎤 🎹',             headline:'HEADLINER 👑',           sub:'PERFECT. You are a QuizChamp LEGEND.', crowd:'👑🙌🙌🙌🙌🙌🙌👑\n🎉🎊🎉🎊🎉🎊🎉🎊\n🌟⭐🌟⭐🌟⭐🌟⭐', confetti:true,  spotlight:true,  crown:true}
+  ];
+  var tier=tiers[0];
+  for(var i=tiers.length-1;i>=0;i--){ if(accuracy>=tiers[i].min){tier=tiers[i];break;} }
+
+  var overlay=document.getElementById('victory-overlay');
+  overlay.style.background=tier.bg;
+
+  // Crown
+  document.getElementById('victory-crown').style.display=tier.crown?'block':'none';
+
+  // Avatar
+  document.getElementById('victory-avatar').innerHTML=renderAvatar(state.profile.avatarCfg||null,76);
+
+  // Stage / text
+  document.getElementById('victory-stage').textContent=tier.stage;
+  document.getElementById('victory-headline').textContent=tier.headline;
+  document.getElementById('victory-sub').textContent=tier.sub;
+
+  // Crowd — staggered wave animation per emoji
+  var crowdRows=tier.crowd.split('\n');
+  var crowdHTML=crowdRows.map(function(row){
+    var chars=Array.from(row);
+    return '<div>'+chars.map(function(ch,i){
+      if(ch===' ') return ' ';
+      var delay=(i*110)+'ms';
+      var dur=(1.2+Math.random()*0.7).toFixed(2)+'s';
+      return '<span class="v-crowd-emoji" style="animation-delay:'+delay+';animation-duration:'+dur+'">'+ch+'</span>';
+    }).join('')+'</div>';
+  }).join('');
+  document.getElementById('victory-crowd').innerHTML=crowdHTML;
+
+  // Personal Best
+  var pbEl=document.getElementById('victory-pb');
+  if(pbTopic){ pbEl.style.display='block'; pbEl.textContent='🏆 Personal Best — '+pbTopic+'!'; }
+  else { pbEl.style.display='none'; }
+
+  // Score line
+  document.getElementById('victory-score-line').textContent=accuracy+'% accuracy';
+
+  // Spotlight
+  var spLight=document.getElementById('victory-spotlight');
+  spLight.style.display=tier.spotlight?'block':'none';
+  if(tier.spotlight) spLight.style.background='rgba(255,255,220,0.15)';
+
+  // Confetti
+  if(tier.confetti) _spawnConfetti(overlay, accuracy>=100);
+
+  // Show overlay
+  overlay.classList.add('show');
+
+  // Animate SP counter 0 → earned
+  var spEl=document.getElementById('victory-sp');
+  spEl.textContent='+0';
+  var spCur=0, spTarget=spEarned, spStep=Math.max(1,Math.ceil(spTarget/40));
+  var spInt=setInterval(function(){
+    spCur=Math.min(spCur+spStep,spTarget);
+    spEl.textContent='+'+spCur;
+    if(spCur>=spTarget) clearInterval(spInt);
+  },40);
+
+  // Auto-dismiss after 6s
+  if(_victoryTimer) clearTimeout(_victoryTimer);
+  _victoryTimer=setTimeout(dismissVictory,6000);
+};
+
+function _spawnConfetti(container, isGold){
+  var cols=isGold
+    ?['#ffd700','#ffed4e','#fff4aa','#ffa500','#ffffff','#ffe066']
+    :['#7c3aed','#2563eb','#16a34a','#dc2626','#f59e0b','#ec4899','#06b6d4','#fff'];
+  for(var i=0;i<(isGold?70:45);i++){
+    (function(){
+      var el=document.createElement('div');
+      el.className='v-confetti';
+      el.style.cssText='left:'+Math.random()*100+'%;top:-20px;width:'+(5+Math.random()*7)+'px;height:'+(8+Math.random()*10)+'px;background:'+cols[Math.floor(Math.random()*cols.length)]+';animation-duration:'+(1.8+Math.random()*2.2).toFixed(2)+'s;animation-delay:'+(Math.random()*1.8).toFixed(2)+'s;';
+      container.appendChild(el);
+      setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},5500);
+    })();
+  }
+}
+
+window.dismissVictory=function(){
+  if(_victoryTimer){clearTimeout(_victoryTimer);_victoryTimer=null;}
+  var overlay=document.getElementById('victory-overlay');
+  overlay.style.opacity='0';
+  overlay.style.transition='opacity 0.35s';
+  setTimeout(function(){
+    overlay.classList.remove('show');
+    overlay.style.opacity=''; overlay.style.transition='';
+    overlay.querySelectorAll('.v-confetti').forEach(function(el){if(el.parentNode)el.parentNode.removeChild(el);});
+  },350);
+};
 
 // ════════════════════════════════════════════════════════
 // RENDER
