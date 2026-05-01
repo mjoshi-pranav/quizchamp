@@ -1403,30 +1403,45 @@ window.setDashFilter=function(filter){
   document.getElementById('dash-topics-list').innerHTML=topics.map(t=>{
     const p=getTopicProgress(t),acc=p.lastAccuracy!==undefined?p.lastAccuracy:0;
     const meta=TOPIC_META[t]||{icon:'📌',grad:'linear-gradient(135deg,#667eea,#764ba2)'};
-    const ph=getTopicPhase(t); // 1-5
-    const PHASE_LABELS=['L3','L3*','L3–4','L3–5','L4+'];
-    const PHASE_COLORS=['#4CAF50','#2196F3','#FF9800','#9C27B0','#FFD700'];
-    const phTrack=PHASE_LABELS.map((lbl,pi)=>{
-      const isCur=pi===ph-1, isDone=pi<ph-1;
-      const col=PHASE_COLORS[pi];
-      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
-        <div style="width:100%;height:8px;background:${col};opacity:${isDone||isCur?1:0.2};
-          border-radius:${pi===0?'6px 0 0 6px':pi===4?'0 6px 6px 0':'0'}"></div>
-        <div style="font-size:0.52rem;font-weight:${isCur?800:500};color:${isCur?'var(--primary)':'var(--text-muted)'}">${lbl}</div>
-      </div>`;
-    }).join('<div style="width:1px;flex:none"></div>');
+    const ph=getTopicPhase(t); // 1–5
+    const isMaths=TOPICS.maths.includes(t);
+    // Maths: L3,L4,L5,L6 (4 levels). English: L2,L3,L4,L5,L6 (5 levels)
+    const LVL_LABELS=isMaths?['L3','L4','L5','L6']:['L2','L3','L4','L5','L6'];
+    const LVL_COLORS=['#4CAF50','#2196F3','#FF9800','#9C27B0','#FFD700'];
+    // Map phase (1-5) to current level index
+    // Maths 4 segs: ph1-2→0, ph3-4→1, ph5→2
+    // English 5 segs: ph1→0, ph2→1, ph3→2, ph4→3, ph5→4
+    const curIdx=isMaths
+      ?(ph<=2?0:ph<=4?1:2)
+      :(ph-1);
     const noData=p.sessions===0;
-    return `<div style="background:var(--card);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px">
-      <div style="font-size:1.6rem;flex:none">${meta.icon}</div>
+    const phTrack=LVL_LABELS.map((lbl,li)=>{
+      const isCur=li===curIdx&&!noData, isDone=li<curIdx&&!noData;
+      const col=LVL_COLORS[li];
+      const last=li===LVL_LABELS.length-1;
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;position:relative">
+        ${isCur?`<div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);
+          background:${col};color:#fff;font-size:0.5rem;font-weight:900;padding:1px 5px;
+          border-radius:20px;white-space:nowrap">YOU</div>`:''}
+        <div style="width:100%;height:10px;background:${col};
+          opacity:${noData?0.15:isDone||isCur?1:0.18};
+          border-radius:${li===0?'6px 0 0 6px':last?'0 6px 6px 0':'0'};
+          outline:${isCur?`2px solid ${col}`:'none'};outline-offset:1px"></div>
+        <div style="font-size:0.55rem;font-weight:${isCur?800:500};
+          color:${isCur?col:'var(--text-muted)'}">${lbl}</div>
+      </div>`;
+    }).join('');
+    return `<div style="background:var(--card);border-radius:14px;padding:14px 16px 12px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px">
+      <div style="font-size:1.5rem;flex:none">${meta.icon}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:0.82rem;font-weight:800;color:var(--text);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t}</div>
-        <div style="display:flex;gap:0;margin-bottom:2px">${phTrack}</div>
+        <div style="font-size:0.82rem;font-weight:800;color:var(--text);margin-bottom:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t}</div>
+        <div style="display:flex;gap:0">${phTrack}</div>
       </div>
-      <div style="flex:none;text-align:right;min-width:52px">
+      <div style="flex:none;text-align:right;min-width:52px;padding-left:8px">
         ${noData
-          ?`<div style="font-size:0.7rem;color:var(--text-muted);font-weight:600">No data</div>`
-          :`<div style="font-size:1.25rem;font-weight:900;color:var(--primary)">${acc}%</div>
-            <div style="font-size:0.62rem;color:var(--text-muted);font-weight:600">${p.sessions} session${p.sessions!==1?'s':''}</div>`
+          ?`<div style="font-size:0.68rem;color:var(--text-muted);font-weight:600">No<br>data</div>`
+          :`<div style="font-size:1.3rem;font-weight:900;color:var(--primary)">${acc}%</div>
+            <div style="font-size:0.6rem;color:var(--text-muted);font-weight:600">${p.sessions} session${p.sessions!==1?'s':''}</div>`
         }
       </div>
     </div>`;
