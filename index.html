@@ -573,7 +573,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <button onclick="saveAvatarCfg()" style="background:var(--primary);color:#fff;border:none;border-radius:10px;padding:7px 16px;font-weight:700;font-size:.88rem;cursor:pointer">Save &#10003;</button>
   </div>
   <div style="text-align:center;margin:10px 0 14px">
-    <div id="ab-preview" style="display:inline-block;border-radius:50%;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.18)"></div>
+    <div id="ab-preview" style="display:inline-block;box-shadow:0 4px 16px rgba(0,0,0,.18)"></div>
     <div id="ab-nick" style="font-weight:800;font-size:1rem;margin-top:8px;color:var(--text)"></div>
   </div>
   <div style="padding:4px 14px 6px;font-weight:700;font-size:.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em">Choose your character</div>
@@ -3514,7 +3514,7 @@ const GLASSES_DEFS=[
 function renderAvatar(cfg,size){
   if(!cfg||!cfg.avatarId)return '<div style="width:'+size+'px;height:'+size+'px;display:flex;align-items:center;justify-content:center;font-size:'+(size*0.5)+'px">🏆</div>';
   var def=AVATAR_DEFS.find(function(a){return a.id===(cfg.avatarId||1);})||AVATAR_DEFS[0];
-  return '<img src="'+def.img+'" width="'+size+'" height="'+size+'" style="border-radius:50%;object-fit:cover;display:block" alt="'+def.name+'">';
+  return '<img src="'+def.img+'" width="'+size+'" height="'+size+'" style="display:block" alt="'+def.name+'">';
 }
 
 var _abCfg={avatarId:1,skinTone:SKIN_TONES[0],hairColor:'#1a1a1a',glassesId:0};
@@ -3543,8 +3543,8 @@ function abRenderFaceGrid(){
     var sel=_abCfg.avatarId===def.id;
     var border=sel?'3px solid var(--primary)':'3px solid transparent';
     return '<div class="ab-face-item" onclick="abPickFace('+def.id+')" title="'+def.name+'" style="cursor:pointer;text-align:center;padding:6px 2px;border-radius:12px;background:'+(sel?'var(--primary-light, #eef)':'transparent')+'">'
-      +'<img src="'+def.img+'" width="64" height="64" style="border-radius:50%;object-fit:cover;display:block;margin:0 auto;border:'+border+'" alt="'+def.name+'">'
-      +'<div style="font-size:.7rem;margin-top:4px;color:var(--text-muted)">'+def.name+'</div>'
+      +'<img src="'+def.img+'" width="64" height="64" style="display:block;margin:0 auto;border:'+border+'" alt="'+def.name+'">'
+      
       +'</div>';
   }).join('');
 }
