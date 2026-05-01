@@ -3533,8 +3533,17 @@ function ssGetStore(){
 var _ssTimerInterval=null;
 
 window.showSparkStore=function(){
-  // SP gate — must afford at least one item
   var sp=state.profile.xp||0;
+  // Trial account: full access, no gate, no timer
+  if(PLAYER_ID==='trial'){
+    showScreen('spark-store');
+    document.getElementById('ss-balance').textContent=sp+' SP';
+    var timerEl=document.getElementById('ss-timer');
+    if(timerEl) timerEl.textContent='∞';
+    ssTab('acc');
+    return;
+  }
+  // SP gate — must afford at least one item not yet owned
   var canAfford=(ACCESSORIES||[]).some(function(a){return a.price<=sp&&!ssGetStore().accessories.includes(a.id);});
   if(!canAfford){
     toast('Save up more SP to shop here! ⚡');
@@ -3553,7 +3562,7 @@ window.showSparkStore=function(){
     if(timerEl) timerEl.textContent=m+':'+(s<10?'0':'')+s;
     if(secsLeft<=0){
       clearInterval(_ssTimerInterval);
-      toast('⏱ Time up! Come back after your next quiz.');
+      toast('Time up! Come back after your next quiz.');
       showHome();
     }
   }
