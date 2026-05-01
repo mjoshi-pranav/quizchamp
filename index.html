@@ -513,6 +513,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <div id="home-av-svg" style="position:absolute;right:8px;top:-18px;width:95px;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.18))"></div>
     <div id="home-av-nick" style="display:none"></div>
   </div>
+  <div id="home-encouraging-msg" style="display:none;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;color:#fff"></div>
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
       <div class="card-title" style="margin:0">This Week</div>
@@ -561,12 +562,10 @@ window.addEventListener('DOMContentLoaded', function(){
     </div>
   </div>
   <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px">
-    <div class="pick-btn active" id="sst-acc" onclick="ssTab('acc')" style="flex:1;text-align:center;cursor:pointer">&#129399; Accessories</div>
-    <div class="pick-btn" id="sst-music" onclick="ssTab('music')" style="flex:1;text-align:center;cursor:pointer">&#127925; Music</div>
+    <div class="pick-btn active" id="sst-music" onclick="ssTab('music')" style="flex:1;text-align:center;cursor:pointer">&#127925; Music</div>
     <div class="pick-btn" id="sst-msg" onclick="ssTab('msg')" style="flex:1;text-align:center;cursor:pointer">&#128140; Messages</div>
   </div>
-  <div id="ss-pane-acc"></div>
-  <div id="ss-pane-music" style="display:none"></div>
+  <div id="ss-pane-music"></div>
   <div id="ss-pane-msg" style="display:none"></div>
   <div id="ss-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9000;align-items:center;justify-content:center">
     <div id="ss-modal-inner" style="background:var(--card-bg);border-radius:16px;padding:20px;max-width:340px;width:90%;max-height:80vh;overflow-y:auto"></div>
@@ -893,7 +892,7 @@ let PLAYER_ID = null;
 let state = {
   subject:'maths', pickMode:'auto', manualTopics:[],
   session:null,
-  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[],nickname:'',avatar:'',dailyChallenge:{},mysteryBox:{lastDate:null,owned:[]},easterEggs:{},consecutivePerfect:0,cheersSentToday:{date:null,count:0},sparkStore:{accessories:[],equippedAccessory:null,ownedThemes:['rock'],activeTheme:'rock'}},
+  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[],nickname:'',avatar:'',dailyChallenge:{},mysteryBox:{lastDate:null,owned:[]},easterEggs:{},consecutivePerfect:0,cheersSentToday:{date:null,count:0},sparkStore:{ownedThemes:[],activeTheme:null}},
   dashFilter:'maths', dashTab:'progress'
 };
 const XP_PER_CORRECT=15, XP_PER_QUESTION=5, XP_PER_LEVEL=200;
@@ -947,9 +946,8 @@ function seedTrialAccount(){
   });
   // Unlock all Spark Store items
   state.profile.sparkStore = state.profile.sparkStore || {};
-  state.profile.sparkStore.accessories = (ACCESSORIES||[]).map(a=>a.id);
   state.profile.sparkStore.ownedThemes = ['rock','ocean','sunset','midnight'];
-  state.profile.sparkStore.equippedAccessory = null;
+  state.profile.sparkStore.activeTheme = 'rock';
   state.profile.trialSeeded = true;
   saveProfile();
 }
@@ -1008,7 +1006,7 @@ window._loadAndGo=async function(id){
     try{await setDoc(doc(db,'players',id),{profile:state.profile});}catch(_e){}
   }
   document.getElementById('loading-overlay').classList.add('hidden');
-  try{ playIntroMusic((state.profile.sparkStore||{}).activeTheme||'rock'); }catch(_e){}
+  try{ var _at=(state.profile.sparkStore||{}).activeTheme; if(_at) playIntroMusic(_at,6000); }catch(_e){}
   showHome();
   // Night Owl easter egg: login between midnight and 1am
   const hr=new Date().getHours();
@@ -1403,6 +1401,8 @@ function renderHome(){
   const st=STUDENTS[PLAYER_ID]||{};
   const nick=(state.profile&&state.profile.nickname)||st.name||'Champion';
   document.getElementById('home-welcome').textContent=nick+'!';
+  loadEncouragingMsg();
+  checkAndPlayAnimatedMsg();
   // Streak display
   const streak=state.profile.streak||0;
   const streakEl=document.getElementById('home-streak-display');
@@ -1927,6 +1927,60 @@ function renderAllLbCats(rows){
 }
 
 var _flybyTags=[];
+// ── Show encouraging message on home screen ─────────────────────────────────
+async function loadEncouragingMsg(){
+  var el=document.getElementById('home-encouraging-msg');
+  if(!el) return;
+  try{
+    var snap=await getDocs(collection(db,'sparkMessages'));
+    var cut24=Date.now()-86400000;
+    var msgs=[];
+    snap.forEach(function(d){
+      var m=Object.assign({id:d.id},d.data());
+      if(m.toId!==PLAYER_ID||m.type!=='normal') return;
+      var ts=m.sentAt&&m.sentAt.toMillis?m.sentAt.toMillis():0;
+      if(ts>cut24) msgs.push(m);
+    });
+    if(!msgs.length){el.style.display='none';return;}
+    msgs.sort(function(a,b){return(b.sentAt&&b.sentAt.toMillis?b.sentAt.toMillis():0)-(a.sentAt&&a.sentAt.toMillis?a.sentAt.toMillis():0);});
+    var m=msgs[0];
+    var avHtml=m.fromAvatarCfg&&typeof renderAvatar==='function'
+      ?renderAvatar(m.fromAvatarCfg,32)
+      :'<span style="font-size:1.4rem">'+(m.fromAvatar||'🏆')+'</span>';
+    el.innerHTML='<div style="display:flex;align-items:center;gap:10px">'
+      +'<div style="flex-shrink:0">'+avHtml+'</div>'
+      +'<div><div style="font-size:0.68rem;font-weight:700;opacity:0.85">From '+(m.fromNick||'A friend')+'</div>'
+      +'<div style="font-size:0.85rem;font-weight:700;margin-top:2px">'+(m.message||'')+'</div></div></div>';
+    el.style.display='block';
+  }catch(e){el.style.display='none';}
+}
+
+// ── Play animated (fly-by) message on login ──────────────────────────────────
+async function checkAndPlayAnimatedMsg(){
+  try{
+    var snap=await getDocs(collection(db,'sparkMessages'));
+    var cut24=Date.now()-86400000;
+    snap.forEach(async function(d){
+      var m=Object.assign({id:d.id},d.data());
+      if(m.toId!==PLAYER_ID||m.type!=='flyby'||m.seenByRecipient) return;
+      var ts=m.sentAt&&m.sentAt.toMillis?m.sentAt.toMillis():0;
+      if(ts<cut24) return;
+      var avEl=document.createElement('div');
+      avEl.className='flyby-emoji';
+      if(m.fromAvatarCfg&&typeof renderAvatar==='function'){
+        avEl.style.cssText='position:fixed;top:40%;z-index:10000;pointer-events:none;animation:flyby-anim 6s ease-out forwards';
+        avEl.innerHTML=renderAvatar(m.fromAvatarCfg,56);
+      } else {
+        avEl.textContent=m.fromAvatar||'🏆';
+      }
+      document.body.appendChild(avEl);
+      setTimeout(function(){ toast('💫 '+(m.fromNick||'A friend')+': '+(m.message||'')); },2000);
+      setTimeout(function(){if(avEl.parentNode)avEl.parentNode.removeChild(avEl);},6000);
+      try{ await setDoc(doc(db,'sparkMessages',m.id),{seenByRecipient:true},{merge:true}); }catch(_){}
+    });
+  }catch(e){}
+}
+
 window.showLeaderboard = async function(){
   showScreen('leaderboard');
   const _lbAllEl=document.getElementById('lb-all-cats'); if(_lbAllEl)_lbAllEl.innerHTML='<div class="lb-empty">Loading…</div>';
@@ -1938,11 +1992,11 @@ window.showLeaderboard = async function(){
     ]);
     _lbData = [];
     lbSnap.forEach(d=>{ const data=d.data(); _lbData.push({id:d.id,...data,av:data.avatar||'🏆',nick:data.nickname||'?'}); });
-    const now=Date.now(), cut48=now-48*60*60*1000;
+    const now=Date.now(), cut24=now-24*60*60*1000;
     _flybyTags=[];
     msgSnap.forEach(d=>{
       const m=d.data();
-      if(m.type==='flyby'&&m.sentAt&&m.sentAt.toMillis&&m.sentAt.toMillis()>cut48){
+      if(m.type==='flyby'&&m.sentAt&&m.sentAt.toMillis&&m.sentAt.toMillis()>cut24){
         _flybyTags.push({toId:m.toId,fromAv:m.fromAvatar||'',message:m.message||''});
       }
     });
@@ -3192,12 +3246,8 @@ const MYSTERY_BOX_ITEMS = [
   {id:'fr_red',    name:'Red Frame',       emoji:'🔴', rarity:'Common'},
   {id:'fr_orange', name:'Orange Frame',    emoji:'🟠', rarity:'Common'},
   // Uncommon 25%
-  {id:'ac_guitar', name:'Guitar Badge',    emoji:'🎸', rarity:'Uncommon'},
-  {id:'ac_foot',   name:'Football Badge',  emoji:'⚽', rarity:'Uncommon'},
-  {id:'ac_mic',    name:'Mic Badge',       emoji:'🎤', rarity:'Uncommon'},
-  {id:'ac_rocket', name:'Rocket Badge',    emoji:'🚀', rarity:'Uncommon'},
-  {id:'ac_cricket',name:'Cricket Badge',   emoji:'🏏', rarity:'Uncommon'},
-  {id:'ac_piano',  name:'Piano Badge',     emoji:'🎹', rarity:'Uncommon'},
+        {id:'ac_rocket', name:'Rocket Badge',    emoji:'🚀', rarity:'Uncommon'},
+    {id:'ac_piano',  name:'Piano Badge',     emoji:'🎹', rarity:'Uncommon'},
   // Rare 12%
   {id:'fx_sparkle',name:'Sparkle Effect',  emoji:'✨', rarity:'Rare'},
   {id:'fx_fire',   name:'Fire Effect',     emoji:'🔥', rarity:'Rare'},
@@ -3472,18 +3522,12 @@ function updateCheersNotification(hasUnread){
 // ════════════════════════════════════════════════════════
 // SPARK STORE — constants, UI, purchase, messaging
 // ════════════════════════════════════════════════════════
-const ACCESSORIES=[
-  {id:'jacket',name:'Champion Jacket',icon:'\u{1F9E5}',price:75,desc:'Shown on your avatar'},
-  {id:'trainers',name:'Trainers',icon:'\u{1F45F}',price:50,desc:'Shown on your avatar'},
-  {id:'football',name:'Football',icon:'⚽',price:40,desc:'Badge beside avatar'},
-  {id:'cricket',name:'Cricket Bat',icon:'\u{1F3CF}',price:50,desc:'Badge beside avatar'},
-  {id:'guitar',name:'Guitar',icon:'\u{1F3B8}',price:75,desc:'Badge beside avatar'},
-];
+
 const MUSIC_THEMES=[
-  {id:'rock',name:'Rock Riff',icon:'\u{1F3B8}',price:0,desc:'Default theme — always free'},
-  {id:'electronic',name:'Electronic Beat',icon:'\u{1F39B}',price:100,desc:'Buy once, yours forever'},
-  {id:'hiphop',name:'Hip-Hop Beat',icon:'\u{1F3A4}',price:100,desc:'Buy once, yours forever'},
-  {id:'fanfare',name:'Epic Fanfare',icon:'\u{1F3C6}',price:200,desc:'Premium theme'},
+  {id:'rock',name:'Rock Riff',icon:'\u{1F3B8}',price:50,desc:'Buy once · plays 6s on login'},
+  {id:'electronic',name:'Electronic Beat',icon:'\u{1F39B}',price:100,desc:'Buy once · plays 6s on login'},
+  {id:'hiphop',name:'Hip-Hop Beat',icon:'\u{1F3A4}',price:100,desc:'Buy once · plays 6s on login'},
+  {id:'fanfare',name:'Epic Fanfare',icon:'\u{1F3C6}',price:200,desc:'Buy once · plays 6s on login'},
 ];
 const SPARK_MESSAGES=[
   "You're on fire this week! \u{1F525}",
@@ -3501,7 +3545,7 @@ const SPARK_MESSAGES=[
 ];
 
 function ssGetStore(){
-  if(!state.profile.sparkStore) state.profile.sparkStore={accessories:[],equippedAccessory:null,ownedThemes:['rock'],activeTheme:'rock'};
+  if(!state.profile.sparkStore) state.profile.sparkStore={ownedThemes:[],activeTheme:null};
   return state.profile.sparkStore;
 }
 
@@ -3515,18 +3559,19 @@ window.showSparkStore=function(){
     document.getElementById('ss-balance').textContent=sp+' SP';
     var timerEl=document.getElementById('ss-timer');
     if(timerEl) timerEl.textContent='∞';
-    ssTab('acc');
+    ssTab('music');
     return;
   }
-  // SP gate — must afford at least one item not yet owned
-  var canAfford=(ACCESSORIES||[]).some(function(a){return a.price<=sp&&!ssGetStore().accessories.includes(a.id);});
-  if(!canAfford){
+  // SP gate
+  var _st=ssGetStore();
+  var canAffordMusic=(MUSIC_THEMES||[]).some(function(t){return t.price>0&&t.price<=sp&&!_st.ownedThemes.includes(t.id);});
+  if(!canAffordMusic&&sp<40){
     toast('Save up more SP to shop here! ⚡');
     return;
   }
   showScreen('spark-store');
   document.getElementById('ss-balance').textContent=sp+' SP';
-  ssTab('acc');
+  ssTab('music');
   // 5-minute timer
   if(_ssTimerInterval) clearInterval(_ssTimerInterval);
   var secsLeft=300;
@@ -3549,42 +3594,21 @@ window.showSparkStore=function(){
 function resetSparkStoreTimer(){ if(_ssTimerInterval){clearInterval(_ssTimerInterval);_ssTimerInterval=null;} }
 
 window.ssTab=function(tab){
-  ['acc','music','msg'].forEach(function(t){
+  ['music','msg'].forEach(function(t){
     document.getElementById('ss-pane-'+t).style.display=t===tab?'block':'none';
     var el=document.getElementById('sst-'+t);
     if(el) el.className='pick-btn'+(t===tab?' active':'');
   });
-  if(tab==='acc') renderSSAcc();
-  else if(tab==='music') renderSSMusic();
+  if(tab==='music') renderSSMusic();
   else renderSSMsg();
 };
-
-function renderSSAcc(){
-  var st=ssGetStore();
-  var el=document.getElementById('ss-pane-acc');
-  var h='<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Accessories appear on your leaderboard card. Equip one at a time.</p>';
-  ACCESSORIES.forEach(function(item){
-    var owned=st.accessories.includes(item.id);
-    var equipped=st.equippedAccessory===item.id;
-    var act='';
-    if(!owned){
-      act='<button class="btn btn-primary btn-sm" onclick="ssBuyAcc(\''+item.id+'\')" style="margin-top:8px">Buy — '+item.price+' SP</button>';
-    } else if(equipped){
-      act='<span class="ss-badge ss-badge-active">✓ Equipped</span> <button class="btn btn-outline btn-sm" onclick="ssEquip(null)" style="margin-top:8px;margin-left:6px">Unequip</button>';
-    } else {
-      act='<span class="ss-badge ss-badge-owned">Owned</span> <button class="btn btn-primary btn-sm" onclick="ssEquip(\''+item.id+'\')" style="margin-top:8px;margin-left:6px">Equip</button>';
-    }
-    h+='<div class="ss-item-card"><div class="ss-item-icon">'+item.icon+'</div><div class="ss-item-info"><div class="ss-item-name">'+item.name+'</div><div class="ss-item-desc">'+item.desc+'</div>'+act+'</div></div>';
-  });
-  el.innerHTML=h;
-}
 
 function renderSSMusic(){
   var st=ssGetStore();
   var el=document.getElementById('ss-pane-music');
-  var h='<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Intro music plays 3 seconds when you log in. Preview before buying!</p>';
+  var h='<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Music plays 6 seconds on every login. Buy a theme to unlock it.</p>';
   MUSIC_THEMES.forEach(function(theme){
-    var owned=st.ownedThemes.includes(theme.id)||theme.price===0;
+    var owned=st.ownedThemes.includes(theme.id);
     var active=st.activeTheme===theme.id;
     var act='';
     if(owned){
@@ -3606,15 +3630,15 @@ function renderSSMsg(){
   var nick=state.profile.nickname||'';
   var dis=nick?'':'disabled';
   var hint=nick?'':' (set a nickname first)';
-  el.innerHTML='<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Send a positive message to any student. Choose from 12 approved messages — no free text allowed.</p>'
+  el.innerHTML='<p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Encourage a friend. It appears on their home screen for 24 hours.</p>'
     +'<div class="ss-item-card" style="flex-direction:column;align-items:flex-start">'
     +'<div style="display:flex;align-items:center;gap:10px"><div style="font-size:1.8rem">\u{1F4EC}</div>'
-    +'<div><div class="ss-item-name">Normal Message — 40 SP</div><div class="ss-item-desc">Private inbox only · 24-hour lifespan</div></div></div>'
-    +'<button class="btn btn-primary" onclick="openSendMsg(\'normal\')" '+dis+' style="margin-top:12px;width:100%">Send a Normal Message'+hint+'</button></div>'
+    +'<div><div class="ss-item-name">Encouraging Message — 40 SP</div><div class="ss-item-desc">Shows on their home screen · 24 hours</div></div></div>'
+    +'<button class="btn btn-primary" onclick="openSendMsg(\'normal\')" '+dis+' style="margin-top:12px;width:100%">Send an encouraging message to a friend'+hint+'</button></div>'
     +'<div class="ss-item-card" style="flex-direction:column;align-items:flex-start">'
     +'<div style="display:flex;align-items:center;gap:10px"><div style="font-size:1.8rem">\u{1F4AB}</div>'
-    +'<div><div class="ss-item-name">Fly-By Message — 100 SP</div><div class="ss-item-desc">Public leaderboard tag (48h) · animation plays when sent</div></div></div>'
-    +'<button class="btn btn-primary" onclick="openSendMsg(\'flyby\')" '+dis+' style="margin-top:12px;width:100%">Send a Fly-By Message'+hint+'</button></div>'
+    +'<div><div class="ss-item-name">Animated Message — 100 SP</div><div class="ss-item-desc">Their avatar flies across their screen on login · 24 hours</div></div></div>'
+    +'<button class="btn btn-primary" onclick="openSendMsg(\'flyby\')" '+dis+' style="margin-top:12px;width:100%">Send an animated message to a friend'+hint+'</button></div>'
     +'<div style="margin-top:16px"><div style="font-weight:700;font-size:0.85rem;margin-bottom:8px">\u{1F4EC} My Inbox</div>'
     +'<div id="ss-inbox">Loading...</div></div>';
   loadSparkInbox();
@@ -3625,19 +3649,19 @@ async function loadSparkInbox(){
   if(!el) return;
   try{
     var snap=await getDocs(collection(db,'sparkMessages'));
-    var now=Date.now(),cut24=now-86400000,cut48=now-172800000;
+    var now=Date.now(),cut24=now-86400000;
     var mine=[];
     snap.forEach(function(d){
       var m=Object.assign({id:d.id},d.data());
       if(m.toId!==PLAYER_ID) return;
       var ts=m.sentAt&&m.sentAt.toMillis?m.sentAt.toMillis():0;
-      if(ts>(m.type==='flyby'?cut48:cut24)) mine.push(m);
+      if(ts>cut24) mine.push(m);
     });
     if(!mine.length){el.innerHTML='<p style="color:var(--text-muted);font-size:0.85rem">No messages yet. Get on that leaderboard! \u{1F3C6}</p>';return;}
     mine.sort(function(a,b){return(b.sentAt&&b.sentAt.toMillis?b.sentAt.toMillis():0)-(a.sentAt&&a.sentAt.toMillis?a.sentAt.toMillis():0);});
     el.innerHTML=mine.map(function(m){
       return '<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px">'
-        +'<div style="font-size:0.75rem;color:var(--text-muted)">'+(m.type==='flyby'?'\u{1F4AB} Fly-By from':'\u{1F4EC} From')+' '+(m.fromAvatar||'')+' '+(m.fromNick||'Someone')+'</div>'
+        +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'+(m.fromAvatarCfg&&typeof renderAvatar==='function'?renderAvatar(m.fromAvatarCfg,28):'<span style="font-size:1.1rem">'+(m.fromAvatar||'🏆')+'</span>')+'<span style="font-size:0.75rem;font-weight:700">'+(m.fromNick||'Someone')+'</span><span style="font-size:0.65rem;color:var(--text-muted);margin-left:auto">'+(m.type==='flyby'?'💫 Animated':'📬 Encouraging')+'</span></div>'
         +'<div style="font-weight:600;margin-top:4px">'+m.message+'</div></div>';
     }).join('');
   }catch(e){el.innerHTML='<p style="color:var(--text-muted)">Could not load messages.</p>';}
@@ -3681,38 +3705,23 @@ window.confirmSendMsg=async function(type,toId,toNick,toAv,msgIdx){
   if((state.profile.xp||0)<cost){toast('Not enough SP!');return;}
   try{
     await addDoc(collection(db,'sparkMessages'),{
-      fromId:PLAYER_ID,fromNick:state.profile.nickname||'',fromAvatar:state.profile.avatar||'\u{1F3C6}',
+      fromId:PLAYER_ID,fromNick:state.profile.nickname||'',fromAvatar:state.profile.avatar||'🏆',fromAvatarCfg:state.profile.avatarCfg||null,
       toId:toId,toNick:toNick,message:SPARK_MESSAGES[msgIdx],type:type,sentAt:serverTimestamp(),read:false
     });
     state.profile.xp=Math.max(0,(state.profile.xp||0)-cost);
     saveProfile();
     document.getElementById('ss-modal').style.display='none';
     document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';
-    if(type==='flyby'){toast('\u{1F4AB} Fly-By sent! Tag will show on the leaderboard!');triggerFlybyAnim(state.profile.avatar||'\u{1F3C6}');}
-    else{toast('\u{1F4EC} Message sent!');}
+    if(type==='flyby'){toast('💫 Animated message sent!');triggerFlybyAnim(state.profile.avatar||'🏆');}
+    else{toast('📬 Encouraging message sent!');}
   }catch(e){toast('Could not send — check your connection');}
 };
 
 function triggerFlybyAnim(av){
   var el=document.createElement('div');el.className='flyby-emoji';el.textContent=av;
   document.body.appendChild(el);
-  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},2200);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},6000);
 }
-
-window.ssBuyAcc=function(id){
-  var item=ACCESSORIES.find(function(a){return a.id===id;});if(!item)return;
-  var st=ssGetStore();
-  if(st.accessories.includes(id)){state.profile.xp=(state.profile.xp||0)+20;saveProfile();toast('Already owned! +20 SP \u{1F381}');document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';return;}
-  if((state.profile.xp||0)<item.price){toast('Need '+item.price+' SP!');return;}
-  state.profile.xp-=item.price;st.accessories.push(id);saveProfile();
-  document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';
-  toast(item.icon+' '+item.name+' unlocked! \u{1F389}');renderSSAcc();
-};
-
-window.ssEquip=function(id){
-  ssGetStore().equippedAccessory=id||null;saveProfile();
-  toast(id?'Equipped! Shows on the leaderboard \u{1F44D}':'Unequipped');renderSSAcc();
-};
 
 window.ssBuyTheme=function(id){
   var theme=MUSIC_THEMES.find(function(t){return t.id===id;});if(!theme)return;
@@ -3721,7 +3730,10 @@ window.ssBuyTheme=function(id){
   if((state.profile.xp||0)<theme.price){toast('Need '+theme.price+' SP!');return;}
   state.profile.xp-=theme.price;st.ownedThemes.push(id);saveProfile();
   document.getElementById('ss-balance').textContent=(state.profile.xp||0)+' SP';
-  toast(theme.icon+' '+theme.name+' unlocked! \u{1F389}');renderSSMusic();
+  if(!st.activeTheme){st.activeTheme=id;saveProfile();}
+  toast(theme.icon+' '+theme.name+' unlocked!');
+  try{playIntroMusic(id,6000);}catch(_){}
+  renderSSMusic();
 };
 
 window.ssSetTheme=function(id){
@@ -3730,12 +3742,12 @@ window.ssSetTheme=function(id){
   toast(th.icon+' '+th.name+' is now your intro!');renderSSMusic();
 };
 
-window.ssPreviewTheme=function(id){try{playIntroMusic(id);toast('\u{1F3B5} Previewing...');}catch(e){}};
+window.ssPreviewTheme=function(id){try{playIntroMusic(id,6000);toast('🎵 Previewing...');}catch(e){}};
 
 // ════════════════════════════════════════════════════════
 // INTRO MUSIC — Web Audio API (3 seconds)
 // ════════════════════════════════════════════════════════
-function playIntroMusic(theme){
+function playIntroMusic(theme,dur){
   try{
     var C=new(window.AudioContext||window.webkitAudioContext)();
     var t=C.currentTime;
@@ -3843,144 +3855,14 @@ function renderAvatar(cfg,size){
   return '<img src="'+def.img+'" style="width:'+size+'px;height:auto;display:block" alt="'+def.name+'">';
 }
 
-// ── LAYERED HOME AVATAR (grows with accessories) ──
-var INTERACTIVE_ITEMS={
-  football: {emoji:'⚽', anim:'goal',   dur:2500, css:'av-anim-football'},
-  cricket:  {emoji:'🏏', anim:'six',    dur:2000, css:'av-anim-cricket'},
-  guitar:   {emoji:'🎸', anim:'strum',  dur:3500, css:'av-anim-guitar'},
-  mic:      {emoji:'🎤', anim:'sing',   dur:3000, css:'av-anim-mic'},
-  drums:    {emoji:'🥁', anim:'beat',   dur:5000, css:'av-anim-drums'}
-};
-// Map store accessory IDs → interactive item keys
-var ITEM_MAP={ac_foot:'football',ac_cricket:'cricket',ac_guitar:'guitar',ac_mic:'mic',ac_drums:'drums'};
-
-function renderHomeAvatar(cfg, store){
-  var faceImg=renderAvatar(cfg, 72);
-  var acc=(store&&store.accessories)||[];
-  var equipped=(store&&store.equippedAccessory)||null;
-  var hasJacket=acc.includes('jacket');
-  var hasShoes=acc.includes('trainers');
-  var interactiveKey=equipped&&ITEM_MAP[equipped]?ITEM_MAP[equipped]:null;
-  var item=interactiveKey?INTERACTIVE_ITEMS[interactiveKey]:null;
-
-  var bodyHTML='';
-  if(hasJacket){
-    bodyHTML+='<div style="font-size:'+(hasShoes?'1.9':'2.1')+'rem;line-height:1;margin-top:-6px;text-align:center">🧥</div>';
-    if(hasShoes) bodyHTML+='<div style="font-size:1.5rem;line-height:1;margin-top:2px;text-align:center;letter-spacing:4px">👟👟</div>';
-  }
-
-  var itemHTML='';
-  if(item){
-    itemHTML='<div id="home-av-item" style="position:absolute;right:-12px;top:'+(hasJacket?(hasShoes?'52':'36'):'18')+'px;font-size:1.8rem;cursor:pointer;transition:transform 0.15s" onclick="tapAvatarItem()">'
-      +item.emoji+'</div>';
-  }
-
-  return '<div style="position:relative;display:flex;flex-direction:column;align-items:center;width:85px" id="av-character-wrap">'
-    +'<div style="font-size:0;line-height:0">' + faceImg + '</div>'
-    + bodyHTML
-    + itemHTML
-    +'</div>';
-}
-
-window.tapAvatarItem=function(){
-  // Check daily limit
-  var today=new Date().toDateString();
-  var ac=state.profile.avatarAnimCount||{date:'',count:0};
-  if(ac.date!==today) ac={date:today,count:0};
-  if(ac.count>=5){ toast('Come back tomorrow for more! 😄'); return; }
-  ac.count++;
-  state.profile.avatarAnimCount=ac;
-  saveProfile();
-
-  var store=ssGetStore();
-  var equipped=store.equippedAccessory;
-  var iKey=equipped&&ITEM_MAP[equipped]?ITEM_MAP[equipped]:null;
-  if(!iKey) return;
-  var item=INTERACTIVE_ITEMS[iKey];
-  var wrap=document.getElementById('av-character-wrap');
-  if(!wrap) return;
-
-  // Show animation overlay
-  var overlay=document.createElement('div');
-  overlay.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;z-index:9999;pointer-events:none';
-  var msgs={football:['⚽ GOAL! 🥅','⚽ WHAT A STRIKE!'],cricket:['🏏 SIX! 🌟','🏏 FOUR! 💥'],guitar:['🎸 🎵 🎶','🎸 SHRED! 🤘'],mic:['🎤 🎵 🎶 🎵','🎤 SUPERSTAR! ⭐'],drums:['🥁 BOOM BOOM BOOM!','🥁 DRUMROLL! 🎶']};
-  var msgArr=msgs[iKey]||['✨'];
-  var msg=msgArr[Math.floor(Math.random()*msgArr.length)];
-  overlay.innerHTML='<div style="font-size:2.2rem;font-weight:900;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.5);background:linear-gradient(135deg,var(--primary),var(--primary-light));padding:18px 28px;border-radius:20px;animation:avPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards">'+msg+'</div>';
-  document.body.appendChild(overlay);
-  setTimeout(function(){ overlay.style.opacity='0'; overlay.style.transition='opacity 0.4s'; setTimeout(function(){overlay.remove();},400); }, item.dur-400);
-
-  // Bounce the item emoji
-  var itemEl=document.getElementById('home-av-item');
-  if(itemEl){ itemEl.style.transform='scale(1.6) rotate(-15deg)'; setTimeout(function(){itemEl.style.transform='';},300); }
-
-  var left=5-ac.count;
-  if(left>0) setTimeout(function(){toast(''+left+' animation'+(left!==1?'s':'')+' left today');},item.dur);
-};
-
-var _abCfg={avatarId:1,skinTone:SKIN_TONES[0],hairColor:'#1a1a1a',glassesId:0};
-
-window.showAvatarBuilder=function(from){
-  window._abPrev=from||'home';
-  _abCfg=Object.assign({avatarId:1,skinTone:SKIN_TONES[0],hairColor:'#1a1a1a',glassesId:0},(state.profile&&state.profile.avatarCfg)||{});
-  showScreen('avatar-builder');
-  var n=document.getElementById('ab-nick');
-  if(n)n.textContent=(state.profile&&state.profile.nickname)||'Champion';
-  abRenderAll();
-};
-
-function abRenderAll(){
-  abUpdatePreview();
-  abRenderFaceGrid();
-}
-function abUpdatePreview(){
-  var el=document.getElementById('ab-preview');
-  if(el)el.innerHTML=renderAvatar(_abCfg,90);
-}
-function abRenderFaceGrid(){
-  var el=document.getElementById('ab-face-grid');
-  if(!el)return;
-  el.innerHTML=AVATAR_DEFS.map(function(def){
-    var sel=_abCfg.avatarId===def.id;
-    var border=sel?'3px solid var(--primary)':'3px solid transparent';
-    return '<div class="ab-face-item" onclick="abPickFace('+def.id+')" title="'+def.name+'" style="cursor:pointer;text-align:center;padding:6px 2px;border-radius:12px;background:'+(sel?'var(--primary-light, #eef)':'transparent')+'">'
-      +'<img src="'+def.img+'" style="width:100%;height:auto;display:block;border:'+border+'" alt="'+def.name+'">'
-      
-      +'</div>';
-  }).join('');
-}
-function abRenderHairColors(){}
-function abRenderGlassesPicker(){}
-
-window.abPickFace=function(id){_abCfg.avatarId=id;abRenderAll();};
-window.abPickHair=function(col){_abCfg.hairColor=col;abRenderAll();};
-window.abPickGlasses=function(id){_abCfg.glassesId=id;abRenderAll();};
-window.abTapSkin=function(){
-  var idx=SKIN_TONES.indexOf(_abCfg.skinTone||SKIN_TONES[0]);
-  _abCfg.skinTone=SKIN_TONES[(idx+1)%SKIN_TONES.length];
-  abRenderAll();
-};
-
-window.saveAvatarCfg=async function(){
-  if(!PLAYER_ID)return;
-  state.profile.avatarCfg=JSON.parse(JSON.stringify(_abCfg));
-  state.profile.avatarSetupSeen=true;
-  try{
-    await saveProfile();
-    var lbSnap=await getDoc(doc(db,'leaderboard',PLAYER_ID));
-    if(lbSnap.exists())await setDoc(doc(db,'leaderboard',PLAYER_ID),{avatarCfg:_abCfg},{merge:true});
-  }catch(e){console.warn('avatar save',e);}
-  updateHomeAvatarCard();
-  showScreen(window._abPrev||'home');
-};
-
 function updateHomeAvatarCard(){
   var svg=document.getElementById('home-av-svg');
   var nick=document.getElementById('home-av-nick');
   var sp=document.getElementById('home-av-sp');
   if(!svg)return;
-  var store=ssGetStore();
-  svg.innerHTML=renderHomeAvatar((state.profile&&state.profile.avatarCfg)||null, store);
+  svg.innerHTML=(typeof renderAvatar==='function')
+    ?renderAvatar((state.profile&&state.profile.avatarCfg)||null,72)
+    :'';
   if(nick)nick.textContent=(state.profile&&state.profile.nickname)||'Champion';
   if(sp)sp.textContent='⚡ '+((state.profile&&state.profile.xp)||0)+' SP';
   showFlybyBadge();
