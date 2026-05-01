@@ -647,7 +647,7 @@ window.addEventListener('DOMContentLoaded', function(){
   </div>
   <div class="stats-row">
     <div class="stat-box"><div class="stat-val" id="end-accuracy">0%</div><div class="stat-lbl">Accuracy</div></div>
-    <div class="stat-box"><div class="stat-val" id="end-xp">+0</div><div class="stat-lbl">XP Earned</div></div>
+    <div class="stat-box"><div class="stat-val" id="end-xp">+0</div><div class="stat-lbl">SP Earned</div></div>
     <div class="stat-box"><div class="stat-val" id="end-time">0m</div><div class="stat-lbl">Time</div></div>
   </div>
   <div id="end-insight" class="card" style="display:none;padding:14px 16px">
@@ -1100,7 +1100,7 @@ async function loadParentDashboard(){
         <div class="psc-stats">🔥 ${streak} day streak &nbsp;·&nbsp; ${sessions} sessions &nbsp;·&nbsp; Last: ${lastDate}</div>
         ${topTopic?`<div style="font-size:0.75rem;color:var(--primary);margin-top:3px;font-weight:700">Best: ${topTopic[0]} (${topTopic[1].lastAccuracy||0}%)</div>`:''}
       </div>
-      <div class="psc-xp">⭐ ${xp}<small>XP</small></div>
+      <div class="psc-xp">⭐ ${xp}<small>SP</small></div>
     </div>`;
   }).join('');
 }
@@ -2274,7 +2274,7 @@ window.handleDailyAnswer = function(chosen, correct, btn){
     updateLeaderboardDoc(50, {isDailyChallenge:true,correct:0,total:0,mathsCorrect:0,mathsTotal:0,engCorrect:0,engTotal:0});
     saveProfile();
     document.getElementById('dm-result-icon').textContent='🎉';
-    document.getElementById('dm-result-msg').textContent='Correct! +50 XP!';
+    document.getElementById('dm-result-msg').textContent='Correct! +50 SP!';
     document.getElementById('dm-result-sub').textContent=q&&q.e?'💡 '+q.e:'';
   } else {
     saveProfile();
@@ -3522,7 +3522,7 @@ window.openMysteryBox=function(){
   let dupMsg='';
   if(owned.includes(reward.id)){
     state.profile.xp=(state.profile.xp||0)+20;
-    dupMsg='+20 XP bonus (duplicate item!)';
+    dupMsg='+20 SP bonus (duplicate item!)';
   } else {
     owned.push(reward.id);
   }
@@ -3649,11 +3649,11 @@ window.openSendCheer=function(targetId, targetNick){
   const today=new Date().toISOString().split('T')[0];
   const cs=state.profile.cheersSentToday||{};
   if(cs.date===today&&(cs.count||0)>=2){ toast("Max 2 cheers per day — come back tomorrow! 💌"); return; }
-  if((state.profile.xp||0)<50){ toast("Need 50 XP to send a cheer!"); return; }
+  if((state.profile.xp||0)<50){ toast("Need 50 SP to send a cheer!"); return; }
   _cheerTarget={id:targetId,nick:targetNick};
   _selectedCheer=null;
   document.getElementById('cheers-modal-title').textContent='💌 Cheer for '+targetNick;
-  document.getElementById('cheers-modal-sub').textContent='Pick a message · Costs 50 XP · Max 2/day';
+  document.getElementById('cheers-modal-sub').textContent='Pick a message · Costs 50 SP · Max 2/day';
   document.getElementById('cheers-send-panel').style.display='';
   document.getElementById('cheers-inbox-panel').style.display='none';
   const sendBtn=document.getElementById('cheers-send-btn');
@@ -3676,7 +3676,7 @@ window.confirmSendCheer=async function(){
   const today=new Date().toISOString().split('T')[0];
   const cs=state.profile.cheersSentToday||{};
   if(cs.date===today&&(cs.count||0)>=2){ toast("Max 2 cheers per day!"); return; }
-  if((state.profile.xp||0)<50){ toast("Need 50 XP to send a cheer!"); return; }
+  if((state.profile.xp||0)<50){ toast("Need 50 SP to send a cheer!"); return; }
   try {
     await addDoc(collection(db,'leaderboard',_cheerTarget.id,'cheers'),{
       from:state.profile.nickname,
@@ -4200,7 +4200,7 @@ function triggerFlybyLoginAnim(msgData){
       <div class="dm-head-icon">🎯</div>
       <div>
         <div class="dm-head-text">Daily Challenge</div>
-        <div class="dm-head-xp">+50 XP for correct answer</div>
+        <div class="dm-head-xp">+50 SP for correct answer</div>
       </div>
       <button onclick="closeDailyChallenge()" style="margin-left:auto;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted)">✕</button>
     </div>
@@ -4244,7 +4244,7 @@ function triggerFlybyLoginAnim(msgData){
       <div id="cheers-msg-list"></div>
       <div style="display:flex;gap:8px;margin-top:12px">
         <button class="btn btn-outline btn-sm" onclick="closeCheers()" style="flex:1">Cancel</button>
-        <button class="btn btn-primary btn-sm" id="cheers-send-btn" onclick="confirmSendCheer()" style="flex:1" disabled>Send 🔥 (50 XP)</button>
+        <button class="btn btn-primary btn-sm" id="cheers-send-btn" onclick="confirmSendCheer()" style="flex:1" disabled>Send 🔥 (50 SP)</button>
       </div>
     </div>
     <div id="cheers-inbox-panel" style="display:none">
