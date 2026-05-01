@@ -949,6 +949,11 @@ function seedTrialAccount(){
   state.profile.sparkStore = state.profile.sparkStore || {};
   state.profile.sparkStore.ownedThemes = ['rock','ocean','sunset','midnight'];
   state.profile.sparkStore.activeTheme = 'rock';
+  // Give Trial a default face so it shows in flyby/leaderboard
+  if(!state.profile.avatarCfg||!state.profile.avatarCfg.avatarId){
+    state.profile.avatarCfg = {avatarId:1};
+  }
+  if(!state.profile.nickname) state.profile.nickname = 'Trial';
   state.profile.trialSeeded = true;
   saveProfile();
 }
@@ -3826,7 +3831,7 @@ const GLASSES_DEFS=[
 ];
 
 function renderAvatar(cfg,size){
-  if(!cfg||!cfg.avatarId)return '<div style="width:'+size+'px;height:'+size+'px;display:flex;align-items:center;justify-content:center;font-size:'+(size*0.5)+'px">🏆</div>';
+  if(!cfg||!cfg.avatarId){var _d=AVATAR_DEFS[0];return _d?'<img src="'+_d.img+'" style="width:'+size+'px;height:auto;display:block" alt="Avatar">'  :'<div style="width:'+size+'px;height:'+size+'px;display:flex;align-items:center;justify-content:center;font-size:'+(size*0.5)+'px">🧒</div>';}
   var def=AVATAR_DEFS.find(function(a){return a.id===(cfg.avatarId||1);})||AVATAR_DEFS[0];
   return '<img src="'+def.img+'" style="width:'+size+'px;height:auto;display:block" alt="'+def.name+'">';
 }
