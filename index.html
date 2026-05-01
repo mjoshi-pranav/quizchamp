@@ -703,22 +703,11 @@ window.addEventListener('DOMContentLoaded', function(){
 <div id="screen-stories" class="screen">
   <div class="app-header">
     <button onclick="showHome()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--primary)">‹</button>
-    <div class="app-logo">Story Library</div>
+    <div class="app-logo">📚 Story Library</div>
     <div></div>
   </div>
-  <p style="font-size:0.82rem;color:var(--text-muted);font-weight:600;margin-bottom:12px">Read stories packed with vocabulary words. Highlighted words are ones you're learning!</p>
-  <div class="story-filter-bar">
-    <div class="sf-btn active" onclick="filterStories('all')" id="sf-all">📚 All</div>
-    <div class="sf-btn" onclick="filterStories('spy')" id="sf-spy">🕵️ Spy</div>
-    <div class="sf-btn" onclick="filterStories('astronaut')" id="sf-astronaut">🚀 Astro</div>
-    <div class="sf-btn" onclick="filterStories('adventure')" id="sf-adventure">🗺️ Adventure</div>
-    <div class="sf-btn" onclick="filterStories('mystery')" id="sf-mystery">🔍 Mystery</div>
-    <div class="sf-btn" onclick="filterStories('fantasy')" id="sf-fantasy">🧙 Fantasy</div>
-    <div class="sf-btn" onclick="filterStories('historical')" id="sf-historical">⚔️ History</div>
-    <div class="sf-btn" onclick="filterStories('science')" id="sf-science">🔬 Science</div>
-    <div class="sf-btn" onclick="filterStories('sport')" id="sf-sport">⚽ Sport</div>
-  </div>
-  <div class="story-grid" id="story-grid"></div>
+  <p style="font-size:0.8rem;color:var(--text-muted);font-weight:600;margin-bottom:14px">Stories packed with vocabulary. Complete each level to unlock the next.</p>
+  <div id="story-levels"></div>
 </div>
 
 <!-- ═══ STORY READER ═══ -->
@@ -3116,46 +3105,72 @@ She looked at the trophy.
 
 };
 
-function storyUnlockedForLevel(lvl){
-  const xp = state.profile.xp || 0;
-  if(lvl === 2) return true;
-  if(lvl === 3) return xp >= 50;
-  if(lvl === 4) return xp >= 200;
-  return false;
+function allStoriesReadForLevel(lvl){
+  const read = state.profile.readStories || [];
+  const lvlStories = STORIES_META.filter(s => s.level === lvl);
+  return lvlStories.length > 0 && lvlStories.every(s => read.includes(s.id));
 }
 
-let _storyFilter = 'all';
+function storyUnlockedForLevel(lvl){
+  if(lvl <= 2) return true;
+  return allStoriesReadForLevel(lvl - 1);
+}
 
 window.showStories = function(){
-  _storyFilter = 'all';
-  document.querySelectorAll('.sf-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('sf-all').classList.add('active');
-  renderStoryGrid();
+  renderStoryLevels();
   showScreen('stories');
 };
 
-window.filterStories = function(genre){
-  _storyFilter = genre;
-  document.querySelectorAll('.sf-btn').forEach(b => b.classList.remove('active'));
-  const btn = document.getElementById('sf-' + genre);
-  if(btn) btn.classList.add('active');
-  renderStoryGrid();
-};
+function renderStoryLevels(){
+  const el = document.getElementById('story-levels');
+  if(!el) return;
+  const levels = [...new Set(STORIES_META.map(s => s.level))].sort((a,b) => a-b);
+  const read = state.profile.readStories || [];
 
-function renderStoryGrid(){
-  const grid = document.getElementById('story-grid');
-  const filtered = _storyFilter === 'all' ? STORIES_META : STORIES_META.filter(s => s.genre === _storyFilter);
-  grid.innerHTML = filtered.map(s => {
-    const unlocked = storyUnlockedForLevel(s.level);
-    const lockMsg = s.level === 3 ? 'Earn 50 XP to unlock' : 'Earn 200 XP to unlock';
-    const isRead = (state.profile.readStories||[]).includes(s.id);
-    return `<div class="story-card${unlocked ? '' : ' locked'}" onclick="${unlocked ? 'openStory(\'' + s.id + '\')' : 'window.toast(\'' + lockMsg + '\')' }">
-      ${!unlocked ? '<span class=\"sc-lock-icon\">🔒</span>' : isRead ? '<span class=\"sc-read-badge\">READ</span>' : ''}
-      <span class="sc-emoji">${s.emoji}</span>
-      <div class="sc-title">${s.title}</div>
-      <div class="sc-sub">${s.subtitle}</div>
-      <span class="sc-level sc-level-${s.level}">Level ${s.level}</span>
-    </div>`;
+  el.innerHTML = levels.map(lvl => {
+    const stories = STORIES_META.filter(s => s.level === lvl);
+    const unlocked = storyUnlockedForLevel(lvl);
+    const readCount = stories.filter(s => read.includes(s.id)).length;
+    const allRead = readCount === stories.length;
+    const prevLvl = lvl - 1;
+
+    // Ribbon header
+    const progressPill = unlocked
+      ? (allRead
+          ? '<span style="font-size:0.7rem;font-weight:800;color:#16a34a;background:#dcfce7;padding:2px 8px;border-radius:10px">✓ All read</span>'
+          : '<span style="font-size:0.7rem;font-weight:700;color:var(--text-muted);background:var(--surface-2,#f3f4f6);padding:2px 8px;border-radius:10px">'+readCount+'/'+stories.length+' read</span>')
+      : '<span style="font-size:0.7rem;font-weight:700;color:#b45309;background:#fef3c7;padding:2px 8px;border-radius:10px">🔒 Complete Level '+prevLvl+' first</span>';
+
+    const ribbonStyle = unlocked
+      ? 'background:linear-gradient(90deg,var(--primary) 0%,var(--primary-light,#7c6fd4) 100%);color:#fff;'
+      : 'background:var(--surface-2,#f3f4f6);color:var(--text-muted);';
+
+    const header = '<div style="'+ribbonStyle+'border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+      + '<span style="font-size:1rem;font-weight:900;letter-spacing:0.3px">'+(unlocked ? '' : '🔒 ')+'Level '+lvl+'</span>'
+      + progressPill
+      + '</div>';
+
+    // Numbered story rows
+    const rows = stories.map((s, i) => {
+      const isRead = read.includes(s.id);
+      if(!unlocked){
+        return '<div style="display:flex;align-items:center;gap:10px;padding:9px 4px;opacity:0.45;pointer-events:none">'
+          + '<span style="font-size:0.75rem;font-weight:800;color:var(--text-muted);min-width:20px;text-align:right">'+(i+1)+'.</span>'
+          + '<span style="font-size:1.1rem">'+s.emoji+'</span>'
+          + '<span style="font-size:0.85rem;font-weight:700;color:var(--text)">'+s.title+'</span>'
+          + '</div>';
+      }
+      var sid=s.id.replace(/'/g,'');
+      return '<div onclick="openStory(\'' + sid + '\')" style="display:flex;align-items:center;gap:10px;padding:10px 4px;cursor:pointer;border-radius:8px">'
+        + '<span style="font-size:0.75rem;font-weight:800;color:var(--text-muted);min-width:20px;text-align:right">'+(i+1)+'.</span>'
+        + '<span style="font-size:1.1rem">'+s.emoji+'</span>'
+        + '<span style="font-size:0.85rem;font-weight:700;color:var(--text);flex:1">'+s.title+'</span>'
+        + (isRead ? '<span style="font-size:0.65rem;font-weight:800;color:#16a34a;background:#dcfce7;padding:2px 7px;border-radius:8px">READ</span>' : '')
+        + '</div>';
+    }).join('');
+
+    return '<div style="background:var(--surface);border-radius:14px;padding:12px 12px 6px;margin-bottom:16px;border:1px solid var(--border,#e5e7eb)">'
+      + header + rows + '</div>';
   }).join('');
 }
 
@@ -3207,6 +3222,7 @@ window.openStory = function(id){
 
 window.closeStoryReader = function(){
   document.getElementById('story-reader').classList.remove('open');
+  renderStoryLevels(); // refresh READ badges and unlock state
 };
 
 let toastTimer;
