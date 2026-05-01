@@ -511,6 +511,7 @@ window.addEventListener('DOMContentLoaded', function(){
     <div style="font-size:0.88rem;font-weight:700;margin-top:6px" id="home-av-sp">&#9889; 0 SP</div>
     <div style="font-size:0.7rem;opacity:0.7;margin-top:3px">Tap to customise &#9998;</div>
     <div id="home-av-svg" style="position:absolute;right:8px;top:-18px;width:95px;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.18))"></div>
+    <div id="flyby-av-badge" style="display:none;position:absolute;right:88px;bottom:6px;cursor:pointer" onclick="showFlybyBadgeToast()" title="Tap to see message"></div>
     <div id="home-av-nick" style="display:none"></div>
   </div>
   <div id="home-encouraging-msg" style="display:none;background:linear-gradient(135deg,var(--primary),var(--primary-light));border-radius:var(--radius);padding:12px 16px;margin-bottom:12px;color:#fff"></div>
@@ -3637,7 +3638,7 @@ function renderSSMsg(){
     +'<button class="btn btn-primary" onclick="openSendMsg(\'normal\')" '+dis+' style="margin-top:12px;width:100%">Send an encouraging message to a friend'+hint+'</button></div>'
     +'<div class="ss-item-card" style="flex-direction:column;align-items:flex-start">'
     +'<div style="display:flex;align-items:center;gap:10px"><div style="font-size:1.8rem">\u{1F4AB}</div>'
-    +'<div><div class="ss-item-name">Animated Message — 100 SP</div><div class="ss-item-desc">Their avatar flies across their screen on login · 24 hours</div></div></div>'
+    +'<div><div class="ss-item-name">Animated Message — 100 SP</div><div class="ss-item-desc">Your avatar flies across their screen on login · 24 hours</div></div></div>'
     +'<button class="btn btn-primary" onclick="openSendMsg(\'flyby\')" '+dis+' style="margin-top:12px;width:100%">Send an animated message to a friend'+hint+'</button></div>'
   ;
 }
@@ -3841,6 +3842,15 @@ function updateHomeAvatarCard(){
   if(nick)nick.textContent=(state.profile&&state.profile.nickname)||'Champion';
   if(sp)sp.textContent='⚡ '+((state.profile&&state.profile.xp)||0)+' SP';
   showFlybyBadge();
+}
+
+function showFlybyBadgeToast(){
+  try{
+    var stored=localStorage.getItem('qc_flyby_badge');
+    if(!stored)return;
+    var rec=JSON.parse(stored);
+    toast('💌 '+rec.fromNick+': "'+rec.message+'"',4000);
+  }catch(e){}
 }
 
 function showFlybyBadge(){
