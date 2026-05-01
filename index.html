@@ -487,6 +487,17 @@ window.addEventListener('DOMContentLoaded', function(){
 
 <!-- ═══ HOME SCREEN ═══ -->
 <div id="screen-home" class="screen">
+  <!-- Trial account banner — hidden for all other students -->
+  <div id="trial-banner" style="display:none;background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;border-radius:12px;padding:10px 16px;margin-bottom:12px;align-items:center;justify-content:space-between;gap:10px;border:1.5px solid #e94560">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:1rem">🧪</span>
+      <div>
+        <div style="font-size:0.72rem;font-weight:900;letter-spacing:0.04em;color:#e94560">TRIAL ACCOUNT</div>
+        <div style="font-size:0.62rem;opacity:0.7;margin-top:1px">All levels &amp; credits unlocked</div>
+      </div>
+    </div>
+    <button onclick="resetTrialAccount()" style="background:#e94560;border:none;color:#fff;font-size:0.65rem;font-weight:800;padding:5px 10px;border-radius:20px;cursor:pointer;white-space:nowrap">🔄 Reset</button>
+  </div>
   <div class="app-header">
     <div class="app-logo">Quiz<span>Champ</span> 🏆</div>
     <div class="header-stats"></div>
@@ -924,6 +935,42 @@ async function loadProfile(){
 async function saveProfile(){
   try{ await setDoc(doc(db,'players',PLAYER_ID),state.profile,{merge:true}); }catch(e){console.warn(e);}
 }
+
+function seedTrialAccount(){
+  if(state.profile.trialSeeded) return; // already seeded — preserve test state
+  // Max XP/SP so all story levels and store items are unlocked
+  state.profile.xp = 5000;
+  state.profile.streak = 30;
+  state.profile.shields = 6;
+  state.profile.consecutivePerfect = 5;
+  state.profile.weekSessions = (()=>{ const w=[]; const d=new Date(); for(let i=6;i>=0;i--){const x=new Date(d);x.setDate(d.getDate()-i);w.push(x.toDateString());} return w; })();
+  // Seed all topics with max phase progress + high accuracy
+  const allTopics=[...TOPICS.maths,...TOPICS.english];
+  allTopics.forEach(t=>{
+    state.profile.topicProgress[t]={
+      correct3:50, correct4:50, attempts:200,
+      totalTime:3600, sessions:20, lastAccuracy:95
+    };
+  });
+  // Unlock all Spark Store items
+  state.profile.sparkStore = state.profile.sparkStore || {};
+  state.profile.sparkStore.accessories = (ACCESSORIES||[]).map(a=>a.id);
+  state.profile.sparkStore.ownedThemes = ['rock','ocean','sunset','midnight'];
+  state.profile.sparkStore.equippedAccessory = null;
+  state.profile.trialSeeded = true;
+  saveProfile();
+}
+
+window.resetTrialAccount=function(){
+  if(!confirm('Reset Trial account to fresh seeded state?')) return;
+  state.profile.trialSeeded = false;
+  // Clear progress so seedTrialAccount re-runs
+  state.profile.topicProgress={};
+  state.profile.xp=0; state.profile.streak=0;
+  seedTrialAccount();
+  renderHome(); renderDashboard();
+  toast('✅ Trial account reset & re-seeded!');
+};
 async function saveSessionResult(r){
   try{ await addDoc(collection(db,'sessions'),{playerId:PLAYER_ID,...r,timestamp:serverTimestamp()}); }catch(e){}
 }
@@ -959,6 +1006,7 @@ window.flagQuestion=function(){
 window._loadAndGo=async function(id){
   PLAYER_ID=id;
   await loadProfile();
+  if(PLAYER_ID==='trial') seedTrialAccount();
   // Auto-set nickname from login name on first login — never ask again
   if(!state.profile.nickname){
     var sName=(STUDENTS[id]||{}).name||id;
@@ -1382,6 +1430,9 @@ function renderHome(){
   document.getElementById('weekly-count').textContent=week.filter(d=>done.includes(d)).length;
   renderDailyChallengeCard();
   checkCheersNotification();
+  // Trial account indicator
+  const trialBanner=document.getElementById('trial-banner');
+  if(trialBanner) trialBanner.style.display=PLAYER_ID==='trial'?'flex':'none';
 }
 
 // ════════════════════════════════════════════════════════
