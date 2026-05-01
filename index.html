@@ -74,7 +74,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); co
 .input-label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; display: block; }
 
 /* ── SUBJECT TOGGLE ── */
-.subject-toggle { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.subject-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
 .subj-btn { background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 12px 8px; text-align: center; cursor: pointer; font-weight: 700; font-size: 0.85rem; transition: all 0.2s; color: var(--text-muted); }
 .subj-btn.active { border-color: var(--primary); background: linear-gradient(135deg,#EEF0FF,#E8EAFF); color: var(--primary); }
 
@@ -489,46 +489,33 @@ window.addEventListener('DOMContentLoaded', function(){
 <div id="screen-home" class="screen">
   <div class="app-header">
     <div class="app-logo">Quiz<span>Champ</span> 🏆</div>
-    <div class="header-stats">
-      <div class="streak-badge" onclick="easterEgg_dragonClick()" style="cursor:pointer">🔥 <span id="home-streak">0</span></div>
-      <div class="xp-badge">⭐ <span id="home-xp">0</span></div>
-    </div>
+    <div class="header-stats"></div>
   </div>
 
-  <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden">
-    <div style="font-size:0.8rem;opacity:0.8;font-weight:700">Welcome back,</div>
-    <div style="font-size:1.5rem;font-weight:900;margin-top:2px" id="home-welcome">Champion!</div>
-    <div style="font-size:0.8rem;opacity:0.75;margin-top:6px" id="home-level-label">⭐ 0 XP · Level 1</div>
-    <div class="xp-bar-wrap" style="margin-top:10px;background:rgba(255,255,255,0.25)">
-      <div class="xp-bar-fill" id="xp-bar" style="width:0%;background:#fff"></div>
-    </div>
-    <div style="position:absolute;top:-20px;right:-20px;font-size:5rem;opacity:0.1">🏆</div>
-  </div>
-
-  <div class="av-card" onclick="showAvatarBuilder()">
-    <div id="home-av-svg"></div>
-    <div class="av-card-info">
-      <div class="av-card-name" id="home-av-nick">Champion</div>
-      <div class="av-card-sp" id="home-av-sp">&#9889; 0 SP</div>
-      <div class="av-card-edit">Tap to customise &#9998;</div>
-    </div>
+  <div style="background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);border-radius:var(--radius);padding:18px 110px 18px 20px;margin-bottom:16px;color:#fff;position:relative;overflow:visible;cursor:pointer;min-height:90px" onclick="showAvatarBuilder()">
+    <div style="font-size:0.78rem;opacity:0.75;font-weight:600">Welcome back,</div>
+    <div style="font-size:1.45rem;font-weight:900;margin-top:3px" id="home-welcome">Champion!</div>
+    <div style="font-size:0.88rem;font-weight:700;margin-top:10px" id="home-av-sp">&#9889; 0 SP</div>
+    <div style="font-size:0.7rem;opacity:0.7;margin-top:3px">Tap to customise &#9998;</div>
+    <div id="home-av-svg" style="position:absolute;right:8px;top:-18px;width:95px;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.18))"></div>
+    <div id="home-av-nick" style="display:none"></div>
   </div>
   <div class="card">
-    <div class="card-title">This Week</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div class="card-title" style="margin:0">This Week</div>
+      <div id="home-streak-display" style="font-size:0.82rem;font-weight:800;color:var(--warning)">🔥 0 day streak</div>
+    </div>
     <div class="weekly-wrap" id="weekly-dots"></div>
     <div style="text-align:center;font-size:0.82rem;color:var(--text-muted);margin-top:6px;font-weight:600"><span id="weekly-count">0</span>/5 sessions this week</div>
+    <div style="display:flex;justify-content:center;align-items:center;gap:4px;margin-top:10px" id="shield-row"></div>
   </div>
 
   <div class="card">
-    <div class="card-title">Session Setup</div>
-    <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);margin-bottom:8px">SUBJECT FOCUS</div>
     <div class="subject-toggle">
       <div class="subj-btn active" id="subj-maths" onclick="setSubject('maths')">🔢 Maths</div>
-      <div class="subj-btn" id="subj-mix" onclick="setSubject('mix')">🔀 Mix</div>
       <div class="subj-btn" id="subj-english" onclick="setSubject('english')">📖 English</div>
     </div>
-    <div style="font-size:0.8rem;font-weight:700;color:var(--text-muted);margin-bottom:8px;margin-top:4px">TOPIC SELECTION</div>
-    <div class="pick-toggle">
+    <div class="pick-toggle" style="margin-top:10px">
       <div class="pick-btn active" id="pick-auto" onclick="setPickMode('auto')">🎯 QuizChamp Picks</div>
       <div class="pick-btn" id="pick-manual" onclick="setPickMode('manual')">📋 I'll Choose</div>
     </div>
@@ -1272,7 +1259,13 @@ async function finishSession(){
   });
   state.profile.xp=(state.profile.xp||0)+xpEarned;
   const today=new Date().toDateString(),last=state.profile.lastSessionDate;
-  if(last!==today){ const yest=new Date(Date.now()-86400000).toDateString(); state.profile.streak=(last===yest)?(state.profile.streak||0)+1:1; state.profile.lastSessionDate=today; }
+  if(last!==today){ const yest=new Date(Date.now()-86400000).toDateString(); state.profile.streak=(last===yest)?(state.profile.streak||0)+1:1; state.profile.lastSessionDate=today;
+    // Award shield every 4-day streak milestone (max 6)
+    if(state.profile.streak>0 && state.profile.streak%4===0){
+      state.profile.shields=Math.min(6,(state.profile.shields||0)+1);
+      setTimeout(()=>toast('🛡️ Shield earned! Your streak is protected!'),1200);
+    }
+  }
   const week=getWeekDates(); if(!state.profile.weekSessions)state.profile.weekSessions=[];
   if(!state.profile.weekSessions.includes(today))state.profile.weekSessions.push(today);
   state.profile.weekSessions=state.profile.weekSessions.filter(d=>week.includes(d));
@@ -1368,12 +1361,22 @@ function renderQuestion(){
 
 function renderHome(){
   const st=STUDENTS[PLAYER_ID]||{};
-  const {level,xpInLevel,xpForLevel}=getXPLevel();
-  document.getElementById('home-welcome').textContent=`${st.avatar||''} ${st.name||'Champion'}!`;
-  document.getElementById('home-streak').textContent=state.profile.streak||0;
-  document.getElementById('home-xp').textContent=state.profile.xp||0;
-  document.getElementById('home-level-label').textContent=`⭐ ${state.profile.xp||0} XP · Level ${level}`;
-  document.getElementById('xp-bar').style.width=Math.round((xpInLevel/xpForLevel)*100)+'%';
+  const nick=(state.profile&&state.profile.nickname)||st.name||'Champion';
+  document.getElementById('home-welcome').textContent=nick+'!';
+  // Streak display
+  const streak=state.profile.streak||0;
+  const streakEl=document.getElementById('home-streak-display');
+  if(streakEl) streakEl.textContent='🔥 '+streak+(streak===1?' day':' day')+' streak';
+  // Shields
+  const shields=Math.min(6,state.profile.shields||0);
+  const shieldRow=document.getElementById('shield-row');
+  if(shieldRow){
+    let sh='';
+    for(let i=0;i<6;i++) sh+=`<span style="font-size:1.3rem;opacity:${i<shields?1:0.2}">🛡️</span>`;
+    sh+=`<span style="font-size:0.72rem;color:var(--text-muted);margin-left:6px">${shields}/6</span>`;
+    shieldRow.innerHTML=sh;
+  }
+  // Weekly dots
   const week=getWeekDates(),done=state.profile.weekSessions||[],today=new Date().toDateString();
   const days=['M','T','W','T','F','S','S'];
   document.getElementById('weekly-dots').innerHTML=week.map((d,i)=>
@@ -1703,9 +1706,7 @@ function renderDailyChallengeCard(){
   } else {
     el.innerHTML=`<div class="daily-card" onclick="openDailyChallenge()">
       <div class="daily-xp-pill">+50 XP</div>
-      <div class="daily-card-tag">🎯 Daily Challenge</div>
       <div class="daily-card-title">Tap to take today's challenge!</div>
-      <div class="daily-card-sub">One harder question · Bonus XP if correct</div>
     </div>`;
   }
 }
