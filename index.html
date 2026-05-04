@@ -1198,7 +1198,7 @@ function buildTopicPool(topic,count){
     pool.push(...shuffle([...avail]).slice(0,needed));
   }
   if(pool.length<count){
-    const extras=shuffle([...(byLevel[3]||[])]).filter(q=>!pool.find(p=>p.id===q.id));
+    const extras=shuffle([...(byLevel[1]||[])]).filter(q=>!pool.find(p=>p.id===q.id));
     pool.push(...extras.slice(0,count-pool.length));
   }
   return shuffle(pool).slice(0,count);
@@ -1538,10 +1538,10 @@ function renderQuestion(){
   const s=state.session,q=getCurrentQuestion();
   document.getElementById('q-topic-tag').textContent=q.t;
   const levelTag=document.getElementById('q-level-tag');
-  var _lvlMap=q.s==='maths'?{3:'Level 1',4:'Level 2',5:'Level 3',6:'Level 4'}:{2:'Level 1',3:'Level 2',4:'Level 3',5:'Level 4',6:'Level 5'};
+  var _lvlMap={1:'Level 1',2:'Level 2',3:'Level 3',4:'Level 4',5:'Level 5'};
   levelTag.textContent=_lvlMap[q.l]||('Level '+q.l);
-  const lvlStyles={2:{bg:'#E1F5EE',color:'#085041'},3:{bg:'#E6F1FB',color:'#0C447C'},4:{bg:'#FAEEDA',color:'#633806'},5:{bg:'#FCEBEB',color:'#791F1F'}};
-  const ls=lvlStyles[q.l]||lvlStyles[3];
+  const lvlStyles={1:{bg:'#E1F5EE',color:'#085041'},2:{bg:'#E6F1FB',color:'#0C447C'},3:{bg:'#FAEEDA',color:'#633806'},4:{bg:'#FCEBEB',color:'#791F1F'},5:{bg:'#F0E8FB',color:'#4A1C8C'}};
+  const ls=lvlStyles[q.l]||lvlStyles[1];
   levelTag.style.background=ls.bg; levelTag.style.color=ls.color;
   document.getElementById('quiz-progress').style.width=(s.current/s.count*100)+'%';
   document.getElementById('q-number').textContent=`Q${s.current+1} of ${s.count}`;
