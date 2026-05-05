@@ -1188,7 +1188,7 @@ function shuffle(arr){
 function buildTopicPool(topic,count){
   const phase=getTopicPhase(topic);
   const subj=TOPICS.maths.includes(topic)?'maths':'english';
-  const mixes={1:[[3,1.0]],2:[[3,0.8],[4,0.2]],3:[[3,0.6],[4,0.4]],4:[[3,0.2],[4,0.6]],5:[[4,0.7],[5,0.3]]};
+  const mixes={1:[[1,1.0]],2:[[1,0.8],[2,0.2]],3:[[1,0.6],[2,0.4]],4:[[1,0.2],[2,0.6]],5:[[2,0.7],[3,0.3]]};
   const mix=mixes[phase]||mixes[1];
   const byLevel={};
   QUESTIONS.filter(q=>q.t===topic&&q.s===subj&&!q.x).forEach(q=>{ if(!byLevel[q.l])byLevel[q.l]=[]; byLevel[q.l].push(q); });
@@ -1332,7 +1332,7 @@ async function finishSession(){
     const tp=getTopicProgress(topic);
     const topicQs=s.questions.filter(q=>q.t===topic);
     const wrongIds=s.wrong.filter(w=>w.q.t===topic).map(w=>w.q.id);
-    topicQs.forEach(q=>{ if(!wrongIds.includes(q.id)){ if(q.l===3)tp.correct3=(tp.correct3||0)+1; if(q.l===4)tp.correct4=(tp.correct4||0)+1; } });
+    topicQs.forEach(q=>{ if(!wrongIds.includes(q.id)){ if(q.l===1)tp.correct3=(tp.correct3||0)+1; if(q.l===2)tp.correct4=(tp.correct4||0)+1; } });
     const corr=topicQs.length-topicQs.filter(q=>wrongIds.includes(q.id)).length;
     tp.attempts=(tp.attempts||0)+topicQs.length;
     tp.lastAccuracy=Math.round((corr/topicQs.length)*100);
@@ -2376,7 +2376,7 @@ function getDailyChallengeQ(){
   let hash = 0;
   for(let c of dateStr) hash = ((hash<<5)-hash)+c.charCodeAt(0);
   hash = Math.abs(hash);
-  const pool = (typeof QUESTIONS!=='undefined') ? QUESTIONS.filter(q=>q.l===4) : [];
+  const pool = (typeof QUESTIONS!=='undefined') ? QUESTIONS.filter(q=>q.l===2) : [];
   if(!pool.length) return null;
   return pool[hash % pool.length];
 }
