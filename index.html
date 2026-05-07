@@ -929,7 +929,7 @@ let PLAYER_ID = null;
 let state = {
   subject:'maths', pickMode:'auto', manualTopics:[],
   session:null,
-  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[],nickname:'',avatar:'',dailyChallenge:{},mysteryBox:{lastDate:null,owned:[]},easterEggs:{},consecutivePerfect:0,cheersSentToday:{date:null,count:0},sparkStore:{ownedThemes:[],activeTheme:null}},
+  profile:{xp:0,streak:0,lastSessionDate:null,weekSessions:[],topicProgress:{},badges:{},personalBest:{},readStories:[],nickname:'',avatar:'',dailyChallenge:{},mysteryBox:{lastDate:null,owned:[]},easterEggs:{},consecutivePerfect:0,cheersSentToday:{date:null,count:0},sparkStore:{ownedThemes:[],activeTheme:null},recentCorrect:[],recentWrong:[]},
   dashFilter:'maths', dashTab:'progress'
 };
 const XP_PER_CORRECT=15, XP_PER_QUESTION=5, XP_PER_LEVEL=200;
@@ -991,6 +991,7 @@ function seedTrialAccount(){
   }
   if(!state.profile.nickname) state.profile.nickname = 'Trial';
   if(!state.profile.recentWrong) state.profile.recentWrong=[];
+  if(!state.profile.recentCorrect) state.profile.recentCorrect=[];
   state.profile.trialSeeded = true;
   saveProfile();
 }
@@ -1191,7 +1192,15 @@ function buildTopicPool(topic,count){
   const mixes={1:[[1,1.0]],2:[[1,0.8],[2,0.2]],3:[[1,0.6],[2,0.4]],4:[[1,0.2],[2,0.6]],5:[[2,0.7],[3,0.3]]};
   const mix=mixes[phase]||mixes[1];
   const byLevel={};
-  QUESTIONS.filter(q=>q.t===topic&&q.s===subj&&!q.x).forEach(q=>{ if(!byLevel[q.l])byLevel[q.l]=[]; byLevel[q.l].push(q); });
+  // Build the full candidate pool
+  let allCandidates=QUESTIONS.filter(q=>q.t===topic&&q.s===subj&&!q.x);
+  // Filter out recently-correct questions (unless we don't have enough)
+  const recentSet=new Set(state.profile.recentCorrect||[]);
+  let freshPool=allCandidates.filter(q=>!recentSet.has(q.id));
+  // If not enough fresh questions, use the full pool as fallback
+  const poolToUse=freshPool.length>=count?freshPool:allCandidates;
+  // Group by level
+  poolToUse.forEach(q=>{ if(!byLevel[q.l])byLevel[q.l]=[]; byLevel[q.l].push(q); });
   let pool=[];
   for(const [lvl,ratio] of mix){
     const avail=byLevel[lvl]||[]; const needed=Math.round(count*ratio);
@@ -1258,6 +1267,10 @@ window.startAutoSession=function(){
       if(questions.length===0){ toast('No questions available — check connection'); return; }
       questions=shuffle(questions);
     }
+    // Deduplicate — no same question twice in one session
+    const seen=new Set();
+    questions=questions.filter(q=>{ if(seen.has(q.id)) return false; seen.add(q.id); return true; });
+    if(questions.length<4){ toast('Not enough unique questions — try a different topic'); return; }
     state.session={questions,count:questions.length,current:0,correct:0,wrong:[],skipped:[],startTime:Date.now(),answered:false};
     renderQuestion();
     showScreen('quiz');
@@ -1280,12 +1293,17 @@ window.handleAnswer=function(idx,btn){
     state.session.correctStreak=0;
     // Persist to recentWrong (capped at 30, newest first)
     if(!state.profile.recentWrong) state.profile.recentWrong=[];
+  if(!state.profile.recentCorrect) state.profile.recentCorrect=[];
     state.profile.recentWrong.unshift({topic:q.t,question:q.q,correct:q.a,given:chosen,ts:Date.now()});
     if(state.profile.recentWrong.length>30) state.profile.recentWrong=state.profile.recentWrong.slice(0,30);
   } else {
     state.session.correct++;
     state.session.correctStreak=(state.session.correctStreak||0)+1;
     if(state.session.correctStreak===5) easterEgg_fiveStreak();
+    // Track correct answer — don't repeat soon
+    if(!state.profile.recentCorrect) state.profile.recentCorrect=[];
+    state.profile.recentCorrect.unshift(q.id);
+    if(state.profile.recentCorrect.length>100) state.profile.recentCorrect=state.profile.recentCorrect.slice(0,100);
   }
   setTimeout(()=>{ state.session.current++; state.session.answered=false; if(state.session.current>=state.session.count) finishSession(); else renderQuestion(); },350);
 };
